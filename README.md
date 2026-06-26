@@ -1,8 +1,5 @@
 # TFC Aeronautics
 
-![CurseForge](https://img.shields.io/badge/CurseForge-TFC%20Aeronautics-orange?style=for-the-badge&logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/tfc-aeronautics)
-![Modrinth](https://img.shields.io/badge/Modrinth-TFC%20Aeronautics-1bd96a?style=for-the-badge&logo=modrinth)](https://modrinth.com/mod/tfc-aeronautics)
-
 **Bridging the Iron Age and the Industrial Revolution.**
 
 TFC Aeronautics is a Minecraft addon that seamlessly integrates the hardcore survival mechanics of **TerraFirmaCraft (TFC)** with the mechanical engineering of **Create** and the sky-high ambitions of **Create Aeronautics**.
