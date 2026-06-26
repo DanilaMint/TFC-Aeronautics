@@ -4,7 +4,7 @@ var METALS_DATA = JsonIO.read("kubejs/data/metals.json");
 ServerEvents.recipes(event => {
     for (const STONE of Object.values(STONE_DATA)) {
         if (STONE.type !== 'igneous extrusive') continue;
-        event.recipes.tfc.heating(`tfc:rock/loose/${STONE.name}`, METALS_DATA.magmatite.melting_temp)
+        event.recipes.tfc.heating(`tfc:rock/loose/${STONE.name}`, METALS_DATA.magmatite.melt_temperature)
             .fluidOutput(Fluid.of("tfc_aeronautics:magmatite", 250));
 
         event.recipes.tfc.quern(
@@ -16,7 +16,7 @@ ServerEvents.recipes(event => {
 TFCEvents.data(event => {
     event.fluidHeat({
         fluid: "tfc_aeronautics:magmatite",
-        meltTemperature: 1200,
+        meltTemperature: METALS_DATA.magmatite.melt_temperature,
         specificHeatCapacity: 0.7
     });
 

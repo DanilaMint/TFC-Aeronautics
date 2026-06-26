@@ -1,8 +1,8 @@
 var METALS_DATA = JsonIO.read("kubejs/data/metals.json");
 
-const ANDESITE_ALLOY_MELTING_TEMP = METALS_DATA.andesite_alloy.melting_temp;
-const ANDESITE_ALLOY_FORGING_TEMP = METALS_DATA.andesite_alloy.forging_temp;
-const ANDESITE_ALLOY_WELDING_TEMP = METALS_DATA.andesite_alloy.welding_temp;
+const ANDESITE_ALLOY_MELTING_TEMP = METALS_DATA.andesite_alloy.melt_temperature;
+const ANDESITE_ALLOY_FORGING_TEMP = METALS_DATA.andesite_alloy.forging_temperature;
+const ANDESITE_ALLOY_WELDING_TEMP = METALS_DATA.andesite_alloy.welding_temperature;
 const ANDESITE_ALLOY_HEAT_CAPACITY = METALS_DATA.andesite_alloy.heat_capacity;
 
 ServerEvents.recipes(event => {

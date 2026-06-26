@@ -1,129 +1,129 @@
 var METALS_DATA = JsonIO.read("kubejs/data/metals.json");
 
 ServerEvents.recipes((event) => {
-    for (const METAL of Object.values(METALS_DATA)) {
+    for (const [KEY, METAL] of Object.entries(METALS_DATA)) {
         if (!METAL.can_be_powder) continue;
 
-        let METAL_POWDER_ID = `tfc_aeronautics:${METAL.name}_powder`;
+        let METAL_POWDER_ID = `tfc_aeronautics:${KEY}_powder`;
+
+        // Дробление слитка в жернове
+        event.recipes.tfc.quern(
+            Item.of(METAL_POWDER_ID, 20),
+            METAL.ingot_id
+        );
+
+        // Дробление слитка в дробилке Create
+        event.recipes.create.crushing(
+            Item.of(METAL_POWDER_ID, 20),
+            METAL.ingot_id
+        );
 
         if (METAL.is_tfc_metal) {
             // Плавка
             event.recipes.tfc
-                .heating(METAL_POWDER_ID, METAL.melting_temp)
-                .fluidOutput(Fluid.of(`tfc:metal/${METAL.name}`, 5));
-
-            // Дробление слитка в жернове
-            event.recipes.tfc.quern(
-                Item.of(METAL_POWDER_ID, 20),
-                `tfc:metal/ingot/${METAL.name}`
-            );
-
-            // Дробление слитка в дробилке Create
-            event.recipes.create.crushing(
-                Item.of(METAL_POWDER_ID, 20),
-                `tfc:metal/ingot/${METAL.name}`
-            );
+                .heating(METAL_POWDER_ID, METAL.melt_temperature)
+                .fluidOutput(Fluid.of(`tfc:metal/${KEY}`, 5));
 
             // Дробление двойного слитка в дробилке Create
             event.recipes.create.crushing(
                 Item.of(METAL_POWDER_ID, 40),
-                `tfc:metal/double_ingot/${METAL.name}`
+                `tfc:metal/double_ingot/${KEY}`
             );
 
             // Дробление листа в дробилке Create
             event.recipes.create.crushing(
                 Item.of(METAL_POWDER_ID, 40),
-                `tfc:metal/sheet/${METAL.name}`
+                `tfc:metal/sheet/${KEY}`
             );
 
             // Дробление двойного листа в дробилке Create
             event.recipes.create.crushing(
                 Item.of(METAL_POWDER_ID, 80),
-                `tfc:metal/double_sheet/${METAL.name}`
+                `tfc:metal/double_sheet/${KEY}`
             );
 
             // Дробление стержня в дробилке Create
             event.recipes.create.crushing(
                 Item.of(METAL_POWDER_ID, 10),
-                `tfc:metal/rod/${METAL.name}`
+                `tfc:metal/rod/${KEY}`
             );
 
             if (METAL.can_be_tool) {
                 // Наконечники
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/pickaxe_head/${METAL.name}`
+                    `tfc:metal/pickaxe_head/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/shovel_head/${METAL.name}`
+                    `tfc:metal/shovel_head/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/axe_head/${METAL.name}`
+                    `tfc:metal/axe_head/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/propick_head/${METAL.name}`
+                    `tfc:metal/propick_head/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/hoe_head/${METAL.name}`
+                    `tfc:metal/hoe_head/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/chisel_head/${METAL.name}`
+                    `tfc:metal/chisel_head/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/hammer_head/${METAL.name}`
+                    `tfc:metal/hammer_head/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/saw_blade/${METAL.name}`
+                    `tfc:metal/saw_blade/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/knife_blade/${METAL.name}`
+                    `tfc:metal/knife_blade/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/scythe_blade/${METAL.name}`
+                    `tfc:metal/scythe_blade/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 20),
-                    `tfc:metal/javelin_head/${METAL.name}`
+                    `tfc:metal/javelin_head/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 40),
-                    `tfc:metal/sword_blade/${METAL.name}`
+                    `tfc:metal/sword_blade/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 40),
-                    `tfc:metal/mace_head/${METAL.name}`
+                    `tfc:metal/mace_head/${KEY}`
                 );
                 event.recipes.create.crushing(
                     Item.of(METAL_POWDER_ID, 40),
-                    `tfc:metal/fish_hook/${METAL.name}`
+                    `tfc:metal/fish_hook/${KEY}`
                 );
             }
         }
         else {
-            event.recipes.tfc.heating(METAL_POWDER_ID, METAL.melting_temp)
-                .fluidOutput(Fluid.of(`tfc_aeronautics:${METAL.name}`, 5));
+            event.recipes.tfc.heating(METAL_POWDER_ID, METAL.melt_temperature)
+                .fluidOutput(Fluid.of(`tfc_aeronautics:${KEY}`, 5));
         }
     }
 });
 
 TFCEvents.data((event) => {
     // Register heat data
-    for (const METAL of Object.values(METALS_DATA)) {
+    for (const [KEY, METAL] of Object.entries(METALS_DATA)) {
         if (!METAL.can_be_powder) continue;
         event.heat({
-            ingredient: `tfc_aeronautics:${METAL.name}_powder`,
+            ingredient: `tfc_aeronautics:${KEY}_powder`,
             heatCapacity: METAL.heat_capacity / 20,
-            forgingTemperature: METAL.forging_temp,
-            weldingTemperature: METAL.welding_temp,
+            forgingTemperature: METAL.melt_temperature * 0.6,
+            weldingTemperature: METAL.melt_temperature * 0.8,
         });
     }
 });
