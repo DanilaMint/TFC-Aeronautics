@@ -1,8 +1,7 @@
 # TFC Aeronautics
 
-[![CurseForge](https://img.shields.io/badge/CurseForge-TFC%20Aeronautics-orange?style=for-the-badge&logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/tfc-aeronautics)
-[![Modrinth](https://img.shields.io/badge/Modrinth-TFC%20Aeronautics-1bd96a?style=for-the-badge&logo=modrinth)](https://modrinth.com/mod/tfc-aeronautics)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+![CurseForge](https://img.shields.io/badge/CurseForge-TFC%20Aeronautics-orange?style=for-the-badge&logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/tfc-aeronautics)
+![Modrinth](https://img.shields.io/badge/Modrinth-TFC%20Aeronautics-1bd96a?style=for-the-badge&logo=modrinth)](https://modrinth.com/mod/tfc-aeronautics)
 
 **Bridging the Iron Age and the Industrial Revolution.**
 
@@ -24,8 +23,7 @@ This mod is designed for **Minecraft 1.21.1** and requires the following mods to
 
 ### Required Core Mods:
 - **[NeoForge](https://neoforged.net/)** (v21.1.233 or later) – *The mod loader.*
-- **[TerraFirmaCraft (TFC)](https://www.curseforge.com/minecraft/mc-mods/tfcraft)** (v4.1.3+) – *The core survival overhaul.*
-  - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/tfcraft) | [Modrinth](https://modrinth.com/mod/terrafirmacraft)
+- **[TerraFirmaCraft (TFC)](https://www.curseforge.com/minecraft/mc-mods/terrafirmacraft)** (v4.1.3+) – *The core survival overhaul.*
 - **[Create](https://www.curseforge.com/minecraft/mc-mods/create)** (v6.0.10+) – *The mechanical engineering mod.*
 - **[Create Aeronautics](https://www.curseforge.com/minecraft/mc-mods/create-aeronautics)** (v1.3.0+) – *The airship construction mod.*
 
@@ -34,7 +32,7 @@ This mod is designed for **Minecraft 1.21.1** and requires the following mods to
 
 - **[KubeJS](https://www.curseforge.com/minecraft/mc-mods/kubejs)** (v2101.7.2+) – *Core scripting mod.*
 - **[KubeJS Create](https://www.curseforge.com/minecraft/mc-mods/kubejs-create)** (v2101.3.1+) – *Adds Create-specific recipe support for KubeJS.*
-- **[KubeJS TFC](https://www.curseforge.com/minecraft/mc-mods/kubejs-terrafirmacraft)** (v2.0.0+) – *Adds TFC-specific recipe support for KubeJS.*
+- **[KubeJS TFC](https://www.curseforge.com/minecraft/mc-mods/kubejs-tfc)** (v2.0.0+) – *Adds TFC-specific recipe support for KubeJS.*
 
 ## 🚀 Getting Started
 
@@ -43,17 +41,6 @@ This mod is designed for **Minecraft 1.21.1** and requires the following mods to
 3. Place all files of repository in `kubejs/` folder.
 4. Launch the game. The KubeJS scripts will automatically load and override the default Create recipes with TFC-compatible versions.
 5. You will now see Create recipes in JEI/REI that utilize TFC ingots, sheets, rods, and planks.
-
-## ⚙️ Crafting Examples
-
-| TFC Resource | Create Mechanism |
-| :--- | :--- |
-| Wrought Iron Ingot | Create: Andesite Alloy (via mixing) |
-| Bronze Sheet | Create: Brass Casing |
-| Steel Ingot | Create: Precision Mechanism |
-| TFC Oak Log | Create: Wooden Bearing / Shaft |
-
-> *Note: All recipes are defined in the `kubejs/server_scripts/` folder. You can edit them to your liking or add new integrations.*
 
 ## 🛠️ Customization
 
