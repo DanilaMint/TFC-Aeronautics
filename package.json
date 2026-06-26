@@ -1,3 +1,11 @@
 {
-    "type": "commonjs"
+    "type": "commonjs",
+    "scripts": {
+        "build": "node build.js",
+        "build:watch": "node build.js --watch"
+    },
+    "devDependencies": {
+        "esbuild": "^0.19.0",
+        "typescript": "^5.0.0"
+    }
 }
