@@ -6,17 +6,20 @@ ServerEvents.recipes((event) => {
 
         let METAL_POWDER_ID = `tfc_aeronautics:${KEY}_powder`;
 
-        // Дробление слитка в жернове
-        event.recipes.tfc.quern(
-            Item.of(METAL_POWDER_ID, 20),
-            METAL.ingot_id
-        );
 
-        // Дробление слитка в дробилке Create
-        event.recipes.create.crushing(
-            Item.of(METAL_POWDER_ID, 20),
-            METAL.ingot_id
-        );
+        if (METAL.ingot_id !== null) {
+            // Дробление слитка в жернове
+            event.recipes.tfc.quern(
+                Item.of(METAL_POWDER_ID, 20),
+                METAL.ingot_id
+            );
+
+            // Дробление слитка в дробилке Create
+            event.recipes.create.crushing(
+                Item.of(METAL_POWDER_ID, 20),
+                METAL.ingot_id
+            );
+        }
 
         if (METAL.is_tfc_metal) {
             // Плавка
@@ -121,7 +124,7 @@ TFCEvents.data((event) => {
         if (!METAL.can_be_powder) continue;
         event.heat({
             ingredient: `tfc_aeronautics:${KEY}_powder`,
-            heatCapacity: METAL.heat_capacity / 20,
+            heatCapacity: METAL.solid_heat_capacity / 20,
             forgingTemperature: METAL.melt_temperature * 0.6,
             weldingTemperature: METAL.melt_temperature * 0.8,
         });

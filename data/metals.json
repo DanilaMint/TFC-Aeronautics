@@ -334,5 +334,17 @@
         "can_make_armor": false,
         "is_tfc_metal": false,
         "can_be_powder": true
+    },
+    "magmatite": {
+        "id": "tfc_aeronautics:magmatite",
+        "ingot_id": null,
+        "melt_temperature": 1200,
+        "liquid_heat_capacity": 0.025,
+        "solid_heat_capacity": 2.5,
+        "is_alloy": false,
+        "can_make_tools": false,
+        "can_make_armor": false,
+        "is_tfc_metal": false,
+        "can_be_powder": true
     }
 }
