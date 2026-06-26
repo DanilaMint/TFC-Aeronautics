@@ -1,0 +1,17 @@
+{
+    "item.tfc_aeronautics.copper_powder": "Медный порошок",
+    "item.tfc_aeronautics.zinc_powder": "Цинковый порошок",
+    "item.tfc_aeronautics.tin_powder": "Оловянный порошок",
+    "item.tfc_aeronautics.bismuth_powder": "Висмутовый порошок",
+    "item.tfc_aeronautics.silver_powder": "Серебряный порошок",
+    "item.tfc_aeronautics.gold_powder": "Золотой порошок",
+    "item.tfc_aeronautics.cast_iron_powder": "Чугунный порошок",
+    "item.tfc_aeronautics.nickel_powder": "Никелевый порошок",
+    "item.tfc_aeronautics.magmatite_powder": "Магматитовая пыль",
+
+    "fluid.tfc_aeronautics.magmatite": "Магматит",
+    "block.tfc_aeronautics.magmatite": "Магматит",
+
+    "fluid.tfc_aeronautics.andesite_alloy": "Расплавленный андезитовый сплав",
+    "block.tfc_aeronautics.andesite_alloy": "Расплавленный андезитовый сплав"
+}

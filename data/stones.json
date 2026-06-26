@@ -1,0 +1,18 @@
+{
+    "andesite": {
+        "name": "andesite",
+        "type": "igneous extrusive"
+    },
+    "dacite": {
+        "name": "dacite",
+        "type": "igneous extrusive"
+    },
+    "basalt": {
+        "name": "basalt",
+        "type": "igneous extrusive"
+    },
+    "rhyolite": {
+        "name": "rhyolite",
+        "type": "igneous extrusive"
+    }
+}
