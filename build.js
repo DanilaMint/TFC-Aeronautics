@@ -1,197 +1,286 @@
-const esbuild = require('esbuild');
 const fs = require('fs');
 const path = require('path');
+const { build } = require('vite');
+const { transform } = require('@babel/core');
 
-// Конфигурация сборки
-const config = {
-    client: {
-        entry: 'src/client.js',
-        outdir: 'client_scripts',
-        platform: 'browser',
-        target: 'es2020',
-        format: 'iife',
-        minify: true,
-        sourcemap: true,
-        bundle: true,
-        external: ['fs', 'path', 'os'], // Node.js модули, которые не должны попасть в клиент
-    },
-    server: {
-        entry: 'src/server.js',
-        outdir: 'server_scripts',
-        platform: 'node',
-        target: 'node18',
-        format: 'cjs',
-        minify: true,
-        sourcemap: true,
-        bundle: true,
-        external: ['sharp', 'ffmpeg'], // Пример тяжелых зависимостей
-    },
-    startup: {
-        entry: 'src/startup.js',
-        outdir: 'startup_scripts',
-        platform: 'node',
-        target: 'node18',
-        format: 'cjs',
-        minify: true,
-        sourcemap: true,
-        bundle: true,
-        external: [],
-    }
+const SRC_PATH = './src';
+
+// Выходные папки напрямую в корне проекта
+const OUTPUT_DIRS = {
+    client: './client_scripts',
+    server: './server_scripts',
+    startup: './startup_scripts'
 };
 
-// Функция очистки папок перед сборкой
-function cleanDirectories() {
-    const dirs = ['client_scripts', 'server_scripts', 'startup_scripts'];
-    dirs.forEach(dir => {
-        if (fs.existsSync(dir)) {
-            fs.rmSync(dir, { recursive: true, force: true });
-        }
+// Создаем все необходимые папки
+Object.values(OUTPUT_DIRS).forEach(dir => {
+    if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
-    });
-    console.log('🧹 Папки очищены');
-}
-
-// Функция сборки
-async function build(target, options) {
-    console.log(`📦 Сборка ${target}...`);
-
-    try {
-        const result = await esbuild.build({
-            entryPoints: [options.entry],
-            outdir: options.outdir,
-            platform: options.platform,
-            target: options.target,
-            format: options.format,
-            minify: options.minify,
-            sourcemap: options.sourcemap,
-            bundle: options.bundle,
-            external: options.external,
-            outbase: 'src',
-            // Дополнительные настройки
-            legalComments: 'none',
-            treeShaking: true,
-            metafile: true,
-            logLevel: 'info',
-        });
-
-        // Анализ размера
-        const stats = analyzeBuild(result, options.outdir);
-        console.log(`✅ ${target} собран (${stats})`);
-
-        return result;
-    } catch (error) {
-        console.error(`❌ Ошибка сборки ${target}:`, error.message);
-        throw error;
     }
-}
+});
 
-// Анализ размера собранных файлов
-function analyzeBuild(result, outdir) {
-    const files = fs.readdirSync(outdir);
-    let totalSize = 0;
-    const fileSizes = files.map(file => {
-        const stats = fs.statSync(path.join(outdir, file));
-        totalSize += stats.size;
-        return `${file}: ${(stats.size / 1024).toFixed(2)}KB`;
+// Babel конфигурация для Rhino
+const BABEL_CONFIG = {
+    presets: [
+        ['@babel/preset-env', {
+            targets: { rhino: '1.7.13' },
+            modules: false
+        }]
+    ],
+    plugins: [
+        '@babel/plugin-transform-block-scoping',
+        '@babel/plugin-transform-arrow-functions',
+        '@babel/plugin-transform-template-literals',
+        '@babel/plugin-transform-classes'
+    ]
+};
+
+// Получаем список папок
+function getFolders(dir) {
+    return fs.readdirSync(dir).filter(file => {
+        return fs.statSync(path.join(dir, file)).isDirectory();
     });
-
-    return `${files.length} файлов, ${(totalSize / 1024).toFixed(2)}KB общий размер`;
 }
 
-// Функция копирования ассетов (если нужны)
-function copyAssets() {
-    // Пример: копирование статических файлов
-    const assets = ['public'];
-    assets.forEach(asset => {
-        if (fs.existsSync(asset)) {
-            // Здесь можно добавить логику копирования
-            console.log(`📁 Ассеты скопированы: ${asset}`);
+// Создаем виртуальный модуль для каждого типа
+function createVirtualModule(type, folders) {
+    let imports = '';
+    let exports = '';
+    let modules = {};
+
+    folders.forEach(folder => {
+        const filePath = path.join(SRC_PATH, folder, `${type}.js`);
+        if (fs.existsSync(filePath)) {
+            const moduleName = `${folder}_${type}`;
+            imports += `import * as ${moduleName} from './${filePath}';\n`;
+            modules[moduleName] = filePath;
+            exports += `Object.assign(exports, ${moduleName});\n`;
         }
     });
-}
 
-// Функция создания файла с версией сборки
-function createVersionFile() {
-    const version = {
-        buildTime: new Date().toISOString(),
-        version: process.env.npm_package_version || '1.0.0',
-        nodeVersion: process.version,
+    return {
+        code: `${imports}\nexport default {\n${Object.keys(modules).map(name => `    ${name},`).join('\n')}\n};\n`,
+        modules
     };
-
-    fs.writeFileSync(
-        'build-info.json',
-        JSON.stringify(version, null, 2)
-    );
-    console.log('📝 Информация о сборке сохранена');
 }
 
-// Основная функция сборки
-async function buildAll() {
-    const startTime = Date.now();
-    console.log('🚀 Начинаем сборку проекта...\n');
+// Сборка через Vite
+async function buildWithVite(type) {
+    const folders = getFolders(SRC_PATH);
+    const outputDir = OUTPUT_DIRS[type];
+    const outputFile = path.join(outputDir, `${type}.js`);
+
+    console.log(`\n📦 Сборка ${type}.js через Vite...`);
+
+    if (!folders.some(folder => fs.existsSync(path.join(SRC_PATH, folder, `${type}.js`)))) {
+        console.log(`   ⚠️ Нет файлов типа ${type}.js`);
+        return;
+    }
+
+    // Создаем временный входной файл
+    const virtualModule = createVirtualModule(type, folders);
+    const tempFile = path.join(outputDir, `_temp_${type}.js`);
+    fs.writeFileSync(tempFile, virtualModule.code, 'utf8');
 
     try {
-        // Очистка
-        //cleanDirectories();
+        // Собираем через Vite
+        await build({
+            build: {
+                lib: {
+                    entry: tempFile,
+                    name: type,
+                    formats: ['iife'],
+                    fileName: () => `${type}.js`
+                },
+                outDir: outputDir,
+                rollupOptions: {
+                    external: [],
+                    output: {
+                        globals: {},
+                        name: type,
+                        extend: false,
+                        esModule: false,
+                        compact: false
+                    }
+                },
+                minify: false,
+                sourcemap: false,
+                target: 'es5'
+            },
+            configFile: false,
+            plugins: [
+                {
+                    name: 'rhino-transform',
+                    transform(code) {
+                        try {
+                            const result = transform(code, {
+                                ...BABEL_CONFIG,
+                                filename: `${type}.js`
+                            });
+                            return result.code;
+                        } catch (error) {
+                            console.error('   ❌ Babel transform error:', error.message);
+                            return code;
+                        }
+                    }
+                }
+            ]
+        });
 
-        // Сборка всех частей
-        const builds = await Promise.all([
-            build('client', config.client),
-            build('server', config.server),
-            build('startup', config.startup),
-        ]);
+        // Читаем сгенерированный файл
+        const builtFile = path.join(outputDir, `${type}.js`);
+        if (fs.existsSync(builtFile)) {
+            let content = fs.readFileSync(builtFile, 'utf8');
 
-        // Дополнительные задачи
-        copyAssets();
-        createVersionFile();
+            // Добавляем дополнительную изоляцию через IIFE если нужно
+            if (!content.includes('(function') && !content.includes('(() =>')) {
+                content = `(function() {\n${content}\n})();\n`;
+            }
 
-        const endTime = Date.now();
-        const duration = ((endTime - startTime) / 1000).toFixed(2);
-
-        console.log(`\n✨ Сборка завершена за ${duration} секунд!`);
-        console.log('📁 Результаты:');
-        console.log('  - client_scripts/');
-        console.log('  - server_scripts/');
-        console.log('  - startup_scripts/');
+            fs.writeFileSync(builtFile, content, 'utf8');
+            console.log(`   ✅ ${type}.js собран в ${builtFile}`);
+            console.log(`   📁 Модулей: ${Object.keys(virtualModule.modules).length}`);
+        }
 
     } catch (error) {
-        console.error('\n❌ Сборка провалилась:', error);
-        process.exit(1);
+        console.error(`   ❌ Ошибка при сборке ${type}.js:`, error.message);
+    } finally {
+        // Удаляем временный файл
+        if (fs.existsSync(tempFile)) {
+            fs.unlinkSync(tempFile);
+        }
     }
 }
 
-// Watch режим (если передан флаг --watch)
-if (process.argv.includes('--watch')) {
-    console.log('👀 Запуск в режиме watch...');
+// Альтернативный вариант с ручным объединением и IIFE
+function buildWithIIFE(type) {
+    const folders = getFolders(SRC_PATH);
+    const outputDir = OUTPUT_DIRS[type];
+    const outputFile = path.join(outputDir, `${type}.js`);
+    let modules = {};
 
-    const watchConfigs = [
-        { ...config.client, watch: true },
-        { ...config.server, watch: true },
-        { ...config.startup, watch: true },
-    ];
+    console.log(`\n📦 Сборка ${type}.js через IIFE...`);
 
-    watchConfigs.forEach(cfg => {
-        esbuild.context({
-            entryPoints: [cfg.entry],
-            outdir: cfg.outdir,
-            platform: cfg.platform,
-            target: cfg.target,
-            format: cfg.format,
-            minify: cfg.minify,
-            sourcemap: cfg.sourcemap,
-            bundle: cfg.bundle,
-            external: cfg.external,
-            outbase: 'src',
-            legalComments: 'none',
-            treeShaking: true,
-        }).then(context => {
-            context.watch();
-            console.log(`👀 Отслеживание: ${cfg.entry} -> ${cfg.outdir}`);
-        });
+    // Собираем все файлы в один модульный объект
+    folders.forEach(folder => {
+        const filePath = path.join(SRC_PATH, folder, `${type}.js`);
+        if (fs.existsSync(filePath)) {
+            let content = fs.readFileSync(filePath, 'utf8');
+            const moduleName = `${folder}_${type}`;
+
+            // Удаляем импорты/экспорты
+            content = content.replace(/^export\s+default\s+/gm, '');
+            content = content.replace(/^export\s+/gm, '');
+            content = content.replace(/^import\s+.*?from\s+['"](.+?)['"];?\s*$/gm, '');
+            content = content.replace(/^import\s+['"](.+?)['"];?\s*$/gm, '');
+
+            modules[moduleName] = content.trim();
+        }
     });
 
-    console.log('Нажмите Ctrl+C для остановки');
-} else {
-    // Обычная сборка
-    buildAll();
+    if (Object.keys(modules).length === 0) {
+        console.log(`   ⚠️ Нет файлов типа ${type}.js`);
+        return;
+    }
+
+    // Для startup скриптов используем особый подход
+    const isStartup = type === 'startup';
+
+    // Создаем IIFE с изолированной областью видимости
+    let finalContent = `(function() {\n`;
+    finalContent += `    'use strict';\n\n`;
+    finalContent += `    const modules = {};\n\n`;
+
+    // Добавляем каждый модуль как IIFE
+    for (const [name, code] of Object.entries(modules)) {
+        finalContent += `    // === Модуль: ${name} ===\n`;
+        finalContent += `    (function() {\n`;
+        finalContent += `        const module = {};\n`;
+        finalContent += `        const exports = module.exports = {};\n\n`;
+        finalContent += `        // Код модуля\n`;
+        finalContent += code + '\n\n';
+        finalContent += `        modules['${name}'] = module.exports;\n`;
+        finalContent += `    })();\n\n`;
+    }
+
+    // Для startup скриптов используем global вместо window
+    if (isStartup) {
+        finalContent += `    // Для startup скриптов используем global\n`;
+        finalContent += `    if (typeof global !== 'undefined') {\n`;
+        finalContent += `        global.${type}Modules = modules;\n`;
+        finalContent += `    }\n`;
+        finalContent += `    // Для совместимости с другими окружениями\n`;
+        finalContent += `    if (typeof window !== 'undefined') {\n`;
+        finalContent += `        window.${type}Modules = modules;\n`;
+        finalContent += `    }\n`;
+    } else {
+        // Для client и server используем window (или global как fallback)
+        finalContent += `    try {\n`;
+        finalContent += `        (typeof global !== 'undefined' ? global : window).${type}Modules = modules;\n`;
+        finalContent += `    } catch(e) {\n`;
+        finalContent += `        // Если ни global, ни window не доступны, просто сохраняем в локальной переменной\n`;
+        finalContent += `        this.${type}Modules = modules;\n`;
+        finalContent += `    }\n`;
+    }
+
+    finalContent += `})();\n`;
+
+    // Транспилируем через Babel
+    try {
+        const result = transform(finalContent, {
+            ...BABEL_CONFIG,
+            filename: `${type}.js`
+        });
+
+        fs.writeFileSync(outputFile, result.code, 'utf8');
+        console.log(`   ✅ ${type}.js собран в ${outputFile}`);
+        console.log(`   📁 Модулей: ${Object.keys(modules).length}`);
+    } catch (error) {
+        console.error(`   ❌ Ошибка при обработке ${type}.js:`, error.message);
+    }
+}
+
+// Главная функция сборки
+async function buildAll() {
+    console.log('🚀 Начинаем сборку...');
+    console.log('='.repeat(50));
+
+    // Выбираем метод сборки
+    const useVite = process.argv.includes('--vite');
+    const useIIFE = process.argv.includes('--iife') || !useVite;
+
+    if (useVite) {
+        console.log('🔧 Используем Vite для сборки');
+        for (const type of ['client', 'server', 'startup']) {
+            await buildWithVite(type);
+        }
+    }
+
+    if (useIIFE) {
+        console.log('🔧 Используем IIFE для сборки');
+        for (const type of ['client', 'server', 'startup']) {
+            buildWithIIFE(type);
+        }
+    }
+
+    console.log('='.repeat(50));
+    console.log('✅ Сборка завершена!');
+    console.log(`📁 Результаты сохранены в папках:`);
+    Object.entries(OUTPUT_DIRS).forEach(([type, dir]) => {
+        console.log(`   📂 ${type}: ${dir}`);
+    });
+}
+
+// Запуск
+buildAll();
+
+// Для отслеживания изменений
+if (process.argv.includes('--watch')) {
+    console.log('👁️ Отслеживание изменений...');
+    fs.watch(SRC_PATH, { recursive: true }, (event, filename) => {
+        if (filename && filename.endsWith('.js')) {
+            console.log(`📄 Изменен файл: ${filename}`);
+            buildAll();
+        }
+    });
 }
