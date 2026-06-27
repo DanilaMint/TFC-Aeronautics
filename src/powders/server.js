@@ -35,12 +35,12 @@ ServerEvents.recipes(event => {
             );
             // Дробление двойного листа в дробилке Create
             event.recipes.create.crushing(
-                Item.of(METAL_POWDER_ID, 80),
+                Item.of(powder_id, 80),
                 `tfc:metal/double_sheet/${KEY}`
             );
             // Дробление стержня в дробилке Create
             event.recipes.create.crushing(
-                Item.of(METAL_POWDER_ID, 10),
+                Item.of(powder_id, 10),
                 `tfc:metal/rod/${KEY}`
             );
 

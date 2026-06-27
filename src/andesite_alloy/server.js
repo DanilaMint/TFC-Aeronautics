@@ -48,21 +48,21 @@ TFCEvents.data(event => {
     // Нагрев жидкого андезитового сплава
     event.fluidHeat({
         fluid: "tfc_aeronautics:andesite_alloy",
-        meltTemperature: ANDESITE_ALLOY_MELTING_TEMP,
-        specificHeatCapacity: 2.7
+        meltTemperature: ANDESITE_ALLOY.melt_temperature,
+        specificHeatCapacity: ANDESITE_ALLOY.liquid_heat_capacity
     });
 
     // Нагрев слитка андезитового сплава
     event.heat({
         ingredient: 'create:andesite_alloy',
-        heatCapacity: ANDESITE_ALLOY_HEAT_CAPACITY,
-        forgingTemperature: ANDESITE_ALLOY_FORGING_TEMP,
-        weldingTemperature: ANDESITE_ALLOY_WELDING_TEMP,
+        heatCapacity: ANDESITE_ALLOY.solid_heat_capacity,
+        forgingTemperature: ANDESITE_ALLOY.melt_temperature * 0.6,
+        weldingTemperature: ANDESITE_ALLOY.melt_temperature * 0.8,
     });
     // Нагрев вала
     event.heat({
         ingredient: 'create:shaft',
-        heatCapacity: ANDESITE_ALLOY_HEAT_CAPACITY
+        heatCapacity: ANDESITE_ALLOY.solid_heat_capacity
     })
 });
 
