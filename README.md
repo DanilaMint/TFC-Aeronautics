@@ -34,8 +34,8 @@ This mod is designed for **Minecraft 1.21.1** and requires the following mods to
 ## 🚀 Getting Started
 
 1. **Install NeoForge** for Minecraft 1.21.1.
-2. Place **all required mods** (TFC, Create, Create Aeronautics, KubeJS, KubeJS Create, KubeJS TFC, and TFC Aeronautics) into your `mods` folder.
-3. Place all files of repository in `kubejs/` folder.
+2. Place **all required mods** (TFC, Create, Create Aeronautics, KubeJS, KubeJS Create, KubeJS TFC) into your `mods` folder.
+3. Place built scripts in `client_scripts/`, `server_scripts/`, `startup_scripts/`, `assets/`, `data/` into `kubejs/` folder.
 4. Launch the game. The KubeJS scripts will automatically load and override the default Create recipes with TFC-compatible versions.
 5. You will now see Create recipes in JEI/REI that utilize TFC ingots, sheets, rods, and planks.
 
