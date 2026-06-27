@@ -152,6 +152,21 @@ async function buildWithVite(type) {
     }
 }
 
+// Функция для обработки содержимого модуля
+function processModuleContent(content) {
+    // Удаляем импорты/экспорты
+    content = content.replace(/^export\s+default\s+/gm, '');
+    content = content.replace(/^export\s+/gm, '');
+    content = content.replace(/^import\s+.*?from\s+['"](.+?)['"];?\s*$/gm, '');
+    content = content.replace(/^import\s+['"](.+?)['"];?\s*$/gm, '');
+
+    // Удаляем комментарии, которые могут вызвать проблемы
+    content = content.replace(/\/\*[\s\S]*?\*\//g, ''); // Многострочные комментарии
+    content = content.replace(/\/\/.*$/gm, ''); // Однострочные комментарии
+
+    return content.trim();
+}
+
 // Альтернативный вариант с ручным объединением и IIFE
 function buildWithIIFE(type) {
     const folders = getFolders(SRC_PATH);
@@ -168,13 +183,10 @@ function buildWithIIFE(type) {
             let content = fs.readFileSync(filePath, 'utf8');
             const moduleName = `${folder}_${type}`;
 
-            // Удаляем импорты/экспорты
-            content = content.replace(/^export\s+default\s+/gm, '');
-            content = content.replace(/^export\s+/gm, '');
-            content = content.replace(/^import\s+.*?from\s+['"](.+?)['"];?\s*$/gm, '');
-            content = content.replace(/^import\s+['"](.+?)['"];?\s*$/gm, '');
+            // Обрабатываем содержимое модуля
+            content = processModuleContent(content);
 
-            modules[moduleName] = content.trim();
+            modules[moduleName] = content;
         }
     });
 
@@ -183,15 +195,19 @@ function buildWithIIFE(type) {
         return;
     }
 
-    // Для startup скриптов используем особый подход
+    // Для разных типов используем разные подходы
     const isStartup = type === 'startup';
+    const isClient = type === 'client';
+    const isServer = type === 'server';
 
     // Создаем IIFE с изолированной областью видимости
     let finalContent = `(function() {\n`;
     finalContent += `    'use strict';\n\n`;
+
+    // Создаем объект для хранения модулей
     finalContent += `    const modules = {};\n\n`;
 
-    // Добавляем каждый модуль как IIFE
+    // Добавляем каждый модуль
     for (const [name, code] of Object.entries(modules)) {
         finalContent += `    // === Модуль: ${name} ===\n`;
         finalContent += `    (function() {\n`;
@@ -203,22 +219,27 @@ function buildWithIIFE(type) {
         finalContent += `    })();\n\n`;
     }
 
-    // Для startup скриптов используем global вместо window
+    // Экспортируем модули в зависимости от типа
     if (isStartup) {
-        finalContent += `    // Для startup скриптов используем global\n`;
+        // Для startup используем global (доступен только здесь)
+        finalContent += `    // Экспорт для startup скриптов\n`;
         finalContent += `    if (typeof global !== 'undefined') {\n`;
         finalContent += `        global.${type}Modules = modules;\n`;
         finalContent += `    }\n`;
-        finalContent += `    // Для совместимости с другими окружениями\n`;
+    } else if (isClient) {
+        // Для client используем window
+        finalContent += `    // Экспорт для client скриптов\n`;
         finalContent += `    if (typeof window !== 'undefined') {\n`;
         finalContent += `        window.${type}Modules = modules;\n`;
         finalContent += `    }\n`;
-    } else {
-        // Для client и server используем window (или global как fallback)
-        finalContent += `    try {\n`;
-        finalContent += `        (typeof global !== 'undefined' ? global : window).${type}Modules = modules;\n`;
-        finalContent += `    } catch(e) {\n`;
-        finalContent += `        // Если ни global, ни window не доступны, просто сохраняем в локальной переменной\n`;
+        // Сохраняем в глобальную переменную this (для случаев когда window недоступен)
+        finalContent += `    if (typeof this !== 'undefined') {\n`;
+        finalContent += `        this.${type}Modules = modules;\n`;
+        finalContent += `    }\n`;
+    } else if (isServer) {
+        // Для server используем this (глобальный объект)
+        finalContent += `    // Экспорт для server скриптов\n`;
+        finalContent += `    if (typeof this !== 'undefined') {\n`;
         finalContent += `        this.${type}Modules = modules;\n`;
         finalContent += `    }\n`;
     }
