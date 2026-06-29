@@ -31,8 +31,6 @@
 | Create heating recipes: powder -> molten metal | ✅ | Items |
 | Create crushing and quern recipes: ingot -> powder | ✅ | Items |
 
-**Acceptance Criteria:** All dusts can be crafted and smelted into ingots
-
 ---
 
 ## Magmatite
@@ -69,5 +67,28 @@
 | Create heating recipe: shaft -> molten andesite alloy | ✅ | – |
 
 ---
+
+## Andesite casing
+**Goal:** Make compatibility with TFC logs
+
+| Task | Status | Dependencies |
+|------|--------|--------------|
+| Create andesite casing recipes | ⬜ |  |
+
+## Brass casing
+**Goal:** Make compatibility with TFC logs
+
+| Task | Status | Dependencies |
+|------|--------|--------------|
+| Create brass casing recipes | ⬜ |  |
+
+## Copper casing
+**Goal:** Make compatibility with TFC logs
+
+| Task | Status | Dependencies |
+|------|--------|--------------|
+| Create copper casing recipes | ⬜ |  |
+
+
 
 *Roadmap will be updated later*
