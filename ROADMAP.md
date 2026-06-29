@@ -75,6 +75,8 @@
 |------|--------|--------------|
 | Create andesite casing recipes | ⬜ |  |
 
+---
+
 ## Brass casing
 **Goal:** Make compatibility with TFC logs
 
@@ -82,12 +84,52 @@
 |------|--------|--------------|
 | Create brass casing recipes | ⬜ |  |
 
+---
+
 ## Copper casing
 **Goal:** Make compatibility with TFC logs
 
 | Task | Status | Dependencies |
 |------|--------|--------------|
 | Create copper casing recipes | ⬜ |  |
+
+---
+
+## Wrench
+**Goal:** Balance recipe of wrench
+
+| Task | Status | Dependencies |
+|------|--------|--------------|
+| Create brass wrench head | ⬜ |  |
+| Make recipe of wrench | ⬜ | Wrench head |
+
+---
+
+## Red quartz
+**Goal:** Balance recipe of red quartz
+
+| Task | Status | Dependencies |
+|------|--------|--------------|
+| Create red quartz recipe: metamorphic stone + redstone | ⬜ |  |
+
+---
+
+## Sandpaper
+**Goal:** Make compatibility Create's and TFC's sandpapers
+
+*idk how to do it*
+
+---
+
+## Sheet pressing
+**Goal:** Rebalance sheet pressing recipes
+
+| Task | Status | Dependencies |
+|------|--------|--------------|
+| Remove old recipe by 1 ingot | ⬜ |  |
+| Add pressing recipe: double ingot -> sheet | ⬜ |  |
+
+---
 
 
 
