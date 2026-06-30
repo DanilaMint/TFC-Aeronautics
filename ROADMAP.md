@@ -131,6 +131,30 @@
 
 ---
 
+## Create Recipes with TFC Grains 
 
+|Task| Status| Dependencies |
+|------|--------|--------------|
+| Create milling recipe: grain -> flour (barley, oat, rye, wheat, rice, maize) | ⬜ |  |
+| Create mixing recipe: tfc flour + water -> tfc dough | ⬜ |  |
+| Create bulk washing recipe: tfc flour -> tfc dough | ⬜ |  |
+| Create basin press recipe: tfc grain -> oil | ⬜ |  |
+
+---
+
+## Create Mixing with Heating
+**Goal:** Make mixing recipes with heating balanced
+
+| Task | Status | Dependencies |
+|------|--------|--------------|
+| Make charcoal forge able to heat basin | ⬜ |  |
+
+## Brass recipe
+
+| Task | Status | Dependencies |
+|------|--------|--------------|
+| Remove create brass recipe | ⬜ |  |
+
+---
 
 *Roadmap will be updated later*
