@@ -1,0 +1,5 @@
+{
+  "type": "tfc:quern",
+  "ingredient": { "item": "tfc:metal/ingot/bismuth" },
+  "result": { "count": 20, "id": "tfc_aeronautics:powder/bismuth" }
+}

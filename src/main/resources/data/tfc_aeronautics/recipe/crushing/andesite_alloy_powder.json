@@ -1,0 +1,6 @@
+{
+  "type": "create:crushing",
+  "ingredients": [ { "item": "create:andesite_alloy" } ],
+  "processing_time": 350,
+  "results": [ { "count": 20, "id": "tfc_aeronautics:powder/andesite_alloy" } ]
+}

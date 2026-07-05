@@ -1,0 +1,6 @@
+{
+  "type": "create:milling",
+  "ingredients": [ { "item": "tfc:metal/ingot/nickel" } ],
+  "processing_time": 250,
+  "results": [ { "count": 20, "id": "tfc_aeronautics:powder/nickel" } ]
+}

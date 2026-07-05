@@ -1,0 +1,11 @@
+{
+  "type": "tfc:heating",
+  "ingredient": {
+    "item": "tfc_aeronautics:powder/nickel"
+  },
+  "result_fluid": {
+    "amount": 5,
+    "id": "tfc:metal/nickel"
+  },
+  "temperature": 1450.0
+}

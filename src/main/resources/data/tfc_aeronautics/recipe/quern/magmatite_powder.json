@@ -1,0 +1,10 @@
+{
+  "type": "tfc:quern",
+  "ingredient": {
+    "tag": "tfc:stones/loose/igneous_extrusive"
+  },
+  "result": {
+    "count": 20,
+    "id": "tfc_aeronautics:powder/magmatite"
+  }
+}

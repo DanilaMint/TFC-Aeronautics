@@ -1,0 +1,5 @@
+{
+  "fluid": "minecraft:lava",
+  "melt_temperature": 1250.0,
+  "specific_heat_capacity": 0.01
+}

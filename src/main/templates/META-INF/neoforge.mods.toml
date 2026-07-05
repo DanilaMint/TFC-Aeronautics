@@ -1,0 +1,84 @@
+# The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
+modLoader="javafml"
+# A version range to match for said mod loader - for regular FML @Mod it will be the the Forge version
+loaderVersion="${loader_version_range}"
+
+# The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
+# Review your options at https://choosealicense.com/. All Rights Reserved is the default copyright stance, and is thus the default here.
+license="${mod_license}"
+
+# A URL to refer people to when problems occur with this mod
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
+
+# A list of mods - how many allowed here is determined by the individual mod loader
+[[mods]]
+# The modid of the mod
+modId="${mod_id}"
+# The version number of the mod
+version="${mod_version}"
+# A display name for the mod
+displayName="${mod_name}"
+# A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
+#updateJSONURL="https://change.me.example.invalid/updates.json"
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
+# A file name (in the root of the mod JAR) containing a logo for display
+#logoFile="examplemod.png"
+# A text field displayed in the mod UI
+authors="${mod_authors}"
+# The description text for the mod (multi line!) (#mandatory)
+description='''${mod_description}'''
+
+# The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
+#[[mixins]]
+#config="${mod_id}.mixins.json"
+
+# The [[accessTransformers]] block allows you to declare where your AT file is.
+# If this block is omitted, a fallback attempt will be made to load an AT from META-INF/accesstransformer.cfg
+#[[accessTransformers]]
+#file="META-INF/accesstransformer.cfg"
+
+# Dependencies for the ${mod_name} addon
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="${loader_version_range}"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="AFTER"
+    side="BOTH"
+
+# TerraFirmaCraft — primary addon target
+[[dependencies.${mod_id}]]
+    modId="tfc"
+    type="required"
+    versionRange="[1.21.1,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Create — provides contraptions and kinetic mechanics
+[[dependencies.${mod_id}]]
+    modId="create"
+    type="required"
+    versionRange="[6.0.0,7.0.0)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Simulated — physics simulation layer for contraptions
+[[dependencies.${mod_id}]]
+    modId="simulated"
+    type="required"
+    versionRange="[1.0.0,2.0.0)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Features are specific properties of the game environment, that you may want to declare you require. This example declares
+# that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring something
+# like this is only effective on clients.
+#[features.${mod_id}]
+#openGLVersion="[3.2,)"

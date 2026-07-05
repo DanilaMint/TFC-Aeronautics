@@ -1,0 +1,8 @@
+{
+  "ingredient": {
+    "item": "tfc_aeronautics:powder/silver"
+  },
+  "heat_capacity": 1.0,
+  "forging_temperature": 485.0,
+  "welding_temperature": 647.0
+}

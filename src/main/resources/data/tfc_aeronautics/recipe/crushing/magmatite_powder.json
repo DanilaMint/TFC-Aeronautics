@@ -1,0 +1,15 @@
+{
+  "type": "create:crushing",
+  "ingredients": [
+    {
+      "tag": "tfc:stones/loose/igneous_extrusive"
+    }
+  ],
+  "processing_time": 350,
+  "results": [
+    {
+      "count": 20,
+      "id": "tfc_aeronautics:powder/magmatite"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "ingredient": {
+    "item": "tfc_aeronautics:powder/cast_iron"
+  },
+  "heat_capacity": 1.0,
+  "forging_temperature": 767.0,
+  "welding_temperature": 1023.0
+}
