@@ -2,7 +2,7 @@
   "ingredient": {
     "item": "tfc_aeronautics:powder/bismuth"
   },
-  "heat_capacity": 1.0,
+  "heat_capacity": 0.357143,
   "forging_temperature": 135.0,
   "welding_temperature": 180.0
 }

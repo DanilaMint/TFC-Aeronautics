@@ -1,73 +1,47 @@
-# Roadmap
----
+# Roadmap for TFC Aeronautics mod
 
-## 📌 Status Legend
-- ⬜ `To Do` – Planned
-- 🟨 `In Progress` – Currently working on
-- ✅ `Done` – Completed
-- 🔄 `Review` – Under review
----
-
-## Environment Setup
-**Goal:** Prepare the repository and development tools
+## Metal Powder
 
 | Task | Status | Dependencies |
-|------|--------|--------------|
-| Initialize repository | ✅ | – |
-| Create folder structure | ✅ | – |
-| Set up build script (Node.js) for automatic compilation | ✅ | – |
-| Configure `.gitignore` | ✅ | – |
+|-|-|-|
+| Add textures for metal powders | Complete | - |
+| Register items | Complete | - |
+| Add TFC Heating to items | Complete | Register |
+| Add TFC Heating recipe: powder -> molten metal | Complete | Register |
 
----
-
-## Metal Powders
-**Goal:** Introduce basic materials for advanced metallurgy
+## Update Andesite Alloy
 
 | Task | Status | Dependencies |
-|------|--------|--------------|
-| Create 16x16 textures for powders: andesite alloy, bismuth, copper, gold, silver, tin, nickel, magmatite, cast iron, zinc | 🟨 | – |
-| Define custom items | ✅ | – |
-| Add localization (`ru_ru.lang`, `en_us.lang`) with proper names | ⬜ | Items |
-| Create heating recipes: powder -> molten metal | ✅ | Items |
-| Create crushing and quern recipes: ingot -> powder | ✅ | Items |
+|-|-|-|
+| Replace texture to TFC style | Complete | - |
+| Change item name to "Andesite alloy ingot" | Complete | - |
+| Register molten metal | Complete | - |
+| Add texture to molten metal | Complete | - |
+| Add TFC Heating to ingot and fluid | Complete | Register metal |
+| Register double ingot of andesite alloy | Complete | - |
+| Add texture to double ingot | Complete | - |
+| Add TFC Welding recipe: ingot + ingot -> double ingot | Complete | double ingot |
+| Add TFC Heating to double ingot | Complete | double ingot |
+| Add TFC Heating recipe: double ingot -> molten metal 200 MB | Complete | double ingot |
 
-**Acceptance Criteria:** All dusts can be crafted and smelted into ingots
-
----
-
-## Magmatite
-**Goal:** Create a new intermediate metal for making andesite alloy
-
-| Task | Status | Dependencies |
-|------|--------|--------------|
-| Create fluid of molten magmatite | ✅ | – |
-| Create heating recipes: igneous extrusive rock -> molten magmatite | ✅ | Fluid |
-| Add fluid name to `.lang` files | ⬜ | Fluid |
-
----
-
-## Andesite Alloy
-**Goal:** Create a new alloy as a core component for future mechanics
+## PR
 
 | Task | Status | Dependencies |
-|------|--------|--------------|
-| Create texture for andesite alloy ingot | ✅ | – |
-| Create texture for molten andesite alloy | 🟨 | – |
-| Create fluid of molten andesite alloy | ✅ | – |
-| Add fluid to `.lang` files | ⬜ | Fluid |
-| Make alloy recipe: magmatite + cast iron -> andesite alloy | ✅ | Items |
+|-|-|-|
+| Make logo for the mod | | - |
+| Make the trailer | | - |
+| Publish to CurseForge | | - |
+| Publish to Modrinth | | - |
 
----
-
-## Shaft
-**Goal:** Add a mechanical component and refactor old recipes
+## Translation
 
 | Task | Status | Dependencies |
-|------|--------|--------------|
-| Create forging recipe for shaft andesite alloy ingot -> shaft | ✅ | Andesite Alloy |
-| Remove old shaft by 2 andesite alloy ingots | ⬜ | – |
-| Create heating recipe: shaft -> molten andesite alloy | ✅ | – |
-
----
-
-*Roadmap will be updated later*
+|-|-|-|
+| Make English US `en_us.lang` | | - |
+| Make Russian `ru_ru.lang` | | - |
+| Make Spanish `es_es.lang`, `es_mx.lang` | | - |
+| Make German `de_de.lang` | | - |
+| Make French `fr_fr.lang` | | - |
+| Make Chinese `zh_cn.lang`, `zh_tw.lang` | | - |
+| Make Japanese `ja_jp.lang` | | - |
+| Make Korean `ko_kr.lang` | | - |

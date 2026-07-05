@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidBlocks;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidItems;
 import ru.tfc_aeronautics.fluid.AeronauticsFluids;
+import ru.tfc_aeronautics.metal.DoubleIngotRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.recipe.RecipeOverrides;
 
@@ -29,6 +30,7 @@ public class Aeronautics {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
         PowderRegistration.register(modEventBus);
+        DoubleIngotRegistration.register(modEventBus);
         AeronauticsFluidBlocks.register(modEventBus);
         AeronauticsFluidItems.register(modEventBus);
         AeronauticsFluids.register(modEventBus);

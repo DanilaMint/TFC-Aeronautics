@@ -26,6 +26,8 @@ code_references/
 crashlog.txt
 libs/
 PROJECT_STRUCTURE.md
+CLAUDE.md
+build.sh
 
 # fabric
 run/

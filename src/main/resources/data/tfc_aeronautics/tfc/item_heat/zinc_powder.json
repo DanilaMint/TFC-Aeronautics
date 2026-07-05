@@ -2,7 +2,7 @@
   "ingredient": {
     "item": "tfc_aeronautics:powder/zinc"
   },
-  "heat_capacity": 1.0,
+  "heat_capacity": 0.238095,
   "forging_temperature": 210.0,
   "welding_temperature": 280.0
 }

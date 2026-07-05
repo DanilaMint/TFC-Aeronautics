@@ -2,7 +2,7 @@
   "ingredient": {
     "item": "tfc_aeronautics:powder/copper"
   },
-  "heat_capacity": 1.0,
+  "heat_capacity": 0.142857,
   "forging_temperature": 540.0,
   "welding_temperature": 720.0
 }

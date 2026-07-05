@@ -1,0 +1,11 @@
+{
+  "type": "tfc:heating",
+  "ingredient": {
+    "tag": "c:double_ingots/andesite_alloy"
+  },
+  "result_fluid": {
+    "amount": 200,
+    "id": "tfc_aeronautics:molten_andesite_alloy"
+  },
+  "temperature": 1150.0
+}
