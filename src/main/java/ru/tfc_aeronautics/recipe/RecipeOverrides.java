@@ -11,14 +11,22 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import ru.tfc_aeronautics.Aeronautics;
 
 /**
- * Removes Create's vanilla crafting recipes for andesite alloy so the only
- * production path is the mod's own chain (rocks → powder → alloy → cast).
+ * Removes Create's vanilla crafting recipes for andesite alloy and shafts so
+ * the only production path for shafts is TFC's anvil workflow (alloy ingot on
+ * an anvil → shafts). The saw/cutting recipe (create:cutting/andesite_alloy)
+ * is intentionally left alone.
+ *
+ * The IDs match what Create's datagen writes — {@code
+ * create:crafting/<folder>/<name>}, with the {@code crafting/} prefix added
+ * by {@code ProcessingRecipeBuilder#build} via
+ * {@code recipeId.withPrefix(typeId.getPath() + "/")}.
  */
 public final class RecipeOverrides
 {
     private static final List<ResourceLocation> REMOVED = List.of(
-        ResourceLocation.fromNamespaceAndPath("create", "andesite_alloy"),
-        ResourceLocation.fromNamespaceAndPath("create", "andesite_alloy_from_zinc")
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/materials/andesite_alloy"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/materials/andesite_alloy_from_zinc"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/shaft")
     );
 
     private RecipeOverrides() {}

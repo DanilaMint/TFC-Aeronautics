@@ -1,0 +1,13 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {
+    "tag": "c:ingots/andesite_alloy"
+  },
+  "result": {
+    "count": 4,
+    "id": "create:shaft"
+  },
+  "rules": ["punch_last", "hit_second_last", "punch_third_last"],
+  "apply_bonus": false,
+  "tier": 3
+}

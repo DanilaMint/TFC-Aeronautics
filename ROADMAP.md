@@ -24,6 +24,13 @@
 | Add TFC Heating to double ingot | Complete | double ingot |
 | Add TFC Heating recipe: double ingot -> molten metal 200 MB | Complete | double ingot |
 
+## Update shaft recipes
+
+| Task | Status | Dependencies |
+|-|-|-|
+| Remove old recipe: 2 andesite alloy -> shaft | Complete | - |
+| Add forging recipe: andesite alloy -> 4 shafts | Complete | - |
+
 ## PR
 
 | Task | Status | Dependencies |
