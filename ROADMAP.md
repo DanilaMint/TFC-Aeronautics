@@ -9,7 +9,7 @@
 | Add TFC Heating to items | Complete | Register |
 | Add TFC Heating recipe: powder -> molten metal | Complete | Register |
 
-## Update Andesite Alloy
+## Refactor Andesite Alloy
 
 | Task | Status | Dependencies |
 |-|-|-|
@@ -24,12 +24,20 @@
 | Add TFC Heating to double ingot | Complete | double ingot |
 | Add TFC Heating recipe: double ingot -> molten metal 200 MB | Complete | double ingot |
 
-## Update shaft recipes
+## Refactor shaft recipes
 
 | Task | Status | Dependencies |
 |-|-|-|
 | Remove old recipe: 2 andesite alloy -> shaft | Complete | - |
 | Add forging recipe: andesite alloy -> 4 shafts | Complete | - |
+
+## Refactor casings
+
+| Task | Status | Dependencies |
+|-|-|-|
+| Add create item application recipe: TFC stripped logs + andesite alloy ingot -> Andesite casing | | - |
+| Add create item application recipe: TFC stripped logs + brass ingot -> Brass casing | | - |
+| Add create item application recipe: TFC stripped logs + copper ingot -> Copper casing | | - |
 
 ## PR
 
