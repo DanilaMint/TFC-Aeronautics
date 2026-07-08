@@ -39,6 +39,22 @@
 | Add create item application recipe: TFC stripped logs + brass ingot -> Brass casing | | - |
 | Add create item application recipe: TFC stripped logs + copper ingot -> Copper casing | | - |
 
+## Stamping Press
+
+| Task | Status | Dependencies |
+|-|-|-|
+| Add `tfc_aeronautics:stamping_press` block + item + block-entity | Complete | - |
+| Reuse Create press model + textures; animate head via `AllPartialModels.MECHANICAL_PRESS_HEAD` | Complete | - |
+| Implement TFC anvil recipe lookup on strike (input + filter item, heat-gated) | Complete | - |
+| Filter UI on back face via `FilteringBehaviour` + `StampingPressFilterSlot` | Complete | - |
+| Register 8.0 SU stress impact (matches Create press) | Complete | - |
+| Reject basin below (canSurvive) and skip basin processing (tryProcessInBasin=false) | Complete | - |
+| Make the shaft actually render inside the block + the striking head actually animate | | renderer |
+| Move filter slot to a perpendicular face (currently it overlaps the energy input face) | | - |
+| Add running squeak/creak sound when the shaft turns | | - |
+| Add anvil strike sound when the head hits the item | | - |
+| Replace Create's press model + textures with a TFC-flavoured custom model and texture | | - |
+
 ## PR
 
 | Task | Status | Dependencies |

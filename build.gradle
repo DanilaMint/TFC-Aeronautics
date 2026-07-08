@@ -72,6 +72,16 @@ dependencies {
 
     // TFC at compile time only — supplied at runtime via mods.toml dependency on the user's modpack.
     compileOnly files('libs/tfc-1.21.1-4.2.5.jar')
+
+    // Create at compile time only — supplied at runtime via mods.toml dependency.
+    // The stamping press is built on top of Create's kinetic block / press engine.
+    compileOnly files('libs/create-1.21.1-6.0.10.jar')
+
+    // Create's transitively-required runtime libs, extracted from Create's META-INF/jarjar.
+    // Ponder (1.0.82) ships catnip; flywheel + registrate come alongside.
+    compileOnly files('libs/ponder-neoforge-1.0.82+mc1.21.1.jar')
+    compileOnly files('libs/flywheel-neoforge-1.21.1-1.0.6.jar')
+    compileOnly files('libs/Registrate-MC1.21-1.3.0+67.jar')
 }
 
 configurations {
