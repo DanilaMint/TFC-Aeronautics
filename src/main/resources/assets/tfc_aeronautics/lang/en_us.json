@@ -19,5 +19,7 @@
   "item.tfc_aeronautics.molten_magmatite_bucket": "Molten Magmatite Bucket",
   "item.create.andesite_alloy": "Andesite Alloy Ingot",
   "item.tfc_aeronautics.metal.double_ingot.andesite_alloy": "Andesite Alloy Double Ingot",
-  "block.tfc_aeronautics.stamping_press": "Stamping Press"
+  "block.tfc_aeronautics.stamping_press": "Stamping Press",
+  "block.tfc_aeronautics.heater": "Heater",
+  "tfc_aeronautics.heater.max_temperature": "Max Temperature"
 }

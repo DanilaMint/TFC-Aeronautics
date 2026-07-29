@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=false": { "model": "tfc_aeronautics:block/heater_off" },
+    "lit=true": { "model": "tfc_aeronautics:block/heater_on" }
+  }
+}

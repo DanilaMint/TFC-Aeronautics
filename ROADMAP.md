@@ -55,6 +55,28 @@
 | Add anvil strike sound when the head hits the item | | - |
 | Replace Create's press model + textures with a TFC-flavoured custom model and texture | | - |
 
+## Heater
+
+| Task | Status | Dependencies |
+|-|-|-|
+| Add `tfc_aeronautics:heater` block + item + block-entity | Complete | - |
+| IItemHandler capability on all faces (chute/funnel/hopper/arm) + IFluidHandler on DOWN face | Complete | - |
+| TFC integration: Fuel burn + Bellows boost + Encased Fan air + HeatingRecipe → molten tank | Complete | - |
+| LIT block-state property + light emission 14 when burning | Complete | - |
+| Max-temperature knob via Create `ValueSettingsBehaviour` (0..MAX_TEMP, 50 °C steps) | Complete | - |
+| Two-state block model via blockstate variants (lit/unlit) | Complete | - |
+| Animated flame overlay rendered by `HeaterBlockEntityRenderer` (Y-bob + scale flicker) | Complete | - |
+| Make heater textures | | - |
+|   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_side.png` | | - |
+|   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_top_off.png` (rest) | | - |
+|   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_top_on.png` (burning) | | - |
+|   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_bottom.png` | | - |
+|   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_flame.png` (animated overlay) | | - |
+
+> Models already reference these textures; the files just don't exist on disk yet.
+> Models: `models/block/heater_off.json`, `models/block/heater_on.json`, `models/block/heater/flame.json`,
+> `blockstates/heater.json`, `models/item/heater.json`.
+
 ## PR
 
 | Task | Status | Dependencies |

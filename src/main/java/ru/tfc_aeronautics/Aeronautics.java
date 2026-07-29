@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidBlocks;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidItems;
 import ru.tfc_aeronautics.fluid.AeronauticsFluids;
+import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.DoubleIngotRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.press.StampingPressRegistration;
@@ -36,6 +37,7 @@ public class Aeronautics {
         AeronauticsFluidItems.register(modEventBus);
         AeronauticsFluids.register(modEventBus);
         StampingPressRegistration.register(modEventBus);
+        HeaterRegistration.register(modEventBus);
         RecipeOverrides.register();
     }
 }

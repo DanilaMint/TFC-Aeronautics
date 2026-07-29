@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "tfc_aeronautics:block/heater_top_on",
+    "side": "tfc_aeronautics:block/heater_side"
+  }
+}
