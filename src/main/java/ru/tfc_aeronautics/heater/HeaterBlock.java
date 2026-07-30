@@ -1,14 +1,18 @@
 package ru.tfc_aeronautics.heater;
 
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -29,11 +33,16 @@ import net.neoforged.neoforge.items.IItemHandler;
  * and an {@code IFluidHandler} capability on the down face (so any pipe can
  * extract molten metal).
  *
+ * <p>The block has a {@link BlockStateProperties#HORIZONTAL_FACING} property so
+ * it can be rotated with Create's wrench. The face the knob points to (where
+ * {@link HeaterValueBehaviour} is rendered) follows this facing — see
+ * {@link HeaterValueBoxTransform}.
+ *
  * <p>RMB behaviour: insert the held item stack into the matching inventory slot
  * (heatable item → slot 0, fuel → slot 1). Sneak + RMB extracts a single
  * hot-enough item from slot 0. There is no GUI container.
  */
-public class HeaterBlock extends Block implements IBE<HeaterBlockEntity> {
+public class HeaterBlock extends Block implements IBE<HeaterBlockEntity>, IWrenchable {
 
     public HeaterBlock(Properties properties) {
         super(properties);
@@ -42,7 +51,15 @@ public class HeaterBlock extends Block implements IBE<HeaterBlockEntity> {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(BlockStateProperties.LIT);
+        builder.add(BlockStateProperties.LIT, BlockStateProperties.HORIZONTAL_FACING);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return defaultBlockState().setValue(
+            BlockStateProperties.HORIZONTAL_FACING,
+            context.getHorizontalDirection().getOpposite()
+        );
     }
 
     @Override
@@ -136,5 +153,40 @@ public class HeaterBlock extends Block implements IBE<HeaterBlockEntity> {
     @Override
     public BlockEntityType<? extends HeaterBlockEntity> getBlockEntityType() {
         return HeaterRegistration.HEATER_BE.get();
+    }
+
+    // --- IWrenchable -----------------------------------------------------
+
+    /**
+     * The heater stores no kinetic state and has no neighbour-dependent shape, so a
+     * plain {@code level.setBlock(... UPDATE_ALL)} is enough — no need for
+     * {@code KineticBlockEntity.switchToBlockState} and its kinetic-network bookkeeping.
+     * Rotation comes from {@link #getRotatedBlockState(BlockState, Direction)}.
+     */
+    @Override
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        BlockState rotated = getRotatedBlockState(state, context.getClickedFace());
+        if (rotated == state || !rotated.canSurvive(level, pos))
+            return InteractionResult.PASS;
+
+        level.setBlock(pos, rotated, Block.UPDATE_ALL);
+        if (level.getBlockState(pos) != state)
+            IWrenchable.playRotateSound(level, pos);
+        return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
+        // Default IWrenchable only rotates HORIZONTAL_FACING when the player clicks the top/bottom
+        // (axis Y). We do the same here so the four cardinal settings stay consistent, regardless of
+        // which face the wrench targets.
+        if (targetedFace.getAxis() != Direction.Axis.Y) return originalState;
+        if (!originalState.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) return originalState;
+        return originalState.setValue(
+            BlockStateProperties.HORIZONTAL_FACING,
+            originalState.getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise(Direction.Axis.Y)
+        );
     }
 }

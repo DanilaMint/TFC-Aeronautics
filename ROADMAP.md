@@ -49,6 +49,7 @@
 | Filter UI on back face via `FilteringBehaviour` + `StampingPressFilterSlot` | Complete | - |
 | Register 8.0 SU stress impact (matches Create press) | Complete | - |
 | Reject basin below (canSurvive) and skip basin processing (tryProcessInBasin=false) | Complete | - |
+| Fix the stamping press model (block renders wrong in world/inventory) | | - |
 | Make the shaft actually render inside the block + the striking head actually animate | | renderer |
 | Move filter slot to a perpendicular face (currently it overlaps the energy input face) | | - |
 | Add running squeak/creak sound when the shaft turns | | - |
@@ -72,10 +73,36 @@
 |   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_top_on.png` (burning) | | - |
 |   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_bottom.png` | | - |
 |   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_flame.png` (animated overlay) | | - |
+| Fix heater texture | | - |
 
 > Models already reference these textures; the files just don't exist on disk yet.
 > Models: `models/block/heater_off.json`, `models/block/heater_on.json`, `models/block/heater/flame.json`,
 > `blockstates/heater.json`, `models/item/heater.json`.
+
+## Create Spout + TFC Casting
+
+| Task | Status | Dependencies |
+|-|-|-|
+| Register `BlockSpoutingBehaviour` against `tfc:mold_table` so a Create spout placed above a mold table executes the matching `tfc:casting` recipe (drains `recipe.getFluidIngredient().amount()` mB from the spout, places result in mold table's `OUTPUT_SLOT`) | Complete | - |
+| Guard against double-casting: skip when mold stack is empty, mold already contains fluid, or `OUTPUT_SLOT` is occupied | Complete | - |
+
+Implementation: `src/main/java/ru/tfc_aeronautics/recipe/SpoutCastingBehavior.java` + `SpoutCompat.java`. Pattern mirrors Create's own `com.simibubi.create.compat.tconstruct.SpoutCasting`.
+
+## Tigth sheet
+
+| Task | Status | Dependencies |
+|-|-|-|
+| Register `tfc_aeronautics:metal/tight_sheet` for copper, wrougth iron and steel | | - |
+| Draw textures for them | | - |
+| Register TFC Heating recipe: tight sheet -> 100 Mb metal | | - |
+| Register Create pressing recipe: ingot -> tight sheet | | - |
+
+## Refactor Create mechanical press
+
+| Task | Status | Dependencies |
+|-|-|-|
+| Delete old recipe | | - |
+| Register new recipe (same, but iron block replace to wrougth iron double ingot) | | - |
 
 ## PR
 

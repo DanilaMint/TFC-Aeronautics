@@ -51,13 +51,18 @@ import org.jetbrains.annotations.Nullable;
  * {@code HeatingRecipe} matches its temperature the recipe's fluid output is
  * pushed into the internal {@link FluidTank} (exposed via {@code IFluidHandler}
  * on the down face).
+ *
+ * <p>The tank holds up to {@link #TANK_CAPACITY} mB of a single molten metal. If the
+ * tank already holds a different metal, the incoming fluid is rejected — metals do not
+ * mix. If the recipe would overflow the tank, the excess is silently discarded; the
+ * input item has still melted, so it is consumed either way.
  */
 public class HeaterBlockEntity extends SmartBlockEntity implements IBellowsConsumer {
 
     public static final int SLOT_ITEM = 0;
     public static final int SLOT_FUEL = 1;
 
-    public static final int TANK_CAPACITY = 4000; // 4 buckets of molten metal
+    public static final int TANK_CAPACITY = 2000; // internal molten-metal volume, in mB
 
     public static final int MAX_TEMP = (int) Heat.maxVisibleTemperature();
 
@@ -110,9 +115,34 @@ public class HeaterBlockEntity extends SmartBlockEntity implements IBellowsConsu
                 sendData();
             }
 
+            /**
+             * Two rules govern insertion:
+             * <ul>
+             *   <li>If the tank already holds a different molten metal, the incoming fluid is rejected —
+             *       metals do not mix inside the heater.</li>
+             *   <li>If the request would push the tank past {@link #TANK_CAPACITY}, only what fits is
+             *       accepted; the overflow is silently discarded (the molten metal "disappears").</li>
+             * </ul>
+             * The caller is responsible for handling the remainder — in practice this means the input
+             * item is always consumed by {@link #tryApplyHeatingRecipe}, since the metal has already melted.
+             */
             @Override
             public int fill(FluidStack resource, FluidAction action) {
-                return 0; // molten metal only leaves, never enters
+                if (resource.isEmpty()) return 0;
+                FluidStack current = getFluid();
+                if (!current.isEmpty() && !FluidStack.isSameFluidSameComponents(current, resource)) return 0;
+                int space = getCapacity() - current.getAmount();
+                if (space <= 0) return 0;
+                int accepted = Math.min(resource.getAmount(), space);
+                if (action.execute()) {
+                    if (current.isEmpty()) {
+                        setFluid(resource.copyWithAmount(accepted));
+                    } else {
+                        current.grow(accepted);
+                    }
+                    onContentsChanged();
+                }
+                return accepted;
             }
         };
         this.hotAwareItemHandler = new HotAwareItemHandler(this, inventory);
@@ -231,12 +261,9 @@ public class HeaterBlockEntity extends SmartBlockEntity implements IBellowsConsu
         FluidStack fluidOut = cachedRecipe.assembleFluid(stack);
         ItemStack itemOut = cachedRecipe.assembleItem(stack);
 
+        // The molten metal either fits in the tank or is discarded (overflow / type mismatch / full).
+        // In every case the input item has melted, so it is always consumed.
         if (!fluidOut.isEmpty()) {
-            int accepted = tank.fill(fluidOut, FluidAction.SIMULATE);
-            if (accepted < fluidOut.getAmount()) {
-                // Not enough room - abort the transformation this tick, try again later
-                return;
-            }
             tank.fill(fluidOut, FluidAction.EXECUTE);
         }
 

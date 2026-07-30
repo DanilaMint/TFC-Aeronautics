@@ -1,3 +1,3 @@
 {
-  "parent": "tfc_aeronautics:block/heater_off"
+  "parent": "create:block/blaze_burner/block"
 }
