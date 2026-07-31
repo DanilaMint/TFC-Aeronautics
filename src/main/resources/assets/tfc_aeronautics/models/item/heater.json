@@ -1,3 +1,27 @@
 {
-  "parent": "tfc_aeronautics:block/heater"
+  "parent": "tfc_aeronautics:block/heater_off",
+  "display": {
+    "thirdperson_righthand": {
+      "scale": [0.2, 0.2, 0.2]
+    },
+    "thirdperson_lefthand": {
+      "scale": [0.2, 0.2, 0.2]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, 45, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 45, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "gui": {
+      "rotation": [30, 45, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "ground": {
+      "translation": [0, 1, 0],
+      "scale": [0.2, 0.2, 0.2]
+    }
+  }
 }

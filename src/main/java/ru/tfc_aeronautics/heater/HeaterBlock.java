@@ -56,7 +56,7 @@ public class HeaterBlock extends Block implements IBE<HeaterBlockEntity>, IWrenc
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(
+        return defaultBlockState().setValue(BlockStateProperties.LIT, false).setValue(
             BlockStateProperties.HORIZONTAL_FACING,
             context.getHorizontalDirection().getOpposite()
         );

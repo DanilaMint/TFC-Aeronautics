@@ -215,10 +215,10 @@ public class HeaterBlockEntity extends SmartBlockEntity implements IBellowsConsu
         // 8. Emit flame/smoke particles while burning
         if (isLit && level instanceof ServerLevel serverLevel && level.getGameTime() % 3 == 0) {
             double x = worldPosition.getX() + 0.5;
-            double y = worldPosition.getY() + 1.0;
+            double y = worldPosition.getY() + 0.375; // 6 px above the block bottom — inside the coal cavity
             double z = worldPosition.getZ() + 0.5;
-            serverLevel.sendParticles(ParticleTypes.FLAME, x, y, z, 4, 0.3, 0.1, 0.3, 0.02);
-            serverLevel.sendParticles(ParticleTypes.SMOKE, x, y + 0.3, z, 2, 0.4, 0.2, 0.4, 0.01);
+            serverLevel.sendParticles(ParticleTypes.FLAME, x, y, z, 3, 0.3, 0.1, 0.3, 0.02);
+            serverLevel.sendParticles(ParticleTypes.SMOKE, x, y + 0.3, z, 1, 0.4, 0.2, 0.4, 0.01);
         }
 
         setChanged();
