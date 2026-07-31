@@ -1,0 +1,13 @@
+{
+  "type": "create:pressing",
+  "ingredients": [
+    {
+      "tag": "c:ingots/copper"
+    }
+  ],
+  "results": [
+    {
+      "id": "tfc_aeronautics:metal/tight_sheet/copper"
+    }
+  ]
+}

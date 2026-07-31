@@ -88,15 +88,15 @@
 
 Implementation: `src/main/java/ru/tfc_aeronautics/recipe/SpoutCastingBehavior.java` + `SpoutCompat.java`. Pattern mirrors Create's own `com.simibubi.create.compat.tconstruct.SpoutCasting`.
 
-## Tigth sheet
+## Tight sheet
 
 | Task | Status | Dependencies |
 |-|-|-|
-| Register `tfc_aeronautics:metal/tight_sheet` for copper, wrougth iron and steel | | - |
+| Register `tfc_aeronautics:metal/tight_sheet` for copper, wrought iron and steel | Complete | - |
 | Draw textures for them | | - |
-| Register TFC Heating recipe: tight sheet -> 100 Mb metal | | - |
-| Register Create pressing recipe: ingot -> tight sheet | | - |
-| Register TFC Forging recipe: ingot -> tigth sheet | | - |
+| Register TFC Heating recipe: tight sheet -> 100 Mb metal | Complete | - |
+| Register Create pressing recipe: ingot -> tight sheet | Complete | - |
+| Register TFC Forging recipe: ingot -> tight sheet | Complete | - |
 
 ## Refactor Create mechanical press
 

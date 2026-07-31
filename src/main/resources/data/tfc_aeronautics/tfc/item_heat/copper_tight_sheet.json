@@ -1,0 +1,8 @@
+{
+  "ingredient": {
+    "item": "tfc_aeronautics:metal/tight_sheet/copper"
+  },
+  "heat_capacity": 9.6,
+  "forging_temperature": 648.0,
+  "welding_temperature": 864.0
+}

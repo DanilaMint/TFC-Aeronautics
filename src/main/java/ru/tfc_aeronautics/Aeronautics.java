@@ -12,6 +12,7 @@ import ru.tfc_aeronautics.fluid.AeronauticsFluidItems;
 import ru.tfc_aeronautics.fluid.AeronauticsFluids;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.DoubleIngotRegistration;
+import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.press.StampingPressRegistration;
 import ru.tfc_aeronautics.recipe.RecipeOverrides;
@@ -33,6 +34,7 @@ public class Aeronautics {
 
         PowderRegistration.register(modEventBus);
         DoubleIngotRegistration.register(modEventBus);
+        TightSheetRegistration.register(modEventBus);
         AeronauticsFluidBlocks.register(modEventBus);
         AeronauticsFluidItems.register(modEventBus);
         AeronauticsFluids.register(modEventBus);

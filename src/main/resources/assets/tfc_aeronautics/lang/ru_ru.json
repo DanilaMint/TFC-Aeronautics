@@ -4,6 +4,9 @@
   "item.tfc_aeronautics.molten_andesite_alloy_bucket": "Ведро жидкого андезитового сплава",
   "item.create.andesite_alloy": "Слиток андезитового сплава",
   "item.tfc_aeronautics.metal.double_ingot.andesite_alloy": "Двойной слиток андезитового сплава",
+  "item.tfc_aeronautics.metal.tight_sheet.copper": "Тонкий медный лист",
+  "item.tfc_aeronautics.metal.tight_sheet.wrought_iron": "Тонкий лист кованого железа",
+  "item.tfc_aeronautics.metal.tight_sheet.steel": "Тонкий стальной лист",
   "block.tfc_aeronautics.stamping_press": "Штамп-пресс",
   "block.tfc_aeronautics.heater": "Нагреватель",
   "tfc_aeronautics.heater.max_temperature": "Максимальная температура"

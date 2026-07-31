@@ -17,6 +17,7 @@
 7. [Спут Create + TFC литьё](#7-спут-create--tfc-литьё)
 8. [Удалённые рецепты Create](#8-удалённые-рецепты-create)
 9. [Вентилятор Create → угольная кузня TFC](#9-вентилятор-create--угольная-кузня-tfc)
+10. [Тонкие листы (Tight sheet)](#10-тонкие-листы-tight-sheet)
 
 ---
 
@@ -744,3 +745,59 @@ Aeronautics.MOD_ID, bus = Bus.GAME)`, поэтому отдельной реги
 механику (`0.0`) или наоборот — сделать вентилятор мощнее меха
 (например, `5.0` → вентилятор на 256 RPM ≈ 1280 air-ticks/тик, т.е.
 моментально насыщает кузню).
+
+---
+
+## 10. Тонкие листы (Tight sheet)
+
+«Тонкий лист» — это промежуточный продукт между слитком и обычным
+TFC-листом: одна единица `metal/tight_sheet/<металл>` содержит 100 мB
+металла (вдвое меньше, чем стандартный `tfc:metal/sheet/<металл>`).
+Используется там, где нужен тонкий, плотно прокатанный металл —
+например, для обшивки воздушных шаров и герметичных корпусов.
+
+### Варианты
+
+* `tfc_aeronautics:metal/tight_sheet/copper`
+* `tfc_aeronautics:metal/tight_sheet/wrought_iron`
+* `tfc_aeronautics:metal/tight_sheet/steel`
+
+Регистрируются через `TightSheetRegistration.TIGHT_SHEETS` — `Map`,
+построенный из enum-класса `TightSheet` через `Helpers.mapOf(...)`.
+Каждая запись enum-а несёт `id`, `meltTemperature` и ленивый `Supplier`
+на выходной жидкий металл из `TFCFluids.METALS.get(Metal.X)`.
+
+### Получение
+
+Два пути, оба data-driven:
+
+1. **Create-пресс.** `data/create/recipe/pressing/tight_sheet_<metal>.json`
+   превращает слиток из тега `c:ingots/<metal>` в наш тонкий лист. Этот
+   рецепт работает на стандартном Create `Mechanical Press`.
+2. **Наковальня TFC.** `data/tfc_aeronautics/recipe/anvil/tight_sheet_<metal>.json`
+   — `tfc:anvil`-рецепт «один слиток → один тонкий лист», правила
+   `hit_last`, `hit_second_last`, `hit_third_last` (как у обычного
+   TFC-листа), тиры 1/3/4 для меди/железа/стали.
+
+### Нагрев
+
+* `data/tfc_aeronautics/tfc/item_heat/<metal>_tight_sheet.json` —
+  задаёт `heat_capacity: 9.6`, температуры ковки и сварки (≈60 % и
+  ≈80 % от температуры плавления).
+* `data/tfc_aeronautics/recipe/heating/<metal>_tight_sheet.json` —
+  `tfc:heating`-рецепт: тонкий лист → 100 мB соответствующего жидкого
+  металла (`tfc:metal/<metal>`) при температуре плавления.
+
+### Регистрация
+
+`TightSheetRegistration.register(modEventBus)` вызывается в
+`Aeronautics#Aeronautics`. Листы попадают в общий креатив-таб через
+`TightSheetRegistration.TIGHT_SHEETS.values().forEach(s -> output.accept(s.get()))`.
+
+### Текстуры
+
+`textures/item/metal/tight_sheet/<metal>.png` — 16×16, с тонкими
+горизонтальными «полосами прокатки», отличающими плотный тонкий лист
+от более «рваного» стандартного TFC-листа. Текстуры сгенерированы
+скриптом в `/tmp/gen_tight_sheet_textures.py` (PIL) и при необходимости
+перегенерируются тем же скриптом.

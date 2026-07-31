@@ -1,0 +1,8 @@
+{
+  "ingredient": {
+    "item": "tfc_aeronautics:metal/tight_sheet/steel"
+  },
+  "heat_capacity": 9.6,
+  "forging_temperature": 924.0,
+  "welding_temperature": 1232.0
+}
