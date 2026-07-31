@@ -24,10 +24,6 @@ public class Config {
             .comment("Multiplier applied to glider durability loss. 1.0 = vanilla rate.")
             .defineInRange("gliderDecayModifier", 1.0, 0.0, 10.0);
 
-    public static final ModConfigSpec.DoubleValue FAN_FORGE_AIR_PER_TICK = BUILDER
-            .comment("How many air-ticks per server tick a Create Encased Fan delivers to an adjacent TFC charcoal forge, per unit of RPM (one bellows push = 200 air-ticks).")
-            .defineInRange("fanForgeAirPerTick", 1.5, 0.0, 20.0);
-
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     @EventBusSubscriber(modid = Aeronautics.MOD_ID)

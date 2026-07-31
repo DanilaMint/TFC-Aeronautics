@@ -105,15 +105,6 @@ Implementation: `src/main/java/ru/tfc_aeronautics/recipe/SpoutCastingBehavior.ja
 | Delete old recipe | | - |
 | Register new recipe (same, but iron block replace to wrougth iron double ingot) | | - |
 
-## Fan → Charcoal Forge
-
-| Task | Status | Dependencies |
-|-|-|-|
-| Implement `FanForgeIntake` server-tick listener that detects adjacent `EncasedFanBlockEntity` blowing into a tracked TFC charcoal forge and feeds it air via `CharcoalForgeBlockEntity.intakeAir(...)` | Complete | - |
-| Track charcoal forge positions via `BlockEvent.EntityPlaceEvent` / `BlockEvent.BreakEvent` / `ChunkEvent.Load` / `ChunkEvent.Unload` to avoid scanning every chunk every tick | Complete | - |
-| Add `fanForgeAirPerTick` config tunable (`common.toml`, range 0.0–20.0) controlling air-ticks per RPM per tick | Complete | - |
-| Document the mechanic in `DOCS.md` (section 9) and add ROADMAP entry | Complete | - |
-
 ## PR
 
 | Task | Status | Dependencies |
