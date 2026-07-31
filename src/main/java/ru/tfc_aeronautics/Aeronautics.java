@@ -38,6 +38,7 @@ public class Aeronautics {
         AeronauticsFluids.register(modEventBus);
         StampingPressRegistration.register(modEventBus);
         HeaterRegistration.register(modEventBus);
+        CreativeTabs.register(modEventBus);
         RecipeOverrides.register();
     }
 }

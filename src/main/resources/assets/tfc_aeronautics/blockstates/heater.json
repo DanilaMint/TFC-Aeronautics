@@ -1,6 +1,6 @@
 {
   "variants": {
-    "lit=false": { "model": "create:block/blaze_burner/block" },
-    "lit=true": { "model": "create:block/blaze_burner/block_with_fire" }
+    "lit=false": { "model": "tfc_aeronautics:block/heater" },
+    "lit=true": { "model": "tfc_aeronautics:block/heater" }
   }
 }

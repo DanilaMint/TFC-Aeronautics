@@ -1,4 +1,5 @@
 {
+  "itemGroup.tfc_aeronautics": "TFC Aeronautics",
   "fluid.tfc_aeronautics.molten_andesite_alloy": "Жидкий андезитовый сплав",
   "item.tfc_aeronautics.molten_andesite_alloy_bucket": "Ведро жидкого андезитового сплава",
   "item.create.andesite_alloy": "Слиток андезитового сплава",
