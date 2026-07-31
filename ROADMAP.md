@@ -51,7 +51,7 @@
 | Reject basin below (canSurvive) and skip basin processing (tryProcessInBasin=false) | Complete | - |
 | Fix the stamping press model (block renders wrong in world/inventory) | | - |
 | Make the shaft actually render inside the block + the striking head actually animate | | renderer |
-| Move filter slot to a perpendicular face (currently it overlaps the energy input face) | | - |
+| Move filter slot to a perpendicular face (currently it overlaps the energy input face) | Complete | - |
 | Add running squeak/creak sound when the shaft turns | | - |
 | Add anvil strike sound when the head hits the item | | - |
 | Replace Create's press model + textures with a TFC-flavoured custom model and texture | | - |

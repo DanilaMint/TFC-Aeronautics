@@ -372,10 +372,12 @@ Create зовёт этот метод, когда `ItemEntity` оказался 
 
 ### Фильтр
 
-`FilteringBehaviour` рендерит слот-фильтр на грани противоположной
-`HORIZONTAL_FACING` (см. `StampingPressFilterSlot#getSouthLocation`):
-`VecHelper.voxelSpace(8f, 8f, 15.5f)`. Только эта грань активна в
-`isSideActive`. Это сделано чтобы фильтр не перекрывал грань подвода кинетики.
+`FilteringBehaviour` рендерит слот-фильтр на двух горизонтальных гранях,
+перпендикулярных оси вала (см. `StampingPressFilterSlot#isSideActive`):
+это `HORIZONTAL_FACING.getClockWise()` и `getCounterClockWise()`. Задняя
+грань (противоположная `HORIZONTAL_FACING`) теперь не активна — раньше
+фильтр стоял именно там и перекрывал свободный торец блока. Теперь
+игрок может поставить/забрать фильтр с любого из двух боков.
 
 `FilteringBehaviour.forRecipes()` — это значит, что слот работает в режиме
 recipe-filter (как у Create-механизмов), а не tag-filter.

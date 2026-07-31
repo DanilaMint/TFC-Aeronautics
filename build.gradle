@@ -12,6 +12,26 @@ sourceSets.main.resources {
     srcDir 'src/generated/resources'
 }
 
+sourceSets {
+    client {
+        java {
+            srcDir 'src/client/java'
+        }
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+        resources {
+            srcDir 'src/client/resources'
+        }
+    }
+}
+
+// The NeoForge moddev plugin auto-provides Minecraft + NeoForge to the main
+// compile classpath only. Mirror that into the client classpath so client-only
+// classes (e.g. BlockEntityRenderer) can reference Minecraft internals.
+configurations.clientCompileClasspath.extendsFrom(configurations.compileClasspath)
+configurations.clientRuntimeClasspath.extendsFrom(configurations.runtimeClasspath)
+configurations.clientCompileOnly.extendsFrom(configurations.compileOnly)
+
 base {
     archivesName = mod_id
 }
@@ -63,6 +83,7 @@ neoForge {
     mods {
         "${mod_id}" {
             sourceSet(sourceSets.main)
+            sourceSet(sourceSets.client)
         }
     }
 }
@@ -113,6 +134,15 @@ neoForge.ideSyncTask generateModMetadata
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+// The NeoForge ModDev plugin's `sourceSet(sourceSets.client)` registers the
+// client source set for run-time classpath assembly, but it does NOT add its
+// output to the main `jar` task. Since the renderer classes (e.g.
+// StampingPressRenderer) live in the client source set, merge its compiled
+// output into the produced mod JAR explicitly.
+tasks.named('jar') {
+    from sourceSets.client.output
 }
 
 idea {

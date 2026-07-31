@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import com.simibubi.create.content.kinetics.press.PressingBehaviour;
+import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 
 import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import net.createmod.catnip.render.CachedBuffers;
@@ -31,6 +32,8 @@ public class StampingPressRenderer extends KineticBlockEntityRenderer<StampingPr
     protected void renderSafe(StampingPressBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer,
         int light, int overlay) {
         super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
+
+        FilteringRenderer.renderOnBlockEntity(be, partialTicks, ms, buffer, light, overlay);
 
         if (VisualizationManager.supportsVisualization(be.getLevel()))
             return;
