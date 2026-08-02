@@ -138,9 +138,8 @@ tasks.withType(JavaCompile).configureEach {
 
 // The NeoForge ModDev plugin's `sourceSet(sourceSets.client)` registers the
 // client source set for run-time classpath assembly, but it does NOT add its
-// output to the main `jar` task. Since the renderer classes (e.g.
-// StampingPressRenderer) live in the client source set, merge its compiled
-// output into the produced mod JAR explicitly.
+// output to the main `jar` task. Merge the client's compiled output into the
+// produced mod JAR explicitly so renderer classes packaged there ship with the mod.
 tasks.named('jar') {
     from sourceSets.client.output
 }

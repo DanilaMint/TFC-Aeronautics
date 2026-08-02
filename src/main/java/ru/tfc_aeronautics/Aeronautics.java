@@ -14,7 +14,6 @@ import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.DoubleIngotRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
-import ru.tfc_aeronautics.press.StampingPressRegistration;
 import ru.tfc_aeronautics.recipe.RecipeOverrides;
 
 /**
@@ -38,7 +37,6 @@ public class Aeronautics {
         AeronauticsFluidBlocks.register(modEventBus);
         AeronauticsFluidItems.register(modEventBus);
         AeronauticsFluids.register(modEventBus);
-        StampingPressRegistration.register(modEventBus);
         HeaterRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
         RecipeOverrides.register();

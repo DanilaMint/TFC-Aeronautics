@@ -19,8 +19,7 @@ import ru.tfc_aeronautics.Aeronautics;
 /**
  * Registers the {@code tfc_aeronautics:heater} block, its block-item, and its block-entity type.
  *
- * <p>Mirrors {@link ru.tfc_aeronautics.press.StampingPressRegistration}: three
- * {@code DeferredRegister}s initialised statically, with a single {@link #register(IEventBus)}
+ * <p>Three {@code DeferredRegister}s initialised statically, with a single {@link #register(IEventBus)}
  * entry point called from {@link Aeronautics#Aeronautics}.
  *
  * <p>Capability registration for the block entity (IItemHandler for chute/funnel/hopper,

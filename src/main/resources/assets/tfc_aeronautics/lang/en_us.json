@@ -22,7 +22,6 @@
   "item.tfc_aeronautics.metal.tight_sheet.copper": "Copper Tight Sheet",
   "item.tfc_aeronautics.metal.tight_sheet.wrought_iron": "Wrought Iron Tight Sheet",
   "item.tfc_aeronautics.metal.tight_sheet.steel": "Steel Tight Sheet",
-  "block.tfc_aeronautics.stamping_press": "Stamping Press",
   "block.tfc_aeronautics.heater": "Heater",
   "tfc_aeronautics.heater.max_temperature": "Max Temperature"
 }
