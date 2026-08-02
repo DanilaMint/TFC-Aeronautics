@@ -15,6 +15,7 @@ import ru.tfc_aeronautics.metal.DoubleIngotRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.recipe.RecipeOverrides;
+import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
 
 /**
  * Main entry point for the TFC Aeronautics mod.
@@ -38,6 +39,7 @@ public class Aeronautics {
         AeronauticsFluidItems.register(modEventBus);
         AeronauticsFluids.register(modEventBus);
         HeaterRegistration.register(modEventBus);
+        StampingPressRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
         RecipeOverrides.register();
     }

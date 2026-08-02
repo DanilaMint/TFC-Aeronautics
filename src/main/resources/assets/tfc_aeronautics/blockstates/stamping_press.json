@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "tfc_aeronautics:block/stamping_press" },
+    "facing=south": { "model": "tfc_aeronautics:block/stamping_press", "y": 180 },
+    "facing=west":  { "model": "tfc_aeronautics:block/stamping_press", "y": 270 },
+    "facing=east":  { "model": "tfc_aeronautics:block/stamping_press", "y": 90 }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "textures": {
+    "peen_side": "tfc_aeronautics:block/stamping_press_head_peen_side",
+    "peen_top": "tfc_aeronautics:block/stamping_press_head_peen_top",
+    "rod_side": "tfc_aeronautics:block/stamping_press_head_rod_side",
+    "rod_top": "tfc_aeronautics:block/stamping_press_head_rod_top",
+    "particle": "tfc_aeronautics:block/stamping_press_head_rod_side"
+  },
+  "elements": [
+    {
+      "name": "peen",
+      "from": [4, 0, 4],
+      "to": [12, 2, 12],
+      "faces": {
+        "north": { "uv": [0, 0, 16, 16], "texture": "#peen_side" },
+        "east":  { "uv": [0, 0, 16, 16], "texture": "#peen_side" },
+        "south": { "uv": [0, 0, 16, 16], "texture": "#peen_side" },
+        "west":  { "uv": [0, 0, 16, 16], "texture": "#peen_side" },
+        "up":    { "uv": [0, 0, 16, 16], "texture": "#peen_top" },
+        "down":  { "uv": [0, 0, 16, 16], "texture": "#peen_top" }
+      }
+    },
+    {
+      "name": "rod",
+      "from": [5, 2, 5],
+      "to": [11, 24, 11],
+      "faces": {
+        "north": { "uv": [0, 0, 16, 16], "texture": "#rod_side" },
+        "east":  { "uv": [0, 0, 16, 16], "texture": "#rod_side" },
+        "south": { "uv": [0, 0, 16, 16], "texture": "#rod_side" },
+        "west":  { "uv": [0, 0, 16, 16], "texture": "#rod_side" },
+        "up":    { "uv": [0, 0, 16, 16], "texture": "#rod_top" },
+        "down":  { "uv": [0, 0, 16, 16], "texture": "#rod_top" }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout"
+}

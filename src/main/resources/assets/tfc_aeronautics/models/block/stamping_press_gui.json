@@ -1,0 +1,97 @@
+{
+	"credit": "Model generated using Blockbench",
+	"textures": {
+		"0": "tfc_aeronautics:block/stamping_press_shaft",
+		"1": "tfc_aeronautics:block/stamping_press_north",
+		"2": "tfc_aeronautics:block/stamping_press_south",
+		"3": "tfc_aeronautics:block/stamping_press_east",
+		"4": "tfc_aeronautics:block/stamping_press_top",
+		"rod_side": "tfc_aeronautics:block/stamping_press_head_rod_side",
+		"peen_side": "tfc_aeronautics:block/stamping_press_head_peen_side",
+		"rod_top": "tfc_aeronautics:block/stamping_press_head_rod_top",
+		"particle": "tfc_aeronautics:block/stamping_press_north"
+	},
+	"elements": [
+		{
+			"name": "cube",
+			"from": [0, 4, 1],
+			"to": [16, 16, 15],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#2"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#4"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#4"}
+			}
+		},
+		{
+			"name": "rod",
+			"from": [5, 2, 5],
+			"to": [11, 24, 11],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#rod_side"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#rod_side"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#rod_side"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#rod_side"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#rod_top"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#rod_top"}
+			}
+		},
+		{
+			"name": "peen",
+			"from": [4, 0, 4],
+			"to": [12, 2, 12],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#peen_side"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#peen_side"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#peen_side"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#peen_side"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#peen_side"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#peen_side"}
+			}
+		},
+		{
+			"name": "val",
+			"from": [6, 6, 0],
+			"to": [10, 10, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, -1, 0],
+			"scale": [0.2, 0.2, 0.2]
+		},
+		"thirdperson_lefthand": {
+			"translation": [0, -1.25, 0],
+			"scale": [0.2, 0.2, 0.2]
+		},
+		"firstperson_righthand": {
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"firstperson_lefthand": {
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"ground": {
+			"translation": [0, 1, 0],
+			"scale": [0.2, 0.2, 0.2]
+		},
+		"gui": {
+			"rotation": [30, 45, 0],
+			"translation": [0, -2, 0],
+			"scale": [0.6, 0.6, 0.6]
+		},
+		"fixed": {
+			"translation": [0, -2.5, 0],
+			"scale": [0.7, 0.7, 0.7]
+		}
+	}
+}
