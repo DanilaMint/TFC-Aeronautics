@@ -28,6 +28,7 @@ libs/
 PROJECT_STRUCTURE.md
 CLAUDE.md
 build.sh
+tmp/
 
 # fabric
 run/
