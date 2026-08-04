@@ -42,7 +42,7 @@ public final class AeronauticsFluids
                 .block(AeronauticsFluidBlocks.MOLTEN_ANDESITE_ALLOY)
                 .bucket(AeronauticsFluidItems.MOLTEN_ANDESITE_ALLOY_BUCKET)
                 .explosionResistance(100),
-            () -> new FluidType(lavaLike()),
+            () -> new FluidType(lavaLike().descriptionId("fluid.tfc_aeronautics.molten_andesite_alloy")),
             MoltenFluid.Source::new,
             MoltenFluid.Flowing::new);
 
@@ -56,7 +56,7 @@ public final class AeronauticsFluids
                 .block(AeronauticsFluidBlocks.MOLTEN_MAGMATITE)
                 .bucket(AeronauticsFluidItems.MOLTEN_MAGMATITE_BUCKET)
                 .explosionResistance(100),
-            () -> new FluidType(lavaLike()),
+            () -> new FluidType(lavaLike().descriptionId("fluid.tfc_aeronautics.molten_magmatite")),
             MoltenFluid.Source::new,
             MoltenFluid.Flowing::new);
 
