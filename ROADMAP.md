@@ -98,6 +98,17 @@ Implementation: `src/main/java/ru/tfc_aeronautics/recipe/SpoutCastingBehavior.ja
 | Register Create pressing recipe: ingot -> tight sheet | Complete | - |
 | Register TFC Forging recipe: ingot -> tight sheet | Complete | - |
 
+## Shaft contact damage
+
+| Task | Status | Dependencies |
+|-|-|-|
+| Register `tfc_aeronautics:shaft` damage type + death message | Complete | - |
+| Hurt living entities touching bare shafts/cogwheels, scaled by RPM (64 → 160 RPM) | Complete | damage type |
+| Leave andesite/brass encased shafts and cogwheels safe | Complete | - |
+| Knock the entity perpendicular to the rotation axis + crunch sound | Complete | - |
+| Expose start RPM, lethal RPM, lethal damage and a damage multiplier in the config | Complete | - |
+| Extend the mechanic to shafts on moving contraptions | | - |
+
 ## Refactor Create mechanical press
 
 | Task | Status | Dependencies |
