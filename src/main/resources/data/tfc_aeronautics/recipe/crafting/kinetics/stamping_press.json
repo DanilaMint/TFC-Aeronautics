@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "show_notification": false,
+  "category": "redstone",
+  "key": {
+    "S": {
+      "item": "create:shaft"
+    },
+    "C": {
+      "item": "create:brass_casing"
+    },
+    "H": {
+      "item": "tfc:metal/hammer_head/wrought_iron"
+    }
+  },
+  "pattern": [
+    "S",
+    "C",
+    "H"
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc_aeronautics:stamping_press"
+  }
+}
