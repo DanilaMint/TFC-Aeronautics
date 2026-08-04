@@ -1,0 +1,6 @@
+{
+  "type": "create:crushing",
+  "ingredients": [ { "item": "tfc:metal/sheet/nickel" } ],
+  "processing_time": 350,
+  "results": [ { "count": 40, "id": "tfc_aeronautics:powder/nickel" } ]
+}

@@ -1,0 +1,6 @@
+{
+  "type": "create:crushing",
+  "ingredients": [ { "item": "tfc:metal/double_sheet/bismuth" } ],
+  "processing_time": 350,
+  "results": [ { "count": 80, "id": "tfc_aeronautics:powder/bismuth" } ]
+}
