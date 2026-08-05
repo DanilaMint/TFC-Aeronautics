@@ -35,9 +35,9 @@
 
 | Task | Status | Dependencies |
 |-|-|-|
-| Add create item application recipe: TFC stripped logs + andesite alloy ingot -> Andesite casing | | - |
-| Add create item application recipe: TFC stripped logs + brass ingot -> Brass casing | | - |
-| Add create item application recipe: TFC stripped logs + copper ingot -> Copper casing | | - |
+| Add create item application recipe: TFC stripped logs + andesite alloy ingot -> Andesite casing | Complete | - |
+| Add create item application recipe: TFC stripped logs + brass ingot -> Brass casing | Complete | - |
+| Add create item application recipe: TFC stripped logs + copper ingot -> Copper casing | Complete | - |
 
 ## Stamping Press
 
