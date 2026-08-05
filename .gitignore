@@ -29,6 +29,7 @@ PROJECT_STRUCTURE.md
 CLAUDE.md
 build.sh
 tmp/
+tmp_docs/
 
 # fabric
 run/
