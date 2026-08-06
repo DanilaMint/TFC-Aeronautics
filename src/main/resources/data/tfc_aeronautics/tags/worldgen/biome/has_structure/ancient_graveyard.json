@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "tfc:plains",
+    "tfc:hills",
+    "tfc:lowlands",
+    "tfc:rolling_hills",
+    "tfc:highlands",
+    "tfc:plateau",
+    "tfc:plateau_wide",
+    "tfc:low_canyons",
+    "tfc:river_valley",
+    "tfc:terrace_upper",
+    "tfc:terrace_lower",
+    "tfc:salt_marsh"
+  ]
+}

@@ -20,6 +20,8 @@
 10. [Тонкие листы (Tight sheet)](#10-тонкие-листы-tight-sheet)
 11. [Урон от вращающегося вала](#11-урон-от-вращающегося-вала)
 12. [Корпуса Create из брёвен TFC](#12-корпуса-create-из-брёвен-tfc)
+13. [Фреймворк атмосферных структур](#13-фреймворк-атмосферных-структур)
+14. [Древнее кладбище (Ancient Graveyard)](#14-древнее-кладбище-ancient-graveyard)
 
 ---
 
@@ -954,3 +956,348 @@ Create подключён как `compileOnly` и миксинов в проек
 соответствующие TFC-слитки. Обычные брёвна и блоки
 `tfc:wood/stripped_wood/<порода>` намеренно не включены: рецепт действует
 только на обрубленные брёвна.
+
+---
+
+## 13. Фреймворк атмосферных структур
+
+Пакет `ru.tfc_aeronautics.worldgen` предоставляет абстракции для регистрации
+структур с «нетипичными механиками» — пост-генерационными эффектами
+(выпадение специфического лута, спавн НИП, расстановка блоков вокруг), а
+также фильтрацией по TFC-климату. Это **скаффолд**: конкретных структур
+пока нет, только API и datapack-папки.
+
+### Регистрация
+
+Сами структуры в 1.21.1 — **датапак-реестр** (`Registries.STRUCTURE` динамический),
+поэтому в коде регистрируются только статические подреестры:
+
+* `StructureType` — тип кодека. `tfc_aeronautics:atmospheric` для общего фреймворка,
+  плюс отдельные типы под конкретные структуры (например,
+  `tfc_aeronautics:ancient_graveyard`).
+* `StructurePieceType` — фабрика куска. Нужна каждой не-джигсоу структуре.
+* `StructureProcessorType` — фабрика процессора блоков.
+
+Сами объекты структур описываются только в JSON:
+
+```json
+{
+  "type": "tfc_aeronautics:atmospheric",
+  "biomes": "#tfc:has_structure/example",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "atmosphere": {
+    "climate": { "min_temperature": 10.0, "max_temperature": 25.0 },
+    "effects": ["spawn_pilots", "mark_landing_pad"]
+  }
+}
+```
+
+Или, если нужны конкретные биомы прямо в структуре:
+
+```java
+new StructureSettings(
+    Optional.empty(),
+    TerrainAdjustment.BEARD_THIN,
+    context.lookup(Registries.BIOME).getOrThrow(TagKey.create(Registries.BIOME,
+        ResourceLocation.fromNamespaceAndPath("tfc", "has_structure/example")))
+)
+```
+
+### `AtmosphereSpec`
+
+Запись из двух опциональных частей:
+
+```java
+public record AtmosphereSpec(
+    Optional<ClimateBounds> climateBounds,  // границы температуры/осадков
+    List<String> effectIds                  // кодовые эффекты, выполняемые
+                                            // после генерации структуры
+) { ... }
+```
+
+* `ClimateBounds` — `min/max_temperature` и `min/max_rainfall` в JSON.
+  Без TFC-интеграции матчер — `NOOP` (всегда принимает).
+  Для реального климат-фильтра нужен `AtmosphereSpec.Resolver`,
+  устанавливаемый через `AtmosphereSpec.installResolver(resolver)`
+  в момент старт-инициализации (например, в `FMLCommonSetupEvent`).
+* `effectIds` — строки-ключи. Каждый ключ резолвится в
+  `AtmosphereSpec.Effect` (зарегистрированный в
+  `AtmosphereSpec.Effect.REGISTRY` через
+  `Effect.register(id, (level, random, center) -> { ... })`).
+
+### JSON-формат структуры
+
+```json
+{
+  "type": "tfc_aeronautics:atmospheric",
+  "biomes": "#tfc:has_structure/example",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "atmosphere": {
+    "climate": {
+      "min_temperature": 10.0,
+      "max_temperature": 25.0,
+      "min_rainfall": 200.0,
+      "max_rainfall": 500.0
+    },
+    "effects": ["spawn_pilots", "mark_landing_pad"]
+  }
+}
+```
+
+Биомы и шаг — стандартные ванильные поля `StructureSettings`,
+`atmosphere` — расширение фреймворка.
+
+### Папки datapack
+
+| Папка | Назначение |
+|---|---|
+| `data/tfc_aeronautics/worldgen/structure/` | По JSON на структуру (`type: tfc_aeronautics:atmospheric`). |
+| `data/tfc_aeronautics/worldgen/structure_set/` | По JSON на размещение структуры по биомам/расстоянию. |
+| `data/tfc_aeronautics/worldgen/template_pool/` | Пул джигсоу-кусков. |
+| `data/tfc_aeronautics/worldgen/processor_list/` | Процессоры замены блоков (например, ванильный камень → TFC-порода). |
+| `data/tfc_aeronautics/structure/` | NBT-файлы джигсоу-кусков. |
+
+### Чего фреймворк пока НЕ делает
+
+* Не реализует кастомный `StructurePlacementType` для климат-фильтрации —
+  TFC-овский `ClimateStructurePlacement` дергает внутренний
+  `ChunkGeneratorExtension`, который аддону недоступен. Для точечной
+  климат-фильтрации — внешний `Resolver` (см. выше).
+* Не интегрируется напрямую с TFC — `tfc_aeronautics:atmospheric` тип
+  структуры совместим с ванильным `structure_set` (биом-фильтрация через
+  теги `#tfc:has_structure/...`).
+
+### Что уже есть
+
+* `tfc_aeronautics:ancient_graveyard` — рабочий пример на фреймворке (см.
+  [раздел 14](#14-древнее-кладбище-ancient-graveyard)). Маленький склеп 5×5×5,
+  закопаный под поверхностью, с адаптацией материалов под TFC-почву/камень
+  и лутом в сосуде.
+
+---
+
+## 14. Древнее кладбище (Ancient Graveyard)
+
+Первая конкретная структура на фреймворке атмосферных структур. Маленький
+склеп 5×5×5, который **генерируется только на суше** (TFC-биомы с почвой на
+поверхности) и **зарыт под землю**: на поверхности торчит ровно один блок
+самого верхнего среднего саманного кирпича, остальное уходит вниз, внутри
+полость.
+
+### Шаблон
+
+`data/tfc_aeronautics/structure/ancient_graveyard.nbt` — 5×5×5 куб:
+
+| y | Содержимое |
+|---|------------|
+| 4 | пусто (structure_void), только центральный блок — саманный кирпич. Это «торчащий» блок. |
+| 3 | саманный кирпич сплошняком по периметру, центр — пусто |
+| 2 | саманный кирпич по периметру, центр — пусто |
+| 1 | саманный кирпич по периметру, внутри — большой сосуд TFC (`tfc:ceramic/large_vessel`) на (3,1,1) |
+| 0 | булыжник по всей нижней грани |
+
+То есть:
+
+* Внешние грани (стены, пол, крыша) — саман и булыжник.
+* Внутренняя полость — реальный `minecraft:air` (в шаблоне), который при размещении вырезает камеру.
+* Всё «пустое место» за стенами (то, что при размещении должно остаться землёй вокруг) — `minecraft:structure_void`. `BlockIgnoreProcessor` в `AncientGraveyardPiece` его пропускает, и наружный рельеф остаётся нетронутым.
+* Сосуд внутри хранит лут.
+
+### Архитектура
+
+```
+data/tfc_aeronautics/
+├── structure/
+│   └── ancient_graveyard.nbt          # шаблон
+├── worldgen/
+│   ├── structure/
+│   │   └── ancient_graveyard.json     # описание структуры (тип, биомы, эффекты)
+│   └── structure_set/
+│       └── ancient_graveyard.json     # random_spread, spacing 24, separation 8
+├── tags/
+│   └── worldgen/biome/has_structure/
+│       └── ancient_graveyard.json     # 12 TFC-биомов с почвой на поверхности
+├── tags/
+│   └── item/ancient_graveyard/
+│       ├── seeds.json                 # 29 культур → лут
+│       └── small_ores.json            # 12 рудных осколков → лут
+└── loot_table/
+    └── ancient_graveyard.json         # 3–5 руллов, 5 взвешенных типов
+
+src/main/java/ru/tfc_aeronautics/worldgen/
+├── AncientGraveyardStructure.java     # extends AtmosphericStructure
+├── AncientGraveyardPiece.java         # extends TemplateStructurePiece
+├── GraveyardMaterialProcessor.java    # StructureProcessor (адаптация материалов)
+├── GraveyardLootEffect.java           # AtmosphereSpec.Effect (наполнение сосуда)
+├── AeronauticsStructureTypes.java     # +ANCIENT_GRAVEYARD
+├── AeronauticsStructurePieceTypes.java
+├── AeronauticsProcessorTypes.java
+└── WorldgenSetup.java                 # подписчик FMLCommonSetupEvent
+```
+
+### Регистрация (статические реестры)
+
+В коде регистрируется три реестра — `AeronauticsStructureTypes`,
+`AeronauticsStructurePieceTypes`, `AeronauticsProcessorTypes`. Сами
+структуры как объекты живут только в JSON (см. выше), потому что
+`Registries.STRUCTURE` — датапак-реестр.
+
+| Реестр | Запись | Что разруливает |
+|--------|--------|-----------------|
+| `StructureType<?>` | `tfc_aeronautics:ancient_graveyard` → `AncientGraveyardStructure.CODEC` | Десериализация JSON в правильный подкласс. |
+| `StructurePieceType` | `tfc_aeronautics:ancient_graveyard` → `AncientGraveyardPiece::new` | Восстановление куска из NBT после выгрузки чанка. |
+| `StructureProcessorType<?>` | `tfc_aeronautics:graveyard_material` → `GraveyardMaterialProcessor.CODEC` | Нужен `getType()` (deprecation API); процессор собирается per-placement, не из JSON. |
+
+`AncientGraveyardStructure` объявляет собственный `MapCodec` (с явным
+type-witness `RecordCodecBuilder.<AncientGraveyardStructure>mapCodec(...)`)
+— иначе DFU не выводит тип, и при десериализации всегда получался бы базовый
+`AtmosphericStructure`.
+
+### `findGenerationPoint` — как кладбище «прячется»
+
+```text
+1. surfaceY = getFirstOccupiedHeight(x, z, WORLD_SURFACE_WG)
+2. if surfaceY ≤ seaLevel → Optional.empty()       (отбраковка под водой)
+3. size = template.getSize()
+4. origin = (x − size.x/2, surfaceY − (size.y − 1), z − size.z/2)
+            ↑ верх шаблона = surfaceY,
+              центр верхнего слоя — над выбранной колонкой
+5. rotation = Rotation.getRandom(random)
+6. → GenerationStub(origin, builder → addPiece(new AncientGraveyardPiece(...)))
+```
+
+То есть центр верхнего слоя шаблона (тот самый единственный саманный блок)
+ложится ровно на выбранную поверхностную колонку. Всё, что выше него в
+слое — `structure_void` и игнорируется, так что окружающая земля остаётся
+как была.
+
+### `AncientGraveyardPiece` — один кусок
+
+`TemplateStructurePiece` с двумя особенностями:
+
+* **Rotation pivot = центр шаблона.** При ротации по Y центр остаётся на
+  месте → футпринт стабильный, торчащий блок всегда над выбранной колонкой.
+* **Rotation персистится в NBT** под ключом `"Rotation"`. Ванильный
+  `TemplateStructurePiece.addAdditionalSaveData` этого не делает.
+
+В `postProcess` заново резолвится `GraveyardMaterialProcessor.resolve(...)`,
+чтобы переписать материалы под текущий чанк (а не под чанк, в котором
+структура впервые сгенерилась — в иных случаях чанк мог уже быть
+перезаписан).
+
+### `GraveyardMaterialProcessor` — адаптация материалов
+
+`StructureProcessor`, который **per-placement** подбирает три замены:
+
+1. **Саманные кирпичи** (`tfc:mud_bricks/<variant>`). Ищет вверх от
+   `box.maxY() + 4` первый блок из списка грунтовых типов
+   (`GRASS, DIRT, DUFF, COARSE_DIRT, ROOTED_DIRT, GRASS_PATH, FARMLAND,
+   CLAY_GRASS, CLAY_DUFF, CLAY, MUD`) — это и есть «локальная почва». По
+   найденному блоку определяет `SoilBlockType.Variant` (mollisol, podzol
+   и т. д.), затем кладёт `TFCBlocks.SOIL.get(MUD_BRICKS).get(variant)`.
+2. **Булыжник** (`tfc:rock/cobble/andesite` в шаблоне). Через
+   `ChunkData.get(chunk).getRockData().getSurfaceRock(x, z).cobble()`. В
+   try/catch — на нетфц-чанках `ChunkData` бросает исключение, и мы
+   оставляем andesite как fallback.
+3. **Большой сосуд** (`tfc:ceramic/large_vessel`). С шансом 50 % →
+   `TFCBlocks.GLAZED_LARGE_VESSELS.get(<случайный DyeColor>)`. Сохраняет
+   `facing`/`sealed`/`powered` исходного блока через `withPropertiesOf`.
+
+`processBlock` для каждого блока шаблона возвращает новый `StructureBlockInfo`
+с подставленным `BlockState`. Совпадение идёт по семейству блоков
+(`MUD_BRICKS`, `COBBLES`, `instanceof LargeVesselBlock`), поэтому можно
+пере-авторствовать шаблон с другим `variant`/`rock` — замена всё равно
+сработает.
+
+### `afterPlace` — где ваниль подставила нам палку
+
+`Structure.afterPlace(WorldGenLevel, StructureManager, ChunkGenerator,
+RandomSource, BoundingBox box, ChunkPos, PiecesContainer)` получает в
+качестве `box` **чанк**, в котором сейчас пишется (vanilla-метод
+`StructureStart.placeInChunk` итерирует по кускам и зовёт `afterPlace` для
+каждого с одним и тем же чанк-боксом). Если вызвать
+`atmosphere.runEffects(level, random, box.getCenter())` отсюда, лут-поиск
+будет крутиться вокруг центра чанка, а сосуд стоит в центре структуры —
+он промажет.
+
+Решение: переопределить `afterPlace` в `AncientGraveyardStructure` и звать
+`runEffects` от `pieces.calculateBoundingBox().getCenter()`:
+
+```java
+if (atmosphere().hasAtmosphere()) {
+    atmosphere().runEffects(level, random, pieces.calculateBoundingBox().getCenter());
+}
+```
+
+`calculateBoundingBox()` обходит все куски старта и выдаёт их реальный
+объединённый бокс. Это даёт правильный центр.
+
+### `GraveyardLootEffect` — наполнение сосуда
+
+`AtmosphereSpec.Effect` с id `tfc_aeronautics:ancient_graveyard_loot`:
+
+1. Загружает `LootTable` через
+   `server.getServer().reloadableRegistries().getLootTable(KEY)`. Если
+   таблица не нашлась — выход.
+2. В кубе 4×4×4 вокруг `center` ищет `LargeVesselBlockEntity`. Для каждого
+   сосуда: если пуст — катает `table.getRandomItems(...)` и раскладывает по
+   слотам `IItemHandlerModifiable`.
+
+Почему **не** `setLootTable` на `BlockEntity`? Потому что TFC-шный
+`LargeVesselBlockEntity extends InventoryBlockEntity`, а не
+`RandomizableContainerBlockEntity`. Ванильный путь «запомнить LootTable, при
+первом открытии раскатать» для TFC-сосуда просто отсутствует. Поэтому катаем
+сразу, при размещении.
+
+Идемпотентность: если сосуд уже непустой (например, при пересечении чанков
+структура обрабатывается несколько раз) — пропускаем. Это важно, потому что
+`StructureStart.placeInChunk` вызывает `afterPlace` **на каждый чанк**, через
+который проходит bounding box структуры.
+
+### Лут-таблица
+
+`data/tfc_aeronautics/loot_table/ancient_graveyard.json` — один пул,
+`rolls: { min: 3, max: 5 }`, пять взвешенных записей:
+
+| Запись | Weight | Count | Что на практике |
+|--------|--------|-------|-----------------|
+| `minecraft:rotten_flesh` | 25 | 0..16 | Тухлятина, основная «масса» лута. |
+| `minecraft:bone` | 25 | 0..4 | Кости, фоновый лут. |
+| `#tfc_aeronautics:ancient_graveyard/seeds` (`minecraft:tag`) | 15 | 0..16 | Любое из 29 TFC-семян (`tfc:seeds/...`) в случайном количестве. |
+| `#tfc_aeronautics:ancient_graveyard/small_ores` (`minecraft:tag`) | 5 | 0..8 | Любой из 12 TFC-рудных осколков (`tfc:ore/small_<ore>`). |
+| `tfc:powder/salt` | 5 | 0..8 | Соль. |
+
+Используется `minecraft:tag` entry type (`expand: false` по умолчанию) —
+один случайный предмет из тега, а не все сразу. Теги семян и руд лежат в
+`data/tfc_aeronautics/tags/item/ancient_graveyard/{seeds,small_ores}.json`.
+
+### Где не генерируется
+
+Тег `#tfc_aeronautics:has_structure/ancient_graveyard` содержит ровно
+12 биомов: `plains, hills, lowlands, rolling_hills, highlands, plateau,
+plateau_wide, low_canyons, river_valley, terrace_upper, terrace_lower,
+salt_marsh`. Сознательно исключены океаны/пляжи, пустыни, голые породы
+(каньоны, месы), горы, ледники, карст — везде либо нет почвы, либо
+неуместно.
+
+Дополнительно `findGenerationPoint` отбраковывает позиции ниже уровня моря.
+
+### Структура `tfc_aeronautics:ancient_graveyard` как пример
+
+Эта структура — рабочий референс для будущих атмосферных структур:
+
+* Свой `StructureType` (`AeronauticsStructureTypes.ANCIENT_GRAVEYARD`) — иначе
+  vanilla десериализует JSON в `AtmosphericStructure` и теряет `findGenerationPoint`.
+* Свой `MapCodec` с явным type-witness.
+* `TemplateStructurePiece` с rotation pivot по центру и персистом rotation в NBT.
+* `StructureProcessor`, который собирается per-placement (не из JSON), чтобы
+  делать мир-зависимые решения (тип почвы, камень).
+* `AtmosphereSpec.Effect` для пост-генерационных действий, которые не
+  выразить процессорами (в нашем случае — наполнение сосуда).
+* `afterPlace` override, чтобы получить настоящий центр структуры вместо
+  per-chunk бокса от vanilla.
+
+При копировании этого паттерна в новые структуры: меняется `template`,
+биомный тег и эффекты — код `AtmosphereSpec.Effect` остаётся узкоспециальным.

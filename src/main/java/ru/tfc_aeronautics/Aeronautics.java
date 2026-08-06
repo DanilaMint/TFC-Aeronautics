@@ -16,6 +16,9 @@ import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.recipe.RecipeOverrides;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
+import ru.tfc_aeronautics.worldgen.AeronauticsProcessorTypes;
+import ru.tfc_aeronautics.worldgen.AeronauticsStructurePieceTypes;
+import ru.tfc_aeronautics.worldgen.AeronauticsStructureTypes;
 
 /**
  * Main entry point for the TFC Aeronautics mod.
@@ -42,5 +45,9 @@ public class Aeronautics {
         StampingPressRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
         RecipeOverrides.register();
+
+        AeronauticsStructureTypes.register(modEventBus);
+        AeronauticsStructurePieceTypes.register(modEventBus);
+        AeronauticsProcessorTypes.register(modEventBus);
     }
 }

@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "tfc_aeronautics:ancient_graveyard",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 80,
+    "separation": 32,
+    "salt": 10387312
+  }
+}

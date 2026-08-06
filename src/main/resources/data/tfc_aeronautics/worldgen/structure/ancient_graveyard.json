@@ -1,0 +1,13 @@
+{
+  "type": "tfc_aeronautics:ancient_graveyard",
+  "biomes": "#tfc_aeronautics:has_structure/ancient_graveyard",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "template": "tfc_aeronautics:ancient_graveyard",
+  "atmosphere": {
+    "effects": [
+      "tfc_aeronautics:ancient_graveyard_loot"
+    ]
+  }
+}
