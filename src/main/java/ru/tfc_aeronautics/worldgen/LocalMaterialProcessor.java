@@ -5,14 +5,20 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
@@ -25,18 +31,24 @@ import net.dries007.tfc.common.blocks.crop.Crop;
 import net.dries007.tfc.common.blocks.rock.Rock;
 import net.dries007.tfc.common.blocks.soil.SoilBlockType;
 import net.dries007.tfc.common.blocks.wood.Wood;
+import net.dries007.tfc.util.EnvironmentHelpers;
+import net.dries007.tfc.client.overworld.SolarCalculator;
 import net.dries007.tfc.world.chunkdata.ChunkData;
+import net.dries007.tfc.world.feature.tree.ForestConfig;
 import net.dries007.tfc.world.settings.RockSettings;
 
 import org.jetbrains.annotations.Nullable;
 
 import ru.tfc_aeronautics.Aeronautics;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -182,19 +194,15 @@ public class LocalMaterialProcessor extends StructureProcessor {
         float crackedChance,
         float mossyChance,
         boolean replaceCrops,
-        boolean requiresIronOre,
-        int oreSearchRadius,
         boolean placeSurfaceMarker
     ) {
-        public static final MaterialConfig DEFAULT = new MaterialConfig(0f, 0f, false, false, 0, false);
+        public static final MaterialConfig DEFAULT = new MaterialConfig(0f, 0f, false, false);
 
         public static final Codec<MaterialConfig> CODEC = RecordCodecBuilder.<MaterialConfig>mapCodec(instance ->
             instance.group(
                 Codec.FLOAT.optionalFieldOf("cracked_chance", 0f).forGetter(MaterialConfig::crackedChance),
                 Codec.FLOAT.optionalFieldOf("mossy_chance", 0f).forGetter(MaterialConfig::mossyChance),
                 Codec.BOOL.optionalFieldOf("replace_crops", false).forGetter(MaterialConfig::replaceCrops),
-                Codec.BOOL.optionalFieldOf("requires_iron_ore", false).forGetter(MaterialConfig::requiresIronOre),
-                Codec.INT.optionalFieldOf("ore_search_radius", 70).forGetter(MaterialConfig::oreSearchRadius),
                 Codec.BOOL.optionalFieldOf("place_surface_marker", false).forGetter(MaterialConfig::placeSurfaceMarker)
             ).apply(instance, MaterialConfig::new)
         ).codec();
@@ -262,23 +270,123 @@ public class LocalMaterialProcessor extends StructureProcessor {
         if (leafHit != null) {
             return leafHit;
         }
+        // No wood in range: pick the species TFC's own forest feature would have chosen
+        // here, so structures don't suddenly become acacia in climates that don't grow
+        // acacia (eternal frost, taiga, etc.).
+        final Wood climateHit = resolveClimateFallback(level, center);
+        if (climateHit != null) {
+            return climateHit;
+        }
+        Aeronautics.LOGGER.warn("LocalMaterialProcessor: no wood found in scan radius and no climate-valid species for {}; defaulting to acacia", center);
         return Wood.ACACIA;
+    }
+
+    /**
+     * Picks a {@link Wood} species valid for the local climate by walking TFC's own
+     * {@code forest_trees} configured-feature tag and filtering by
+     * {@link ForestConfig.Entry#isValid}. Mirrors {@code ForestFeature.getTrees}:
+     * filter by climate, sort by {@code distanceFromMean} (closest first), then take
+     * the head. Returns {@code null} if the tag can't be resolved or no entry matches —
+     * the caller falls back to {@link Wood#ACACIA} in that case.
+     *
+     * <p>Rain variance is flipped for the southern hemisphere (matching
+     * {@code ForestFeature}); without that, chunks south of the equator would always
+     * miss species like pine that read variance as a signed range. Falls back to
+     * {@link WorldGenLevel}-aware hemisphere detection; older call paths that hand us a
+     * plain {@link LevelReader} just assume the northern sign.
+     */
+    @Nullable
+    private static Wood resolveClimateFallback(LevelReader level, BlockPos center) {
+        final ChunkData chunkData;
+        final float seaLevelTemp;
+        final float groundwater;
+        final float rawRainVariance;
+        final int elevation = center.getY();
+        try {
+            chunkData = ChunkData.get(level.getChunk(center));
+            if (chunkData == ChunkData.EMPTY) {
+                return null;
+            }
+            seaLevelTemp = chunkData.getAverageSeaLevelTemp(center);
+            groundwater = chunkData.getAverageGroundwater(center);
+            rawRainVariance = chunkData.getRainVariance(center);
+        } catch (RuntimeException e) {
+            return null;
+        }
+
+        final float temperature = EnvironmentHelpers.adjustAvgTempForElev(elevation, seaLevelTemp);
+        final boolean northern = !(level instanceof WorldGenLevel worldGenLevel)
+            || SolarCalculator.getInNorthernHemisphere(center, worldGenLevel.getLevel());
+        final float rainVariance = rawRainVariance * (northern ? 1f : -1f);
+
+        final Registry<ConfiguredFeature<?, ?>> registry;
+        try {
+            registry = level.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE);
+        } catch (RuntimeException e) {
+            return null;
+        }
+        final TagKey<ConfiguredFeature<?, ?>> forestTrees = TagKey.create(
+            Registries.CONFIGURED_FEATURE,
+            ResourceLocation.fromNamespaceAndPath("tfc", "forest_trees"));
+
+        final Optional<? extends net.minecraft.core.HolderSet<ConfiguredFeature<?, ?>>> tag = registry.getTag(forestTrees);
+        if (tag.isEmpty()) {
+            return null;
+        }
+
+        final List<ForestConfig.Entry> matching = new ArrayList<>();
+        for (Holder<ConfiguredFeature<?, ?>> holder : tag.get()) {
+            if (holder.value().config() instanceof ForestConfig.Entry entry
+                && entry.isValid(temperature, groundwater, rainVariance, elevation)) {
+                matching.add(entry);
+            }
+        }
+        if (matching.isEmpty()) {
+            return null;
+        }
+        matching.sort(Comparator.comparingDouble(entry ->
+            entry.distanceFromMean(temperature, groundwater, rainVariance, elevation)));
+
+        final ForestConfig.Entry closest = matching.get(0);
+        final String speciesPath = closest.treeFeature().unwrapKey()
+            .map(key -> key.location().getPath())
+            .map(path -> path.substring(path.lastIndexOf('/') + 1))
+            .orElse(null);
+        if (speciesPath == null) {
+            return null;
+        }
+        for (Wood wood : Wood.values()) {
+            if (wood.getSerializedName().equals(speciesPath)) {
+                return wood;
+            }
+        }
+        return null;
     }
 
     @Nullable
     private static Wood scanForWood(LevelReader level, BlockPos center, Wood.BlockType target) {
         final BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         final int baseY = center.getY() + WOOD_SEARCH_Y_OFFSET;
-        for (int dx = -WOOD_SEARCH_RADIUS; dx <= WOOD_SEARCH_RADIUS; dx += 2) {
-            for (int dz = -WOOD_SEARCH_RADIUS; dz <= WOOD_SEARCH_RADIUS; dz += 2) {
-                for (int dy = -WOOD_SEARCH_VERTICAL; dy <= WOOD_SEARCH_VERTICAL; dy += 2) {
-                    cursor.set(center.getX() + dx, baseY + dy, center.getZ() + dz);
-                    final BlockState state = level.getBlockState(cursor);
-                    final Wood.BlockType type = WOOD_BLOCKS.get(state.getBlock());
-                    if (type == target) {
-                        final Wood found = findWoodForBlock(state.getBlock(), target);
-                        if (found != null) {
-                            return found;
+        // Walk outward in Chebyshev-distance shells so the tree closest to the
+        // structure wins regardless of where it sits in the search box. A linear
+        // corner-to-corner scan finds whatever happens to be at (-R, -R) first;
+        // with a wider radius that becomes a distant acacia instead of the pine
+        // standing right next to the building.
+        for (int dist = 0; dist <= WOOD_SEARCH_RADIUS; dist++) {
+            for (int dx = -dist; dx <= dist; dx++) {
+                for (int dz = -dist; dz <= dist; dz++) {
+                    if (Math.abs(dx) < dist && Math.abs(dz) < dist) {
+                        continue;
+                    }
+                    for (int dy = -WOOD_SEARCH_VERTICAL; dy <= WOOD_SEARCH_VERTICAL; dy++) {
+                        cursor.set(center.getX() + dx, baseY + dy, center.getZ() + dz);
+                        final BlockState state = level.getBlockState(cursor);
+                        final Wood.BlockType type = WOOD_BLOCKS.get(state.getBlock());
+                        if (type == target) {
+                            final Wood found = findWoodForBlock(state.getBlock(), target);
+                            if (found != null) {
+                                return found;
+                            }
                         }
                     }
                 }

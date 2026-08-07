@@ -34,13 +34,7 @@ import java.util.Optional;
  * building sits on the surface (bottom layer replaces the surface block), and an
  * underground chamber anchors at the first stone layer below the surface.
  *
- * <p>Materials and crop selection are configured per-structure via {@link LocalMaterialProcessor.MaterialConfig};
- * the smith house additionally gates on a probabilistic "iron-ore-likely-here" roll so its
- * density stays low even with a 1/1000 structure-set spacing. The real iron-ore scan would
- * need to simulate chunk generation (no chunk data exists at findGenerationPoint time),
- * so for now the gate is a random roll scaled by the local surface rock — sedimentary
- * rocks roll a low chance, igneous/metamorphic rocks roll a higher one, on top of a flat
- * 30% baseline.
+ * <p>Materials and crop selection are configured per-structure via {@link LocalMaterialProcessor.MaterialConfig}.
  */
 public class AtmosphericTemplateStructure extends AtmosphericStructure {
     public static final MapCodec<AtmosphericTemplateStructure> CODEC = RecordCodecBuilder.<AtmosphericTemplateStructure>mapCodec(instance ->
@@ -120,10 +114,6 @@ public class AtmosphericTemplateStructure extends AtmosphericStructure {
                 if (anchorY <= context.chunkGenerator().getSeaLevel()) {
                     return Optional.empty();
                 }
-            }
-
-            if (material.requiresIronOre() && !ironOreGate(context.random())) {
-                return Optional.empty();
             }
 
             final int originY;
@@ -206,16 +196,6 @@ public class AtmosphericTemplateStructure extends AtmosphericStructure {
     private static boolean isStone(Block block) {
         final ResourceLocation id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
         return id != null && id.getNamespace().equals("tfc") && id.getPath().startsWith("rock/");
-    }
-
-    /**
-     * Probabilistic stand-in for "is there iron ore near here?". We can't read ore blocks at
-     * findGenerationPoint time (no chunk data exists yet), so we just roll a flat 30% gate.
-     * Combined with the smith house's 1/1000 structure-set spacing, the effective density
-     * is ≈ 1/3000 — close to the user's "not too dense" target.
-     */
-    private static boolean ironOreGate(RandomSource random) {
-        return random.nextFloat() < 0.30f;
     }
 
     /**

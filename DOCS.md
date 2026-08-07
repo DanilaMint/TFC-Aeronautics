@@ -21,7 +21,11 @@
 11. [Урон от вращающегося вала](#11-урон-от-вращающегося-вала)
 12. [Корпуса Create из брёвен TFC](#12-корпуса-create-из-брёвен-tfc)
 13. [Фреймворк атмосферных структур](#13-фреймворк-атмосферных-структур)
-14. [Древнее кладбище (Ancient Graveyard)](#14-древнее-кладбище-ancient-graveyard)
+14. [Древняя гробница (Ancient Graveyard)](#14-древняя-гробница-ancient-graveyard)
+15. [Древнее укрытие (Ancient Shelter)](#15-древнее-укрытие-ancient-shelter)
+16. [Дом фермера (Farmer House)](#16-дом-фермера-farmer-house)
+17. [Богатая гробница (Rich Graveyard)](#17-богатая-гробница-rich-graveyard)
+18. [Дом кожевника (Tanner House)](#18-дом-кожевника-tanner-house)
 
 ---
 
@@ -1075,6 +1079,14 @@ public record AtmosphereSpec(
   [раздел 14](#14-древнее-кладбище-ancient-graveyard)). Маленький склеп 5×5×5,
   закопаный под поверхностью, с адаптацией материалов под TFC-почву/камень
   и лутом в сосуде.
+* `tfc_aeronautics:ancient_shelter` — наземный шалаш из брёвен с большим
+  сосудом (климатически-фильтрованный лут) и потухшим костром (зола).
+* `tfc_aeronautics:farmer_house` — саманный дом с грядками, инструментом и
+  сосудом, где лут подстраивается под климат так же, как культура на грядках.
+* `tfc_aeronautics:rich_graveyard` — заглубленный каменный склеп с лутом в
+  сундуке и полированным маркером на поверхности.
+* `tfc_aeronautics:tanner_house` — деревянный дом с тремя бочками (вода /
+  известковое молоко / танин) и сундуком со шкурами и ножом.
 
 ---
 
@@ -1301,3 +1313,324 @@ salt_marsh`. Сознательно исключены океаны/пляжи, 
 
 При копировании этого паттерна в новые структуры: меняется `template`,
 биомный тег и эффекты — код `AtmosphereSpec.Effect` остаётся узкоспециальным.
+
+---
+
+## 15. Древнее укрытие (Ancient Shelter)
+
+Небольшой наземный шалаш — самый «древний» из наших строений. По сути это
+навес из брёвен с двумя контейнерами внутри: большим сосудом и потухшим
+костром.
+
+### Материалы
+
+Все деревянные блоки (брёвна, доски, плиты, двери, бочки, полки, листва)
+переписываются под локальную породу дерева через `LocalMaterialProcessor`
+(см. раздел 13). Камня, самана и почвы в шаблоне нет — только дерево,
+структурный пустоты вокруг и два контейнера.
+
+### Эффекты (`AncientShelterEffects`)
+
+| ID | Что делает |
+|----|------------|
+| `tfc_aeronautics:ancient_shelter_vessel` | Наполняет большой сосуд. Лут катается в коде через `AncientShelterLoot` (см. ниже). |
+| `tfc_aeronautics:ancient_shelter_ash` | Засыпает 1–2 `tfc:powder/wood_ash` в потухший firepit (через `setAsh` на `AbstractFirepitBlockEntity`). Лут-таблица — `loot_table/ancient_shelter_ash.json`. |
+
+### Климатически-фильтрованный лут сосуда (`AncientShelterLoot`)
+
+Стандартная JSON-таблица тут не подходит: чтобы в тёплом климате не
+выпадали клюква и снежная ягода, а в холодном — бананы и апельсины, нужно
+знать локальный климат в момент генерации. Поэтому лут-пул живёт в коде:
+
+```java
+private static final List<Entry> POOL = List.of(
+    // Без климатических ограничений:
+    entry(4, null, "food/beef", 1, 3),
+    entry(4, null, "food/pork", 1, 3),
+    // ...
+    entry(3, null, "powder/salt", 1, 4),
+    entry(1, null, "ore/small_native_copper", 1, 8),
+
+    // Тёплые фрукты:
+    entry(3, ClimateRanges.BANANA_PLANT, "food/banana", 1, 4),
+    entry(3, ClimateRanges.FRUIT_TREES.get(FruitBlocks.Tree.ORANGE), "food/orange", 1, 4),
+
+    // Холодные кусты:
+    entry(1, ClimateRanges.STATIONARY_BUSHES.get(FruitBlocks.StationaryBush.SNOWBERRY), "food/snowberry", 1, 4),
+    entry(1, ClimateRanges.STATIONARY_BUSHES.get(FruitBlocks.StationaryBush.CLOUDBERRY), "food/cloudberry", 1, 4),
+    // ...
+);
+```
+
+Каждая запись несёт `weight`, `Supplier<ClimateRange>` (или `null`, если
+без ограничений), `ResourceLocation` предмета и диапазон количества.
+`ClimateRange` берётся прямо из тех же `ClimateRanges`, что управляют
+ростом культур и фруктовых деревьев в TFC.
+
+В `roll` мы читаем `ChunkData` для центра структуры, фильтруем пул по
+`range.checkBoth(groundwater, temperature, false)` и бросаем один
+взвешенный ролл. То есть одно укрытие — один предмет (мясо / фрукт /
+овощ / руда / соль).
+
+Идемпотентность: `fillLargeVessel` пропускает сосуд, если он уже непустой
+— на случай повторного `afterPlace` при пересечении чанков.
+
+### Где генерируется
+
+`#tfc_aeronautics:has_structure/ancient_shelter` — 12 TFC-биомов
+(plains, hills, lowlands, rolling_hills, highlands, plateau, plateau_wide,
+low_canyons, river_valley, terrace_upper, terrace_lower, salt_marsh).
+Сознательно исключены пустыни и горы — там дерево не растёт.
+
+Плотность: `random_spread`, spacing 22, separation 4, salt 100101
+(≈ 1/484 чанков, по дизайну «≈ 1/500 блоков»).
+
+---
+
+## 16. Дом фермера (Farmer House)
+
+Саманный дом с грядками под открытым небом. Саман и земля подстраиваются
+под локальную почву, брёвна — под локальное дерево. Внутри: закрытый
+большой сосуд с едой и семенами и стеллаж с мотыгой.
+
+### Эффекты (`FarmerHouseEffects`)
+
+| ID | Что делает |
+|----|------------|
+| `tfc_aeronautics:farmer_house_vessel` | Наполняет сосуд 3–16 единиц еды и 4–16 единиц семян той же культуры, что растёт на грядках. |
+| `tfc_aeronautics:farmer_house_tool_rack` | Кладёт каменную (реже — медную) мотыгу в стеллаж. |
+
+### Климатический пикер культур (`FarmerHouseCrops`)
+
+Ключевая инвариантность дома фермера: культура, которую кладёт процессор на
+грядки, **та же самая**, что попадает в сосуд. Для этого оба пользуются
+общим пикером:
+
+```java
+public static Optional<Crop> pick(LevelReader level, BlockPos center) {
+    final ChunkData data = ChunkData.get(level.getChunk(center));
+    final float temperature = data.getAverageSeaLevelTemp(center);
+    final float groundwater = data.getAverageGroundwater(center);
+    final List<Crop> suitable = new ArrayList<>();
+    for (Crop crop : FOOD_IDS.keySet()) {
+        final ClimateRange range = crop.getClimateRange().get();
+        if (range != null && range.checkBoth((int) groundwater, temperature, false)) {
+            suitable.add(crop);
+        }
+    }
+    final RandomSource rng = RandomSource.create(center.asLong());
+    return Optional.of(suitable.get(rng.nextInt(suitable.size())));
+}
+```
+
+* `FOOD_IDS` — отфильтрованный список `Crop`-ов, у которых есть
+  `tfc:food/<...>` (CANOLA, ALFALFA, JUTE и прочие «без еды» отброшены).
+* RNG засеян от `center.asLong()`, а не от структурного — это гарантирует,
+  что и `LocalMaterialProcessor.resolve` (запускается в `postProcess`), и
+  `FarmerHouseEffects.fillVessel` (запускается в `afterPlace`) видят одну
+  и ту же последовательность случайных чисел и попадают на одну культуру.
+* `WHEAT` как fallback на случай, когда `ChunkData` ещё пуст или в
+  диапазоне не нашлось ни одной культуры.
+
+В `fillVessel` дальше:
+
+```java
+final Crop crop = FarmerHouseCrops.pick(level, center).orElse(Crop.WHEAT);
+final Item foodItem = FarmerHouseCrops.foodItem(crop);
+final Item seedItem = FarmerHouseCrops.seedItem(crop);  // TFCItems.CROP_SEEDS.get(crop)
+final int foodCount = 3 + random.nextInt(14);   // 3..16
+final int seedCount = 4 + random.nextInt(13);   // 4..16
+```
+
+### Стеллаж
+
+`ToolRackBlockEntity` — стандартный TFC-стеллаж на `ItemStackHandler`.
+Через `setStackInSlot` (это ванильный хендлер без TFC-овского
+onContentsChanged-цикла, дедлока нет). Лут-таблица —
+`loot_table/farmer_house_tool_rack.json`:
+
+| Предмет | Вес |
+|---------|-----|
+| `tfc:stone/hoe/sedimentary` | 5 |
+| `tfc:stone/hoe/igneous_extrusive` | 4 |
+| `tfc:stone/hoe/igneous_intrusive` | 3 |
+| `tfc:stone/hoe/metamorphic` | 3 |
+| `tfc:metal/hoe/copper` | 2 |
+
+Все с `set_damage: { uniform: 0..0.85 }` — стартовая мотыга почти
+истёрта.
+
+### Где генерируется
+
+`#tfc_aeronautics:has_structure/farmer_house` — те же 12 TFC-биомов, что и
+у `ancient_shelter` (тёплые и умеренные). Плотность: spacing 26,
+separation 4, salt 100102 (≈ 1/676 чанков, по дизайну «1/700 блоков»).
+
+---
+
+## 17. Богатая гробница (Rich Graveyard)
+
+Заглубленный каменный склеп с лутом в сундуке (или в бочке). В отличие от
+`ancient_graveyard`, эта структура сделана по общему фреймворку
+`AtmosphericTemplateStructure` с типом `placement: underground` — шаблон
+укладывается внутри каменного слоя, на 5 блоков ниже поверхности.
+
+### Эффекты (`RichGraveyardEffects`)
+
+| ID | Что делает |
+|----|------------|
+| `tfc_aerveyard_marker` | Кладёт один блок `tfc:rock/smooth/<локальная_порода>` на поверхность над склепом, чтобы у игрока был визуальный след. |
+
+Сундук/бочка лутятся через стандартный ванильный механизм
+`RandomizableContainer` — `LootTable` зашит прямо в NBT блока шаблона
+(инжектится скриптом `tmp/inject_chest_loot.py`), TFC-контейнеры
+наследуют то же поведение.
+
+### Полированный маркер на поверхности
+
+```java
+final Rock rock = LocalMaterialProcessor.lookupRock(
+    data.getRockData().getSurfaceRock(center.getX(), center.getZ()));
+final BlockState marker = TFCBlocks.ROCK_BLOCKS.get(rock).get(Rock.BlockType.SMOOTH).get().defaultBlockState();
+final int surfaceY = generator.getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG, ...);
+level.setBlock(new BlockPos(x, surfaceY, z), marker, Block.UPDATE_ALL_IMMEDIATE);
+```
+
+Резолвится порода слоя под структурой (через `ChunkData`), не
+поверхности, потому что шаблон сидит в камне — `getSurfaceRock` на
+координатах структуры возвращает ту же породу, что стены склепа.
+
+### Сундук vs бочка
+
+В шаблоне стоит сундук; в NBT дополнительно прописан флаг
+«заменить сундук бочкой с шансом 50 %» — реализуется прямо в NBT
+блока через `tmp/inject_chest_loot.py`. Если стоит бочка — в ней
+наливается вода/алкоголь/уксус до 2000 мБ (распределение — через
+`RandomizableContainer`).
+
+### Лут
+
+`loot_table/rich_graveyard_chest.json`, четыре пула:
+
+| Пул | Содержимое |
+|-----|------------|
+| `bones` | 3–8 костей (всегда). |
+| `flesh` | 3–8 тухлятины (всегда). |
+| `salt` | 40 % шанс на 1–3 `tfc:powder/salt`, иначе пусто. |
+| `valuables` | 45 % пусто; 55 % шанс на слиток (`copper`, `bronze`, `bismuth_bronze`, `silver`, `gold`) 1–2 шт. или самоцвет (`diamond`, `emerald`, `lapis_lazuli`) 1–4 шт. |
+
+### Треснутые и замшелые кирпичи
+
+`MaterialConfig { cracked_chance: 0.30, mossy_chance: 0.30 }` — каждый
+каждый кирпич в шаблоне с 30 % шансом превращается в
+`rock/cracked_bricks` или в `rock/mossy_bricks` соответственно
+(`LocalMaterialProcessor.chooseRockVariant`).
+
+### Где генерируется
+
+`#tfc_aeronautics:has_structure/rich_graveyard` — **21 TFC-биом**, все
+обитаемые, в том числе горы, пустыни и побережья (то есть «по всему
+миру»). Плотность: spacing 32, separation 4, salt 100103 (≈ 1/1024
+чанков).
+
+---
+
+## 18. Дом кожевника (Tanner House)
+
+Деревянное здание с тремя бочками внутри — водой, известковым молоком и
+танином — и сундуком со шкурами и ножом.
+
+### Эффекты (`TannerHouseEffects`)
+
+| ID | Что делает |
+|----|------------|
+| `tfc_aeronautics:tanner_house_chest` | Наполняет сундук шкурами и ножом (через `ContainerLootFiller.fill` + ванильную `LootTable`). |
+| `tfc_aeronautics:tanner_house_barrel` | Наполняет три бочки в коде и запечатывает их обратно. |
+
+### Наполнение бочек в коде
+
+Стандартная JSON-таблица тут не подходит: лут — это не предметы, а
+жидкости в разных объёмах. Поэтому `TannerHouseEffects` собирает план
+бочек в коде:
+
+```java
+private static final List<BarrelSpec> BARREL_SPECS = List.of(
+    new BarrelSpec(Fluids.WATER, 1000, 5000),     // 1000..5000 мБ
+    new BarrelSpec(resolveFluid(LIMEWATER_ID), 1, 2000),
+    new BarrelSpec(resolveFluid(TANNIN_ID),    1, 2000)
+);
+```
+
+`ContainerLootFiller.fillWithCodeLoot` обходит бочки в порядке обхода
+`(dx, dy, dz)` вокруг центра структуры и применяет эффект к каждой.
+Внутри эффекта:
+
+1. Очистить слоты предметов бочки (через прямой write в
+   `InventoryItemHandler.getInternalStacks()` — та же обход-цепочка
+   TFC-sync, что и в `clearItems`, см. комментарий на
+   `ContainerLootFiller.writeLoot`).
+2. Взять следующий `BarrelSpec` по индексу, бросить объём жидкости
+   `random.nextInt(min, max + 1)`.
+3. `inventory.fill(new FluidStack(fluid, amount), FluidAction.EXECUTE)`.
+4. Запечатать бочку обратно:
+
+```java
+final BlockState state = level.getBlockState(pos);
+level.setBlock(pos, state.setValue(SealableDeviceBlock.SEALED, true),
+    Block.UPDATE_ALL_IMMEDIATE);
+barrel.onSeal();
+```
+
+Запечатывание **после** наполнения: `BarrelInventory.fill` гейтится на
+`!getBlockState().getValue(SEALED)`, поэтому запечатанная бочка молча
+отбросила бы заливку. `barrel.onSeal()` обновляет `sealedTick`,
+помечает BE на синк и проигрывает звук закрытия — здесь это безопасно,
+потому что ни вода, ни известковое молоко, ни танин сами по себе не
+запускают `barrel_sealed` рецепт (для танина и воды TFC требует ещё
+`tannin_logs` в слотах, а известковое молоко — это `barrel_instant`).
+
+Ротация структуры может поменять порядок обхода бочек, и тогда «вода»,
+«известковое молоко» и «танин» перемешаются между бочками — это
+сознательно: три бочки визуально идентичны, и перемешивание не
+ломает нарратив.
+
+### Флюиды (`resolveFluid`)
+
+```java
+private static Fluid resolveFluid(ResourceLocation id) {
+    final Fluid fluid = BuiltInRegistries.FLUID.get(id);
+    if (fluid == null) {
+        Aeronautics.LOGGER.error("TannerHouseEffects: required fluid {} is not registered", id);
+        return Fluids.EMPTY;
+    }
+    return fluid;
+}
+```
+
+TFC — жёсткая зависимость, так что `null` означает сломанный мод; в этом
+случае логируем ошибку и пропускаем соответствующую бочку, а не валим
+генерацию мира.
+
+### Сундук
+
+`loot_table/tanner_house_chest.json` — девять записей:
+
+| Предмет | Вес | Количество |
+|---------|-----|------------|
+| `tfc:hide/small/raw` | 5 | 1–4 |
+| `tfc:hide/small/scraped` | 4 | 1–4 |
+| `tfc:hide/medium/raw` | 3 | 1–3 |
+| `tfc:hide/medium/scraped` | 2 | 1–3 |
+| `tfc:hide/large/raw` | 1 | 1–2 |
+| `tfc:hide/large/scraped` | 1 | 1–2 |
+| `tfc:metal/knife/copper` | 4 | 1, dmg 0..0.85 |
+| `tfc:stone/knife/sedimentary` | 4 | 1, dmg 0..0.85 |
+| `tfc:stone/knife/igneous_extrusive` | 3 | 1, dmg 0..0.85 |
+
+### Где генерируется
+
+`#tfc_aeronautics:has_structure/tanner_house` — 7 TFC-биомов умеренной
+полосы (plains, hills, lowlands, rolling_hills, river_valley,
+terrace_upper, terrace_lower). Жаркие и холодные биомы исключены —
+танин и известковое молоко там неуместны. Плотность: spacing 28,
+separation 4, salt 100105 (≈ 1/784 чанков, по дизайну «1/800 блоков»).

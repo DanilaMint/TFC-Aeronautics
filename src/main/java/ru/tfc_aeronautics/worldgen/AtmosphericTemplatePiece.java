@@ -71,7 +71,7 @@ public class AtmosphericTemplatePiece extends TemplateStructurePiece {
         final float cracked = tag.contains(CRACKED_CHANCE_KEY) ? tag.getFloat(CRACKED_CHANCE_KEY) : 0f;
         final float mossy = tag.contains(MOSSY_CHANCE_KEY) ? tag.getFloat(MOSSY_CHANCE_KEY) : 0f;
         final boolean replaceCrops = tag.contains(REPLACE_CROPS_KEY) && tag.getBoolean(REPLACE_CROPS_KEY);
-        this.materialConfig = new LocalMaterialProcessor.MaterialConfig(cracked, mossy, replaceCrops, false, 0, false);
+        this.materialConfig = new LocalMaterialProcessor.MaterialConfig(cracked, mossy, replaceCrops, false);
     }
 
     private static StructurePlaceSettings makeSettings(StructureTemplateManager manager, ResourceLocation template, Rotation rotation) {
@@ -92,7 +92,7 @@ public class AtmosphericTemplatePiece extends TemplateStructurePiece {
         // Persist the postProcess-relevant fields so a deserialized piece (vanilla
         // round-trips structure pieces through chunk NBT before postProcess) ends up
         // with the same cracked/mossy chances as the freshly-built instance. The other
-        // MaterialConfig fields (requiresIronOre, oreSearchRadius, placeSurfaceMarker)
+        // MaterialConfig fields (placeSurfaceMarker)
         // are only consulted at findGenerationPoint / afterPlace time, which never run
         // for a deserialized piece, so they don't need to round-trip.
         tag.putFloat(CRACKED_CHANCE_KEY, materialConfig.crackedChance());
