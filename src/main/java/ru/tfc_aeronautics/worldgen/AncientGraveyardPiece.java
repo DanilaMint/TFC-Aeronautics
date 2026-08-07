@@ -45,6 +45,11 @@ public class AncientGraveyardPiece extends TemplateStructurePiece {
     }
 
     private static StructurePlaceSettings makeSettings(StructureTemplateManager manager, ResourceLocation template, Rotation rotation) {
+        // Pivot is the un-rotated centre of the template bottom: the block at template-local
+        // (sizeX/2, sizeY-1, sizeZ/2) — the protruding brick — sits on this column and so
+        // lands at the world column sampled by the structure for every rotation. Vanilla's
+        // StructureTemplate.getBoundingBox computes the bbox around this pivot, so the chunk
+        // generator's load set follows the rotated footprint automatically.
         final Vec3i size = manager.getOrCreate(template).getSize();
         return new StructurePlaceSettings()
             .setRotation(rotation)

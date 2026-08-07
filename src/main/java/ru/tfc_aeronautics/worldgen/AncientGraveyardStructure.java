@@ -84,16 +84,18 @@ public class AncientGraveyardStructure extends AtmosphericStructure {
                 return Optional.empty();
             }
 
+            final Rotation rotation = Rotation.getRandom(context.random());
             // Offset so the centre of the template's topmost layer — the block that pokes out —
             // lands one block below the sampled surface column (tomb is fully buried).
+            // The pivot in AncientGraveyardPiece is the un-rotated centre of the template,
+            // so the protruding brick column is preserved across all four rotations.
             final BlockPos origin = new BlockPos(
                 x - size.getX() / 2,
                 surfaceY - size.getY(),
                 z - size.getZ() / 2
             );
-            final Rotation rotation = Rotation.getRandom(context.random());
 
-            Aeronautics.LOGGER.info("Placing ancient_graveyard at chunk={}, surfaceY={}, origin={}", chunkPos, surfaceY, origin);
+            Aeronautics.LOGGER.info("Placing ancient_graveyard at chunk={}, surfaceY={}, origin={}, rotation={}", chunkPos, surfaceY, origin, rotation);
 
             return Optional.of(new GenerationStub(origin, builder -> builder.addPiece(
                 new AncientGraveyardPiece(context.structureTemplateManager(), template, origin, rotation))));
