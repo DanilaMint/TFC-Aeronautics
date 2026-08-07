@@ -21,19 +21,16 @@ import ru.tfc_aeronautics.Aeronautics;
 import java.util.List;
 
 /**
- * Fills the containers inside an ancient shelter from loot tables.
+ * Fills the containers inside an ancient shelter.
  *
- * <p>The large vessel is a TFC custom inventory (not a {@code RandomizableContainer}), so
- * its loot is rolled here. The firepit ash is a TFC-specific counter — we set it directly
- * with {@link AbstractFirepitBlockEntity#setAsh}.
+ * <p>The large vessel's loot is rolled in code by {@link AncientShelterLoot} so it
+ * can stay climate-appropriate — see that class for the pool definition. The
+ * firepit ash is a TFC-specific counter, still rolled from the JSON table and
+ * applied directly with {@link AbstractFirepitBlockEntity#setAsh}.
  */
 public final class AncientShelterEffects {
     public static final String VESSEL_ID = Aeronautics.MOD_ID + ":ancient_shelter_vessel";
     public static final String ASH_ID = Aeronautics.MOD_ID + ":ancient_shelter_ash";
-
-    private static final ResourceKey<LootTable> VESSEL_TABLE = ResourceKey.create(
-        net.minecraft.core.registries.Registries.LOOT_TABLE,
-        ResourceLocation.fromNamespaceAndPath(Aeronautics.MOD_ID, "ancient_shelter_vessel"));
 
     private static final ResourceKey<LootTable> ASH_TABLE = ResourceKey.create(
         net.minecraft.core.registries.Registries.LOOT_TABLE,
@@ -47,7 +44,11 @@ public final class AncientShelterEffects {
     }
 
     private static void fillVessel(WorldGenLevel level, RandomSource random, BlockPos center, BoundingBox box) {
-        ContainerLootFiller.fill(level, random, center, VESSEL_TABLE, AncientShelterEffects::fillLargeVessel);
+        // Generate the loot in code from the climate-filtered pool — the JSON table
+        // was deleted because the pool needs the local TFC climate at generation
+        // time, which JSON can't express.
+        final List<ItemStack> loot = AncientShelterLoot.roll(level, center, random);
+        ContainerLootFiller.fillWithCodeLoot(level, random, center, VESSEL_ID, AncientShelterEffects::fillLargeVessel, loot);
     }
 
     private static void fillLargeVessel(BlockEntity blockEntity, List<ItemStack> loot, ServerLevel level, BlockPos pos) {

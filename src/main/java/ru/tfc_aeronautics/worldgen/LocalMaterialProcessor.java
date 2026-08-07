@@ -25,7 +25,6 @@ import net.dries007.tfc.common.blocks.crop.Crop;
 import net.dries007.tfc.common.blocks.rock.Rock;
 import net.dries007.tfc.common.blocks.soil.SoilBlockType;
 import net.dries007.tfc.common.blocks.wood.Wood;
-import net.dries007.tfc.util.climate.ClimateRange;
 import net.dries007.tfc.world.chunkdata.ChunkData;
 import net.dries007.tfc.world.settings.RockSettings;
 
@@ -223,9 +222,16 @@ public class LocalMaterialProcessor extends StructureProcessor {
         Aeronautics.LOGGER.info(
             "LocalMaterialProcessor.resolve at {}: rock={}, crackedChance={}, mossyChance={}, replaceCrops={}",
             center, rock, config.crackedChance, config.mossyChance, config.replaceCrops);
+        // The crop pick is keyed on the structure's centre BlockPos, not on the
+        // structure RNG: both this processor and the farmer_house vessel filler
+        // (FarmerHouseEffects.fillVessel) call FarmerHouseCrops.pick with the same
+        // centre and must agree on which crop is in play.
+        final Crop crop = config.replaceCrops
+            ? FarmerHouseCrops.pick(level, center).orElse(null)
+            : null;
         return new LocalMaterialProcessor(
             wood, soil, rock, vessel,
-            config.replaceCrops ? resolveCrop(level, center, random) : null,
+            crop,
             config.crackedChance,
             config.mossyChance,
             config.replaceCrops,
@@ -371,30 +377,6 @@ public class LocalMaterialProcessor extends StructureProcessor {
             return byCobble;
         }
         return ROCK_BY_BLOCK.get(settings.raw());
-    }
-
-    @Nullable
-    private static Crop resolveCrop(LevelReader level, BlockPos center, RandomSource random) {
-        try {
-            final ChunkData data = ChunkData.get(level.getChunk(center));
-            if (data == ChunkData.EMPTY) {
-                return null;
-            }
-            final float temperature = data.getAverageSeaLevelTemp(center);
-            final List<Crop> suitable = new java.util.ArrayList<>();
-            for (Crop crop : Crop.values()) {
-                final ClimateRange range = crop.getClimateRange().get();
-                if (range.minTemperature() <= temperature && temperature <= range.maxTemperature()) {
-                    suitable.add(crop);
-                }
-            }
-            if (suitable.isEmpty()) {
-                return Crop.WHEAT;
-            }
-            return suitable.get(random.nextInt(suitable.size()));
-        } catch (RuntimeException e) {
-            return Crop.WHEAT;
-        }
     }
 
     @Override
