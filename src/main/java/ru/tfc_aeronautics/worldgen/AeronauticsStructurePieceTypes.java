@@ -23,6 +23,9 @@ public final class AeronauticsStructurePieceTypes {
     public static final DeferredHolder<StructurePieceType, StructurePieceType> ANCIENT_GRAVEYARD =
         STRUCTURE_PIECES.register("ancient_graveyard", () -> AncientGraveyardPiece::new);
 
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> ATMOSPHERIC_TEMPLATE =
+        STRUCTURE_PIECES.register("atmospheric_template", () -> AtmosphericTemplatePiece::new);
+
     private AeronauticsStructurePieceTypes() {}
 
     public static void register(IEventBus bus) {

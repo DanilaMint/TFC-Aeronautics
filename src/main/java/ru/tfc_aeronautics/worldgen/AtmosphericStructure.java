@@ -79,8 +79,8 @@ public class AtmosphericStructure extends Structure {
     ) {
         super.afterPlace(level, structureManager, generator, random, box, chunkPos, pieces);
         if (atmosphere.hasAtmosphere()) {
-            BlockPos center = box.getCenter();
-            atmosphere.runEffects(level, random, center);
+            BoundingBox structureBox = pieces.calculateBoundingBox();
+            atmosphere.runEffects(level, random, structureBox.getCenter(), structureBox);
         }
     }
 }

@@ -1,0 +1,23 @@
+{
+  "type": "tfc_aeronautics:atmospheric_template",
+  "biomes": "#tfc_aeronautics:has_structure/smith_house",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "placement": "on_surface",
+  "template": "tfc_aeronautics:smith_house",
+  "material": {
+    "cracked_chance": 0.10,
+    "mossy_chance": 0.10,
+    "replace_crops": false,
+    "requires_iron_ore": true,
+    "ore_search_radius": 70
+  },
+  "atmosphere": {
+    "effects": [
+      "tfc_aeronautics:smith_house_chest",
+      "tfc_aeronautics:smith_house_tool_rack",
+      "tfc_aeronautics:smith_house_floor_pad"
+    ]
+  }
+}

@@ -123,7 +123,8 @@ public class AncientGraveyardStructure extends AtmosphericStructure {
             return;
         }
         try {
-            atmosphere().runEffects(level, random, pieces.calculateBoundingBox().getCenter());
+            final net.minecraft.world.level.levelgen.structure.BoundingBox structureBox = pieces.calculateBoundingBox();
+            atmosphere().runEffects(level, random, structureBox.getCenter(), structureBox);
         } catch (RuntimeException | LinkageError e) {
             Aeronautics.LOGGER.error("ancient_graveyard afterPlace (atmosphere) failed for chunk {}", chunkPos, e);
         }

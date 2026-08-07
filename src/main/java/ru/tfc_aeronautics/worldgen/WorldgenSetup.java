@@ -22,5 +22,10 @@ public final class WorldgenSetup {
     @SubscribeEvent
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(GraveyardLootEffect::register);
+        event.enqueueWork(AncientShelterEffects::register);
+        event.enqueueWork(FarmerHouseEffects::register);
+        event.enqueueWork(SmithHouseEffects::register);
+        event.enqueueWork(TannerHouseEffects::register);
+        event.enqueueWork(RichGraveyardEffects::register);
     }
 }

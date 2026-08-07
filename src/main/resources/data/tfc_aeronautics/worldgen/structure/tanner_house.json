@@ -1,0 +1,20 @@
+{
+  "type": "tfc_aeronautics:atmospheric_template",
+  "biomes": "#tfc_aeronautics:has_structure/tanner_house",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "placement": "on_surface",
+  "template": "tfc_aeronautics:tanner_house",
+  "material": {
+    "cracked_chance": 0.0,
+    "mossy_chance": 0.0,
+    "replace_crops": false
+  },
+  "atmosphere": {
+    "effects": [
+      "tfc_aeronautics:tanner_house_chest",
+      "tfc_aeronautics:tanner_house_barrel"
+    ]
+  }
+}

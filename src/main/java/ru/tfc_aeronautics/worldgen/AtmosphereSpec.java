@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,11 +60,11 @@ public record AtmosphereSpec(
         return ACTIVE_RESOLVER.matchesClimate(this, level, pos, random);
     }
 
-    public void runEffects(WorldGenLevel level, RandomSource random, BlockPos center) {
+    public void runEffects(WorldGenLevel level, RandomSource random, BlockPos center, BoundingBox box) {
         for (String id : effectIds) {
             Effect effect = Effect.REGISTRY.get(id);
             if (effect != null) {
-                effect.run(level, random, center);
+                effect.run(level, random, center, box);
             }
         }
     }
@@ -113,12 +114,17 @@ public record AtmosphereSpec(
     /**
      * Atmospheric effect hook. Effects are registered by id via {@link Effect#REGISTRY}
      * at startup and resolved when {@link AtmosphereSpec#runEffects} runs.
+     *
+     * <p>{@code box} is the bounding box covering every piece of the structure (computed
+     * by vanilla from {@code PiecesContainer.calculateBoundingBox}); effects that need to
+     * reason about the structure's footprint (e.g. placing a floor pad) use it, while
+     * container-fillers can ignore it and search around {@code center}.
      */
     @FunctionalInterface
     public interface Effect {
         java.util.Map<String, Effect> REGISTRY = new java.util.concurrent.ConcurrentHashMap<>();
 
-        void run(WorldGenLevel level, RandomSource random, BlockPos center);
+        void run(WorldGenLevel level, RandomSource random, BlockPos center, BoundingBox box);
 
         static void register(String id, Effect effect) {
             REGISTRY.put(id, effect);

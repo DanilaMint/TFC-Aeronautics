@@ -1,0 +1,20 @@
+{
+  "type": "tfc_aeronautics:atmospheric_template",
+  "biomes": "#tfc_aeronautics:has_structure/rich_graveyard",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "placement": "underground",
+  "template": "tfc_aeronautics:rich_graveyard",
+  "material": {
+    "cracked_chance": 0.30,
+    "mossy_chance": 0.30,
+    "replace_crops": false,
+    "place_surface_marker": true
+  },
+  "atmosphere": {
+    "effects": [
+      "tfc_aeronautics:rich_graveyard_marker"
+    ]
+  }
+}

@@ -14,7 +14,8 @@ import ru.tfc_aeronautics.Aeronautics;
  *
  * <p>Vanilla structures (e.g. {@code minecraft:jigsaw}, {@code minecraft:village})
  * are registered by Minecraft itself; this registry exists only for the mod's own
- * structure codec — currently {@link AtmosphericStructure}.
+ * structure codec — {@link AtmosphericStructure}, {@link AncientGraveyardStructure},
+ * and {@link AtmosphericTemplateStructure}.
  *
  * <p>Registration follows the same pattern as the rest of the mod
  * (see {@link ru.tfc_aeronautics.heater.HeaterRegistration}, {@code StampingPressRegistration}).
@@ -28,6 +29,9 @@ public final class AeronauticsStructureTypes {
 
     public static final DeferredHolder<StructureType<?>, StructureType<AncientGraveyardStructure>> ANCIENT_GRAVEYARD =
         STRUCTURE_TYPES.register("ancient_graveyard", () -> () -> AncientGraveyardStructure.CODEC);
+
+    public static final DeferredHolder<StructureType<?>, StructureType<AtmosphericTemplateStructure>> ATMOSPHERIC_TEMPLATE =
+        STRUCTURE_TYPES.register("atmospheric_template", () -> () -> AtmosphericTemplateStructure.CODEC);
 
     private AeronauticsStructureTypes() {}
 

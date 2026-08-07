@@ -9,6 +9,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -58,7 +59,7 @@ public final class GraveyardLootEffect implements AtmosphereSpec.Effect {
     }
 
     @Override
-    public void run(WorldGenLevel level, RandomSource random, BlockPos center) {
+    public void run(WorldGenLevel level, RandomSource random, BlockPos center, BoundingBox box) {
         final ServerLevel serverLevel = level.getLevel();
         final LootTable table;
         try {
