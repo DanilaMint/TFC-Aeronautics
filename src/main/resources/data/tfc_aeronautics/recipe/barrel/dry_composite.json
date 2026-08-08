@@ -1,0 +1,15 @@
+{
+  "type": "tfc:barrel_instant",
+  "input_fluid": {
+    "amount": 25,
+    "fluid": "tfc:limewater"
+  },
+  "input_item": {
+    "count": 1,
+    "item": "tfc_aeronautics:dry_composite"
+  },
+  "output_item": {
+    "count": 1,
+    "id": "tfc_aeronautics:composite"
+  }
+}

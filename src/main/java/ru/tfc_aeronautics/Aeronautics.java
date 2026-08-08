@@ -7,6 +7,7 @@ import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidBlocks;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidItems;
 import ru.tfc_aeronautics.fluid.AeronauticsFluids;
@@ -36,6 +37,7 @@ public class Aeronautics {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
         PowderRegistration.register(modEventBus);
+        CompositeRegistration.register(modEventBus);
         DoubleIngotRegistration.register(modEventBus);
         TightSheetRegistration.register(modEventBus);
         AeronauticsFluidBlocks.register(modEventBus);

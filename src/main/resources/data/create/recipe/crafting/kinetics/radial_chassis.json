@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": {
+      "tag": "minecraft:logs"
+    },
+    "P": {
+      "item": "tfc_aeronautics:composite"
+    }
+  },
+  "pattern": [
+    " L ",
+    "PLP",
+    " L "
+  ],
+  "result": {
+    "count": 3,
+    "id": "create:radial_chassis"
+  }
+}

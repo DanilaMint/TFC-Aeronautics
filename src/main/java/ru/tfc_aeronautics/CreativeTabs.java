@@ -9,6 +9,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidItems;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.DoubleIngotRegistration;
@@ -32,6 +33,8 @@ public final class CreativeTabs
             .icon(() -> new ItemStack(PowderRegistration.POWDERS.get(MetalPowder.NICKEL).get()))
             .displayItems((params, output) -> {
                 PowderRegistration.POWDERS.values().forEach(p -> output.accept(p.get()));
+                output.accept(CompositeRegistration.DRY_COMPOSITE.get());
+                output.accept(CompositeRegistration.COMPOSITE.get());
                 output.accept(DoubleIngotRegistration.ANDESITE_ALLOY.get());
                 TightSheetRegistration.TIGHT_SHEETS.values().forEach(s -> output.accept(s.get()));
                 output.accept(HeaterRegistration.HEATER_ITEM.get());

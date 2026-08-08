@@ -23,6 +23,8 @@
   "item.tfc_aeronautics.powder.nickel": "Nickel Powder",
   "item.tfc_aeronautics.powder.andesite_alloy": "Andesite Alloy Powder",
   "item.tfc_aeronautics.powder.magmatite": "Magmatite Powder",
+  "item.tfc_aeronautics.dry_composite": "Dry Composite",
+  "item.tfc_aeronautics.composite": "Composite",
   "fluid.tfc_aeronautics.molten_andesite_alloy": "Molten Andesite Alloy",
   "item.tfc_aeronautics.molten_andesite_alloy_bucket": "Molten Andesite Alloy Bucket",
   "fluid.tfc_aeronautics.molten_magmatite": "Molten Magmatite",
