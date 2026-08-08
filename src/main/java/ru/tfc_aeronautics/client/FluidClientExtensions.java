@@ -14,8 +14,8 @@ import ru.tfc_aeronautics.fluid.AeronauticsFluids;
 
 /**
  * Registers {@link net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions}
- * for our molten fluids so TFC's {@code ContainedFluidModel} can resolve a still/flowing
- * texture sprite when rendering them inside containers (buckets, molds).
+ * for our molten magmatite fluid so TFC's {@code ContainedFluidModel} can resolve a still/flowing
+ * texture sprite when rendering it inside containers (buckets, molds).
  *
  * Without this registration, {@code ContainedFluidModel.bake()} dereferences a null
  * {@link ResourceLocation} from {@code IClientFluidTypeExtensions.of(fluid).getStillTexture()}
@@ -37,13 +37,6 @@ public final class FluidClientExtensions
     @SubscribeEvent
     public static void registerFluidExtensions(RegisterClientExtensionsEvent event)
     {
-        // Andesite alloy — dark orange molten metal look
-        event.registerFluidType(
-            new FluidRendererExtension(
-                TFCFluids.ALPHA_MASK | 0xB06820,
-                TFC_MOLTEN_STILL, TFC_MOLTEN_FLOW, null, null),
-            AeronauticsFluids.MOLTEN_ANDESITE_ALLOY.getType());
-
         // Magmatite — dark grey molten metal look
         event.registerFluidType(
             new FluidRendererExtension(

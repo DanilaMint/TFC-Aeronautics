@@ -24,7 +24,6 @@ public enum MetalPowder
     GOLD("gold", 1060, () -> TFCFluids.METALS.get(Metal.GOLD).getSource()),
     SILVER("silver", 970, () -> TFCFluids.METALS.get(Metal.SILVER).getSource()),
     NICKEL("nickel", 1450, () -> TFCFluids.METALS.get(Metal.NICKEL).getSource()),
-    ANDESITE_ALLOY("andesite_alloy", 1150, () -> AeronauticsFluids.MOLTEN_ANDESITE_ALLOY.getSource()),
     MAGMATITE("magmatite", 1250, () -> AeronauticsFluids.MOLTEN_MAGMATITE.getSource());
 
     public static final String ITEM_ID_PREFIX = "powder/";

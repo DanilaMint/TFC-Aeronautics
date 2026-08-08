@@ -12,7 +12,6 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidItems;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
-import ru.tfc_aeronautics.metal.DoubleIngotRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.MetalPowder;
 import ru.tfc_aeronautics.powder.PowderRegistration;
@@ -35,11 +34,9 @@ public final class CreativeTabs
                 PowderRegistration.POWDERS.values().forEach(p -> output.accept(p.get()));
                 output.accept(CompositeRegistration.DRY_COMPOSITE.get());
                 output.accept(CompositeRegistration.COMPOSITE.get());
-                output.accept(DoubleIngotRegistration.ANDESITE_ALLOY.get());
                 TightSheetRegistration.TIGHT_SHEETS.values().forEach(s -> output.accept(s.get()));
                 output.accept(HeaterRegistration.HEATER_ITEM.get());
                 output.accept(StampingPressRegistration.STAMPING_PRESS_ITEM.get());
-                output.accept(AeronauticsFluidItems.MOLTEN_ANDESITE_ALLOY_BUCKET.get());
                 output.accept(AeronauticsFluidItems.MOLTEN_MAGMATITE_BUCKET.get());
             })
             .build());

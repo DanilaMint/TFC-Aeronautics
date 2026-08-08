@@ -17,13 +17,13 @@ import net.dries007.tfc.util.registry.RegistrationHelpers;
 import ru.tfc_aeronautics.Aeronautics;
 
 /**
- * Registers the molten andesite alloy fluid, mirroring TFC's
+ * Registers the molten magmatite fluid, mirroring TFC's
  * {@code TFCFluids.METALS} pattern using TFC's own {@link MoltenFluid} Source/Flowing
  * classes, {@link net.dries007.tfc.common.blocks.MoltenFluidBlock MoltenFluidBlock},
  * and {@link RegistrationHelpers#registerFluid}.
  *
  * <p>FluidType properties are copied verbatim from TFC's {@code lavaLike()} so the
- * alloy behaves identically to TFC's molten metals.</p>
+ * magmatite behaves identically to TFC's molten metals.</p>
  */
 public final class AeronauticsFluids
 {
@@ -31,20 +31,6 @@ public final class AeronauticsFluids
         DeferredRegister.create(NeoForgeRegistries.FLUID_TYPES, Aeronautics.MOD_ID);
     public static final DeferredRegister<net.minecraft.world.level.material.Fluid> FLUIDS =
         DeferredRegister.create(Registries.FLUID, Aeronautics.MOD_ID);
-
-    public static final FluidHolder<BaseFlowingFluid> MOLTEN_ANDESITE_ALLOY =
-        RegistrationHelpers.registerFluid(
-            FLUID_TYPES, FLUIDS,
-            "molten_andesite_alloy",
-            "molten_andesite_alloy",
-            "flowing_molten_andesite_alloy",
-            properties -> properties
-                .block(AeronauticsFluidBlocks.MOLTEN_ANDESITE_ALLOY)
-                .bucket(AeronauticsFluidItems.MOLTEN_ANDESITE_ALLOY_BUCKET)
-                .explosionResistance(100),
-            () -> new FluidType(lavaLike().descriptionId("fluid.tfc_aeronautics.molten_andesite_alloy")),
-            MoltenFluid.Source::new,
-            MoltenFluid.Flowing::new);
 
     public static final FluidHolder<BaseFlowingFluid> MOLTEN_MAGMATITE =
         RegistrationHelpers.registerFluid(

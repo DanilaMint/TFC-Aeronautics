@@ -12,10 +12,8 @@ import ru.tfc_aeronautics.fluid.AeronauticsFluidBlocks;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidItems;
 import ru.tfc_aeronautics.fluid.AeronauticsFluids;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
-import ru.tfc_aeronautics.metal.DoubleIngotRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
-import ru.tfc_aeronautics.recipe.RecipeOverrides;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
 import ru.tfc_aeronautics.worldgen.AeronauticsProcessorTypes;
 import ru.tfc_aeronautics.worldgen.AeronauticsStructurePieceTypes;
@@ -38,7 +36,6 @@ public class Aeronautics {
 
         PowderRegistration.register(modEventBus);
         CompositeRegistration.register(modEventBus);
-        DoubleIngotRegistration.register(modEventBus);
         TightSheetRegistration.register(modEventBus);
         AeronauticsFluidBlocks.register(modEventBus);
         AeronauticsFluidItems.register(modEventBus);
@@ -46,7 +43,6 @@ public class Aeronautics {
         HeaterRegistration.register(modEventBus);
         StampingPressRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
-        RecipeOverrides.register();
 
         AeronauticsStructureTypes.register(modEventBus);
         AeronauticsStructurePieceTypes.register(modEventBus);

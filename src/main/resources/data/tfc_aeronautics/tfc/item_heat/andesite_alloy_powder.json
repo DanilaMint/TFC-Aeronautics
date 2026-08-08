@@ -1,8 +1,0 @@
-{
-  "ingredient": {
-    "item": "tfc_aeronautics:powder/andesite_alloy"
-  },
-  "heat_capacity": 0.48,
-  "forging_temperature": 575.0,
-  "welding_temperature": 767.0
-}
