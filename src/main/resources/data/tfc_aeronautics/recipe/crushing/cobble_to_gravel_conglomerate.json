@@ -1,0 +1,18 @@
+{
+  "type": "create:crushing",
+  "ingredients": [
+    {
+      "item": "tfc:rock/cobble/conglomerate"
+    }
+  ],
+  "processing_time": 250,
+  "results": [
+    {
+      "id": "tfc:rock/gravel/conglomerate"
+    },
+    {
+      "chance": 0.1,
+      "id": "minecraft:flint"
+    }
+  ]
+}
