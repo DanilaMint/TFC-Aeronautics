@@ -39,6 +39,21 @@
 | Add create item application recipe: TFC stripped logs + brass ingot -> Brass casing | Complete | - |
 | Add create item application recipe: TFC stripped logs + copper ingot -> Copper casing | Complete | - |
 
+## Override Create recipes using dried kelp
+
+Create uses vanilla `minecraft:dried_kelp` / `minecraft:dried_kelp_block` in 8 recipes. Vanilla dried kelp doesn't exist in TFC's food chain, so all of these need to be shadowed at their original paths under `data/create/recipe/...` per [[feedback-recipe-override-convention]].
+
+| Task | Status | Dependencies |
+|-|-|-|
+| Shadow `data/create/recipe/crafting/kinetics/belt_connector.json` (replace `minecraft:dried_kelp`) | Complete | - |
+| Shadow `data/create/recipe/crafting/kinetics/spout.json` (replace `minecraft:dried_kelp`) | | - |
+| Shadow `data/create/recipe/crafting/logistics/andesite_funnel.json` (replace `minecraft:dried_kelp`) | | - |
+| Shadow `data/create/recipe/crafting/logistics/andesite_tunnel.json` (replace `minecraft:dried_kelp`) | | - |
+| Shadow `data/create/recipe/crafting/logistics/brass_funnel.json` (replace `minecraft:dried_kelp`) | | - |
+| Shadow `data/create/recipe/crafting/logistics/brass_tunnel.json` (replace `minecraft:dried_kelp`) | | - |
+| Shadow `data/create/recipe/crafting/kinetics/hose_pulley.json` (replace `minecraft:dried_kelp_block`) | | - |
+| Shadow `data/create/recipe/crafting/kinetics/elevator_pulley.json` (replace `minecraft:dried_kelp_block`) | | - |
+
 ## Stamping Press
 
 | Task | Status | Dependencies |
