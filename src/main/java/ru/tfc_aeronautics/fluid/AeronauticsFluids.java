@@ -11,6 +11,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import net.dries007.tfc.common.fluids.FluidHolder;
+import net.dries007.tfc.common.fluids.MixingFluid;
 import net.dries007.tfc.common.fluids.MoltenFluid;
 import net.dries007.tfc.util.registry.RegistrationHelpers;
 
@@ -46,6 +47,19 @@ public final class AeronauticsFluids
             MoltenFluid.Source::new,
             MoltenFluid.Flowing::new);
 
+    public static final FluidHolder<BaseFlowingFluid> ROSIN =
+        RegistrationHelpers.registerFluid(
+            FLUID_TYPES, FLUIDS,
+            "rosin",
+            "rosin",
+            "flowing_rosin",
+            properties -> properties
+                .block(AeronauticsFluidBlocks.ROSIN)
+                .bucket(AeronauticsFluidItems.ROSIN_BUCKET),
+            () -> new FluidType(waterLikeRosin().descriptionId("fluid.tfc_aeronautics.rosin")),
+            MixingFluid.Source::new,
+            MixingFluid.Flowing::new);
+
     private AeronauticsFluids() {}
 
     /** Lava-like FluidType properties copied from {@code TFCFluids.lavaLike()}. */
@@ -66,6 +80,23 @@ public final class AeronauticsFluids
             .canPushEntity(false)
             .canSwim(false)
             .supportsBoating(false)
+            .fallDistanceModifier(0);
+    }
+
+    /** Water-like FluidType properties copied from {@code TFCFluids.waterLike()} for rosin. */
+    private static FluidType.Properties waterLikeRosin()
+    {
+        return FluidType.Properties.create()
+            .adjacentPathType(PathType.WATER)
+            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
+            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)
+            .canConvertToSource(true)
+            .canDrown(true)
+            .canExtinguish(true)
+            .canHydrate(true)
+            .canPushEntity(true)
+            .canSwim(true)
+            .supportsBoating(true)
             .fallDistanceModifier(0);
     }
 

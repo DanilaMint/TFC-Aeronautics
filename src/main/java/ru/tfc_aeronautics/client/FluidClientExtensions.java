@@ -43,5 +43,14 @@ public final class FluidClientExtensions
                 TFCFluids.ALPHA_MASK | 0x3F3F3F,
                 TFC_MOLTEN_STILL, TFC_MOLTEN_FLOW, null, null),
             AeronauticsFluids.MOLTEN_MAGMATITE.getType());
+
+        // Rosin — honey-amber tint over vanilla water textures (same approach TFC uses for alcohol)
+        event.registerFluidType(
+            new FluidRendererExtension(
+                TFCFluids.ALPHA_MASK | 0xC68A3A,
+                ResourceLocation.withDefaultNamespace("block/water_still"),
+                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                null, null),
+            AeronauticsFluids.ROSIN.getType());
     }
 }

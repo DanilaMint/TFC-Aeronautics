@@ -2,6 +2,7 @@ package ru.tfc_aeronautics.fluid;
 
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -9,10 +10,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import ru.tfc_aeronautics.Aeronautics;
 
 /**
- * Registers the molten magmatite bucket item. Vanilla {@link BucketItem}
- * is used directly — TFC's {@code TFCItems.FLUID_BUCKETS} flow goes through
+ * Registers fluid bucket items. Vanilla {@link BucketItem} is used directly —
+ * TFC's {@code TFCItems.FLUID_BUCKETS} flow goes through
  * {@code FluidId.mapOf(...)} which is coupled to TFC's {@code Metal} enum,
- * so for a single new fluid we register the bucket by hand.
+ * so for new fluids we register the bucket by hand.
  */
 public final class AeronauticsFluidItems
 {
@@ -23,6 +24,11 @@ public final class AeronauticsFluidItems
         ITEMS.register("molten_magmatite_bucket", () -> new BucketItem(
             AeronauticsFluids.MOLTEN_MAGMATITE.getSource(),
             new Item.Properties()));
+
+    public static final DeferredHolder<Item, BucketItem> ROSIN_BUCKET =
+        ITEMS.register("rosin_bucket", () -> new BucketItem(
+            AeronauticsFluids.ROSIN.getSource(),
+            new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
 
     private AeronauticsFluidItems() {}
 

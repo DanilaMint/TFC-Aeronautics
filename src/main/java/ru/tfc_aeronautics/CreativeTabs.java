@@ -40,6 +40,7 @@ public final class CreativeTabs
                 output.accept(StampingPressRegistration.STAMPING_PRESS_ITEM.get());
                 output.accept(ResinRegistration.RESIN_CLUMP.get());
                 output.accept(AeronauticsFluidItems.MOLTEN_MAGMATITE_BUCKET.get());
+                output.accept(AeronauticsFluidItems.ROSIN_BUCKET.get());
             })
             .build());
 
