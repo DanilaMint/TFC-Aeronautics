@@ -1,0 +1,16 @@
+{
+  "type": "tfc:barrel_sealed",
+  "duration": 7200,
+  "input_item": {
+    "count": 1,
+    "item": "tfc:burlap_cloth"
+  },
+  "input_fluid": {
+    "amount": 100,
+    "fluid": "tfc_aeronautics:rosin"
+  },
+  "output_item": {
+    "count": 1,
+    "id": "tfc_aeronautics:impregnated_burlap_cloth"
+  }
+}

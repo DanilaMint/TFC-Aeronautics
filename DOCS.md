@@ -26,6 +26,7 @@
 16. [Дом фермера (Farmer House)](#16-дом-фермера-farmer-house)
 17. [Богатая гробница (Rich Graveyard)](#17-богатая-гробница-rich-graveyard)
 18. [Дом кожевника (Tanner House)](#18-дом-кожевника-tanner-house)
+19. [Пропитанная джутовая ткань (Impregnated Burlap Cloth)](#19-пропитанная-джутовая-ткань-impregnated-burlap-cloth)
 
 ---
 
@@ -1634,3 +1635,44 @@ TFC — жёсткая зависимость, так что `null` означа
 terrace_upper, terrace_lower). Жаркие и холодные биомы исключены —
 танин и известковое молоко там неуместны. Плотность: spacing 28,
 separation 4, salt 100105 (≈ 1/784 чанков, по дизайну «1/800 блоков»).
+
+---
+
+## 19. Пропитанная джутовая ткань (Impregnated Burlap Cloth)
+
+Полуфабрикат для будущих воздухоплавательных конструкций мода (оболочки
+аэростатов, дирижаблей, планера). Джутовая ткань, пропитанная канифолью,
+перестаёт пропускать воздух и влагу — то, что нужно для аэростата.
+
+### Регистрация
+
+Пакет `burlap/` (`src/main/java/ru/tfc_aeronautics/burlap/BurlapRegistration.java`)
+содержит `DeferredHolder<Item, Item> IMPREGNATED_BURLAP_CLOTH` — vanilla
+`Item` со стандартным `Properties`. Регистрируется в `Aeronautics.java`
+рядом с `ResinRegistration.register(...)` и выводится в `CreativeTabs.MAIN`
+после `resin_clump`.
+
+### Рецепт
+
+`data/tfc_aeronautics/recipe/barrel/impregnated_burlap_cloth.json` —
+`type: tfc:barrel_sealed`, `duration: 7200` (6 игровых часов),
+`input_item: tfc:burlap_cloth × 1`, `input_fluid: tfc_aeronautics:rosin × 100 мб`,
+`output_item: tfc_aeronautics:impregnated_burlap_cloth × 1`. Канифоль
+потребляется полностью (нет `output_fluid`). Параметры подобраны под
+стандарт TFC для замачивания (как `large_leather.json` в TFC).
+
+### Логика
+
+Это первое «заметное» применение канифоли в моде: раньше `rosin` шла
+только в производство (`rosin.json` растворяет `resin_clump` в спирте).
+Пропитка ткани замыкает первый производственный цикл: собираем смолу
+с брёвен → делаем канифоль → пропитываем ткань → будущая оболочка.
+
+### Текстура
+
+Берёт `tfc:textures/item/burlap_cloth.png` (16×16) и накладывает тёплый
+янтарный фильтр (умножение RGB на ~`0.95/0.70/0.30` + общее
+затемнение 0.85), чтобы передать «пропитанность» канифолью. Текстура
+хранится в `src/main/resources/assets/tfc_aeronautics/textures/item/
+impregnated_burlap_cloth.png`; модель — стандартный `item/generated`
+с `layer0` на эту текстуру.

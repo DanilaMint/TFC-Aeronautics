@@ -7,6 +7,7 @@ import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidBlocks;
 import ru.tfc_aeronautics.fluid.AeronauticsFluidItems;
@@ -44,6 +45,7 @@ public class Aeronautics {
         HeaterRegistration.register(modEventBus);
         StampingPressRegistration.register(modEventBus);
         ResinRegistration.register(modEventBus);
+        BurlapRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
 
         AeronauticsStructureTypes.register(modEventBus);
