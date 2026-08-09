@@ -15,6 +15,7 @@ import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.MetalPowder;
 import ru.tfc_aeronautics.powder.PowderRegistration;
+import ru.tfc_aeronautics.resin.ResinRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
 
 /**
@@ -37,6 +38,7 @@ public final class CreativeTabs
                 TightSheetRegistration.TIGHT_SHEETS.values().forEach(s -> output.accept(s.get()));
                 output.accept(HeaterRegistration.HEATER_ITEM.get());
                 output.accept(StampingPressRegistration.STAMPING_PRESS_ITEM.get());
+                output.accept(ResinRegistration.RESIN_CLUMP.get());
                 output.accept(AeronauticsFluidItems.MOLTEN_MAGMATITE_BUCKET.get());
             })
             .build());

@@ -14,6 +14,7 @@ import ru.tfc_aeronautics.fluid.AeronauticsFluids;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
+import ru.tfc_aeronautics.resin.ResinRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
 import ru.tfc_aeronautics.worldgen.AeronauticsProcessorTypes;
 import ru.tfc_aeronautics.worldgen.AeronauticsStructurePieceTypes;
@@ -42,6 +43,7 @@ public class Aeronautics {
         AeronauticsFluids.register(modEventBus);
         HeaterRegistration.register(modEventBus);
         StampingPressRegistration.register(modEventBus);
+        ResinRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
 
         AeronauticsStructureTypes.register(modEventBus);

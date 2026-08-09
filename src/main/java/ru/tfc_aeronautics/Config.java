@@ -24,6 +24,10 @@ public class Config {
             .comment("Multiplier applied to glider durability loss. 1.0 = vanilla rate.")
             .defineInRange("gliderDecayModifier", 1.0, 0.0, 10.0);
 
+    public static final ModConfigSpec.DoubleValue RESIN_DROP_CHANCE = BUILDER
+            .comment("Chance that stripping (right-clicking with an axe) a resin-bearing log drops a resin clump. 0.15 = 15%.")
+            .defineInRange("resinDropChance", 0.15, 0.0, 1.0);
+
     public static final ModConfigSpec.BooleanValue SHAFT_DAMAGE_ENABLED = BUILDER
             .comment("Whether touching a bare spinning shaft or cogwheel hurts. Encased ones are always safe.")
             .define("shaftDamageEnabled", true);
