@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "show_notification": false,
+  "category": "misc",
+  "key": {
+    "M": [
+      {
+        "item": "minecraft:leather"
+      },
+      {
+        "item": "tfc_aeronautics:impregnated_burlap_cloth"
+      }
+    ]
+  },
+  "pattern": [
+    "MMM"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:belt_connector"
+  }
+}
