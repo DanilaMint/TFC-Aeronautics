@@ -1,8 +1,5 @@
 {
   "itemGroup.tfc_aeronautics": "TFC Aeronautics",
-  "tfc_aeronautics.config.balloonLiftMultiplier": "Balloon Lift Multiplier",
-  "tfc_aeronautics.config.hotAirBurnRate": "Hot Air Burn Rate",
-  "tfc_aeronautics.config.gliderDecayModifier": "Glider Decay Modifier",
   "tfc_aeronautics.config.resinDropChance": "Resin Drop Chance",
   "tfc_aeronautics.config.shaftDamageEnabled": "Shaft Contact Damage",
   "tfc_aeronautics.config.shaftDamageStartRpm": "Shaft Damage Start RPM",
