@@ -9,6 +9,23 @@
 | Add TFC Heating to items | Complete | Register |
 | Add TFC Heating recipe: powder -> molten metal | Complete | Register |
 
+## Sync TFC `quern` onto Create `milling`, mark mod powders `only_quern`, support TFC result modifiers
+
+The mod's 8 ingot→powder recipes were previously duplicated as both `tfc:quern` (slow, manual) and `create:milling` (fast, kinetic). The user wants ingot→powder to be quern-only (`tfc_aeronautics:only_quern`, folder/convention — not a new RecipeType), but every vanilla-convertible TFC `tfc:quern` recipe mirrored onto `create:milling` so the millstone becomes a superset of the quern. Additionally, the 6 grain→flour recipes need real `tfc:copy_food` modifier support — flat mirrors that drop the modifier are insufficient.
+
+| Task | Status | Dependencies |
+|-|-|-|
+| Delete `data/tfc_aeronautics/recipe/milling/{8 metal}_powder.json` so the 8 ingot→powder recipes become quern-only | Complete | - |
+| Mirror convertible TFC `tfc:quern` recipes (single item / tag ingredient, simple `{count, id}` result) into `data/create/recipe/milling/<mirror_path>.json` with `processing_time: 250` | Complete | - |
+| Skip TFC recipes with multi-ingredient / compound ingredient (gem+ore powders, plant dyes) — they remain quern-only by construction | Complete | - |
+| Skip `bone_meal.json` mirror — Create already defines `bone.json` (input=minecraft:bone → 3× bone_meal + 25% white_dye) which is a strict superset of the TFC recipe | Complete | - |
+| Register `tfc_aeronautics:quern_milling` RecipeType + custom Serializer that reads TFC-shapes (`ingredient`, `result.stack`+`modifiers`, `processing_time`) via `ItemStackProvider.CODEC` | Complete | - |
+| Implement `Mixin` into `MillstoneBlockEntity` (`tick`/`process`/`canProcess`) that routes our type through `ItemStackProvider.getSingleStack(input)` so `tfc:copy_food` and other `ItemStackModifier`s actually run | Complete | - |
+| Replace 6 flat grain→flour mirrors with quern-shaped `tfc_aeronautics:quern_milling` recipes at `data/tfc_aeronautics/recipe/milling/food/` | Complete | - |
+| Enable [[mixins]] block in `neoforge.mods.toml` and wire `tfc_aeronautics.mixins.json` | Complete | - |
+| Update DOCS.md «Получение» section to describe `only_quern` convention, mirror scope, and the new `quern_milling` RecipeType + mixin mechanics | Complete | - |
+| Build sanity: `./gradlew compileJava` passes; `grep -r "create:milling" src/main/java src/client/java` shows only doc-string references | Complete | - |
+
 ## Refactor shaft recipes
 
 | Task | Status | Dependencies |

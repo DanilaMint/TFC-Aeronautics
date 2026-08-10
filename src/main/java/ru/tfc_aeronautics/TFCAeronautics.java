@@ -15,6 +15,7 @@ import ru.tfc_aeronautics.fluid.Fluids;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
+import ru.tfc_aeronautics.recipe.RecipeRegistration;
 import ru.tfc_aeronautics.resin.ResinRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
 import ru.tfc_aeronautics.worldgen.ProcessorTypes;
@@ -47,6 +48,7 @@ public class TFCAeronautics {
         ResinRegistration.register(modEventBus);
         BurlapRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
+        RecipeRegistration.register(modEventBus);
 
         StructureTypes.register(modEventBus);
         StructurePieceTypes.register(modEventBus);

@@ -1,0 +1,26 @@
+{
+  "type": "tfc_aeronautics:quern_milling",
+  "ingredient": {
+    "type": "tfc:and",
+    "children": [
+      {
+        "item": "tfc:food/oat_grain"
+      },
+      {
+        "type": "tfc:not_rotten"
+      }
+    ]
+  },
+  "result": {
+    "modifiers": [
+      {
+        "type": "tfc:copy_food"
+      }
+    ],
+    "stack": {
+      "count": 1,
+      "id": "tfc:food/oat_flour"
+    }
+  },
+  "processing_time": 250
+}

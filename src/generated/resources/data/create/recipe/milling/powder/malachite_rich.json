@@ -1,0 +1,15 @@
+{
+  "type": "create:milling",
+  "ingredients": [
+    {
+      "item": "tfc:ore/rich_malachite"
+    }
+  ],
+  "processing_time": 250,
+  "results": [
+    {
+      "count": 7,
+      "id": "tfc:powder/malachite"
+    }
+  ]
+}

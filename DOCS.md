@@ -77,18 +77,106 @@
 
 ### Получение
 
-Два пути, оба добавляются рецептами:
+Один путь на сегодня — только через жернов (см. каталог
+`tfc_aeronautics:only_quern` ниже).
 
-* **`tfc:quern`** — жернов. Перемалывает руду (медленно, руками).
-* **`tfc:milling`** — фрезерный станок TFC. Перемалывает руду (быстро, через
-  кинетику).
+* **`tfc:quern`** — жернов. Перемалывает слиток в 20 ед. порошка (медленно,
+  руками). Рецепты лежат в `data/tfc_aeronautics/recipe/quern/<id>_powder.json`
+  с типом `tfc:quern`.
 
-Каждый порошок имеет оба рецепта
-(`data/tfc_aeronautics/recipe/quern/<id>_powder.json` и
-`.../milling/<id>_powder.json`).
+#### `tfc_aeronautics:only_quern` — каталог рецептов только для жернова
 
-Также для всех порошков есть парные рецепты `create:crushing` — Create-мельница
-даёт тот же порошок.
+Это не отдельный `RecipeType`, а соглашение об именовании директорий. TFC
+обрабатывает любой рецепт с `"type": "tfc:quern"` независимо от вложенной
+папки, а Create-мельница видит только `"type": "create:milling"`. Поэтому,
+чтобы рецепт «видел только жернов», достаточно не публиковать его
+`create:milling`-зеркало.
+
+Сейчас в эту категорию попадают 8 слитков → порошков: bismuth, cast_iron,
+copper, gold, nickel, silver, tin, zinc.
+
+#### Зеркалирование TFC `tfc:quern` рецептов в Create `milling`
+
+Большинство TFC-рецептов `tfc:quern` мы зеркалируем в
+`data/create/recipe/milling/<тот_же_путь>.json` с типом `create:milling`,
+`processing_time: 250`, чтобы Create-мельница тоже их обрабатывала
+(зеркалирование — по конвенции в исходный неймспейс, см.
+[[feedback-recipe-override-convention]]).
+
+Зеркалируются как обычные `create:milling` (59 файлов под `data/create/recipe/milling/`):
+
+* `canola_paste.json`, `lime_dye.json` — одиночные ингредиенты;
+* `ore/gypsum.json` — известняк → 1 гипс;
+* `powder/*.json` (56 файлов) — одиночные рудные ингредиенты и `#tfc:fluxstone`.
+
+`bone` → 3 bone_meal уже покрыт собственным рецептом Create
+`data/create/recipe/milling/bone.json` (который ещё и бонусом даёт
+25% шанс white_dye), так что зеркало не публикуем — иначе бы затенили
+полезный бонус.
+
+#### `tfc_aeronautics:quern_milling` — поддержка TFC-модификаторов в мельнице
+
+У TFC `food/<grain>_flour.json` ингредиент — сложный `tfc:and { item: …, tfc:not_rotten }`,
+а результат несёт `result.modifiers: [{ type: tfc:copy_food }]` и обёртку
+`result.stack`. Стандартный `create:milling` не поддерживает ни сложные
+предикаты, ни модификаторы результата, поэтому для этих 6 рецептов
+заводим кастомный `RecipeType` и собственный маршрут обработки в
+Create-мельнице.
+
+JSON-форма (см. `data/tfc_aeronautics/recipe/milling/food/wheat_flour.json`):
+
+```json
+{
+  "type": "tfc_aeronautics:quern_milling",
+  "ingredient": {
+    "type": "tfc:and",
+    "children": [
+      { "item": "tfc:food/wheat_grain" },
+      { "type": "tfc:not_rotten" }
+    ]
+  },
+  "result": {
+    "modifiers": [{ "type": "tfc:copy_food" }],
+    "stack": { "count": 1, "id": "tfc:food/wheat_flour" }
+  },
+  "processing_time": 250
+}
+```
+
+Чтобы мельница вообще увидела этот `RecipeType`, реализация живёт в Java
+(`src/main/java/ru/tfc_aeronautics/recipe/`):
+
+* `QuernMillingRecipe` — наследник `MillingRecipe`, хранит `Ingredient` и
+  `ItemStackProvider` (включая модификаторы).
+* `QuernMillingRecipeSerializer` — `RecipeSerializer`, читает тот же TFC-формат
+  через `ItemStackProvider.CODEC` (включая `tfc:copy_food`).
+* `QuernMillingRecipeType` — `DeferredRegister` для `RecipeType` и
+  `RecipeSerializer` под id `tfc_aeronautics:quern_milling`.
+* `mixin/MillstoneBlockEntityMixin` — три `@Inject`/`@Redirect` в `tick()`,
+  `process()` и `canProcess()`. Когда вход соответствует нашему рецепсу,
+  `process()` вызывает `ItemStackProvider.getSingleStack(input)` вместо
+  стандартного `rollResults(random)` — поэтому `tfc:copy_food` (и любой
+  другой `ItemStackModifier`) реально применяется, а не теряется.
+
+Поведенческий результат неотличим от жернова: Create-мельница принимает
+**только несгнившее** зерно (через `tfc:not_rotten`), а получившаяся мука
+получает decay и food-data зерна (через `tfc:copy_food`).
+
+**Не зеркалируются** — естественно остаются только на жернове:
+
+* `redstone.json`, `blue_dye.json` … `yellow_dye.json` (13 + redstone) —
+  несколько ингредиентов; Create `milling` принимает только один
+  (`ProcessingRecipe.validate`, максимум один item-ингредиент).
+* `powder/amethyst.json`, `diamond.json`, `emerald.json`, `lapis_lazuli.json`,
+  `opal.json`, `ruby.json`, `sapphire.json`, `topaz.json` — `gem/<x>` ИЛИ
+  `ore/<x>` (массив из двух).
+
+#### Прочее
+
+Для порошков также есть парные рецепты `create:crushing` — Create-дробилка
+даёт тот же порошок (`data/tfc_aeronautics/recipe/crushing/<id>_powder.json`,
+как и для листов/двойных_листов/стержней — см. раздел про tight sheet и
+metal powder).
 
 ### Температура и плавка
 
