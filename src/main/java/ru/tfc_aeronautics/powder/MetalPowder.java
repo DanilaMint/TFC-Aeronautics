@@ -6,8 +6,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.dries007.tfc.common.fluids.TFCFluids;
 import net.dries007.tfc.util.Metal;
 
-import ru.tfc_aeronautics.fluid.AeronauticsFluids;
-
 /**
  * Registry of metal powders the aeronautics mod adds.
  * Each entry's {@link #outputFluid()} is a lazy supplier — TFC's {@code TFCFluids.METALS}
@@ -23,8 +21,7 @@ public enum MetalPowder
     CAST_IRON("cast_iron", 1535, () -> TFCFluids.METALS.get(Metal.CAST_IRON).getSource()),
     GOLD("gold", 1060, () -> TFCFluids.METALS.get(Metal.GOLD).getSource()),
     SILVER("silver", 970, () -> TFCFluids.METALS.get(Metal.SILVER).getSource()),
-    NICKEL("nickel", 1450, () -> TFCFluids.METALS.get(Metal.NICKEL).getSource()),
-    MAGMATITE("magmatite", 1250, () -> AeronauticsFluids.MOLTEN_MAGMATITE.getSource());
+    NICKEL("nickel", 1450, () -> TFCFluids.METALS.get(Metal.NICKEL).getSource());
 
     public static final String ITEM_ID_PREFIX = "powder/";
 

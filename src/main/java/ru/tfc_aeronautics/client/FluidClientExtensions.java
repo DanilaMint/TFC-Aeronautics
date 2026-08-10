@@ -14,36 +14,21 @@ import ru.tfc_aeronautics.fluid.AeronauticsFluids;
 
 /**
  * Registers {@link net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions}
- * for our molten magmatite fluid so TFC's {@code ContainedFluidModel} can resolve a still/flowing
+ * for rosin so TFC's {@code ContainedFluidModel} can resolve a still/flowing
  * texture sprite when rendering it inside containers (buckets, molds).
  *
  * Without this registration, {@code ContainedFluidModel.bake()} dereferences a null
  * {@link ResourceLocation} from {@code IClientFluidTypeExtensions.of(fluid).getStillTexture()}
  * and crashes the client with a {@code NullPointerException} in {@link TextureAtlas}.
- *
- * Reuses TFC's {@code block/molten_still} and {@code block/molten_flow} textures from
- * its own JAR — no new PNGs needed.
  */
 @EventBusSubscriber(modid = Aeronautics.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class FluidClientExtensions
 {
-    private static final ResourceLocation TFC_MOLTEN_STILL =
-        ResourceLocation.fromNamespaceAndPath("tfc", "block/molten_still");
-    private static final ResourceLocation TFC_MOLTEN_FLOW =
-        ResourceLocation.fromNamespaceAndPath("tfc", "block/molten_flow");
-
     private FluidClientExtensions() {}
 
     @SubscribeEvent
     public static void registerFluidExtensions(RegisterClientExtensionsEvent event)
     {
-        // Magmatite — dark grey molten metal look
-        event.registerFluidType(
-            new FluidRendererExtension(
-                TFCFluids.ALPHA_MASK | 0x3F3F3F,
-                TFC_MOLTEN_STILL, TFC_MOLTEN_FLOW, null, null),
-            AeronauticsFluids.MOLTEN_MAGMATITE.getType());
-
         // Rosin — honey-amber tint over vanilla water textures (same approach TFC uses for alcohol)
         event.registerFluidType(
             new FluidRendererExtension(

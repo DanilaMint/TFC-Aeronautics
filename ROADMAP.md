@@ -9,21 +9,6 @@
 | Add TFC Heating to items | Complete | Register |
 | Add TFC Heating recipe: powder -> molten metal | Complete | Register |
 
-## Refactor Andesite Alloy
-
-| Task | Status | Dependencies |
-|-|-|-|
-| Replace texture to TFC style | Complete | - |
-| Change item name to "Andesite alloy ingot" | Complete | - |
-| Register molten metal | Complete | - |
-| Add texture to molten metal | Complete | - |
-| Add TFC Heating to ingot and fluid | Complete | Register metal |
-| Register double ingot of andesite alloy | Complete | - |
-| Add texture to double ingot | Complete | - |
-| Add TFC Welding recipe: ingot + ingot -> double ingot | Complete | double ingot |
-| Add TFC Heating to double ingot | Complete | double ingot |
-| Add TFC Heating recipe: double ingot -> molten metal 200 MB | Complete | double ingot |
-
 ## Refactor shaft recipes
 
 | Task | Status | Dependencies |

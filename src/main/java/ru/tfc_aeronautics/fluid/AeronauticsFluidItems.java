@@ -20,11 +20,6 @@ public final class AeronauticsFluidItems
     public static final DeferredRegister.Items ITEMS =
         DeferredRegister.createItems(Aeronautics.MOD_ID);
 
-    public static final DeferredHolder<Item, BucketItem> MOLTEN_MAGMATITE_BUCKET =
-        ITEMS.register("molten_magmatite_bucket", () -> new BucketItem(
-            AeronauticsFluids.MOLTEN_MAGMATITE.getSource(),
-            new Item.Properties()));
-
     public static final DeferredHolder<Item, BucketItem> ROSIN_BUCKET =
         ITEMS.register("rosin_bucket", () -> new BucketItem(
             AeronauticsFluids.ROSIN.getSource(),
