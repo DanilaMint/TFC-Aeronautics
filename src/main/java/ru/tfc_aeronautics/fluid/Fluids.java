@@ -14,18 +14,18 @@ import net.dries007.tfc.common.fluids.FluidHolder;
 import net.dries007.tfc.common.fluids.MixingFluid;
 import net.dries007.tfc.util.registry.RegistrationHelpers;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Registers mod fluids. Rosin uses vanilla {@link MixingFluid} Source/Flowing
  * and mirrors TFC's water-like alcohol fluids.
  */
-public final class AeronauticsFluids
+public final class Fluids
 {
     public static final DeferredRegister<FluidType> FLUID_TYPES =
-        DeferredRegister.create(NeoForgeRegistries.FLUID_TYPES, Aeronautics.MOD_ID);
+        DeferredRegister.create(NeoForgeRegistries.FLUID_TYPES, TFCAeronautics.MOD_ID);
     public static final DeferredRegister<net.minecraft.world.level.material.Fluid> FLUIDS =
-        DeferredRegister.create(Registries.FLUID, Aeronautics.MOD_ID);
+        DeferredRegister.create(Registries.FLUID, TFCAeronautics.MOD_ID);
 
     public static final FluidHolder<BaseFlowingFluid> ROSIN =
         RegistrationHelpers.registerFluid(
@@ -34,13 +34,13 @@ public final class AeronauticsFluids
             "rosin",
             "flowing_rosin",
             properties -> properties
-                .block(AeronauticsFluidBlocks.ROSIN)
-                .bucket(AeronauticsFluidItems.ROSIN_BUCKET),
+                .block(FluidBlocks.ROSIN)
+                .bucket(FluidItems.ROSIN_BUCKET),
             () -> new FluidType(waterLikeRosin().descriptionId("fluid.tfc_aeronautics.rosin")),
             MixingFluid.Source::new,
             MixingFluid.Flowing::new);
 
-    private AeronauticsFluids() {}
+    private Fluids() {}
 
     /** Water-like FluidType properties copied from {@code TFCFluids.waterLike()} for rosin. */
     private static FluidType.Properties waterLikeRosin()

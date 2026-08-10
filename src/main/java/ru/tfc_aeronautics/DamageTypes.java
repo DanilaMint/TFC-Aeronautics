@@ -11,14 +11,14 @@ import net.minecraft.world.level.Level;
  * Damage types added by this mod. The matching entries live in
  * {@code data/tfc_aeronautics/damage_type/}.
  */
-public final class AeronauticsDamageTypes {
+public final class DamageTypes {
     /** Dealt by touching a bare, spinning Create shaft or cogwheel. */
     public static final ResourceKey<DamageType> SHAFT = key("shaft");
 
-    private AeronauticsDamageTypes() {}
+    private DamageTypes() {}
 
     private static ResourceKey<DamageType> key(String name) {
-        return ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(Aeronautics.MOD_ID, name));
+        return ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(TFCAeronautics.MOD_ID, name));
     }
 
     public static DamageSource shaft(Level level) {

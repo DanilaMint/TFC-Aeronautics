@@ -18,17 +18,17 @@ import ru.aeronautics.client.ponder.scenes.StampingPressScenes;
  * assets/tfc_aeronautics/ponder/<id>.nbt and to generate lang keys
  * tfc_aeronautics.ponder.<id>.header / .text_N.
  */
-public final class AeronauticsPonderScenes {
+public final class PonderScenes {
 
-    private AeronauticsPonderScenes() {}
+    private PonderScenes() {}
 
     public static void register(PonderSceneRegistrationHelper<DeferredHolder<?, ?>> helper) {
         helper.forComponents(HeaterRegistration.HEATER)
             .addStoryBoard("heater/intro", HeaterScenes::intro,
-                AeronauticsPonderTags.AERONAUTICS_KINETICS);
+                PonderTags.KINETICS);
 
         helper.forComponents(StampingPressRegistration.STAMPING_PRESS)
             .addStoryBoard("stamping_press/pressing", StampingPressScenes::pressing,
-                AeronauticsPonderTags.AERONAUTICS_KINETICS);
+                PonderTags.KINETICS);
     }
 }

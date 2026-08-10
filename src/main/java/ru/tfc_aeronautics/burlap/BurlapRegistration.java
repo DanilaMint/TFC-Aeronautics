@@ -5,7 +5,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Registers the impregnated burlap cloth item. The item itself is a vanilla {@link Item};
@@ -14,7 +14,7 @@ import ru.tfc_aeronautics.Aeronautics;
  */
 public final class BurlapRegistration {
     public static final DeferredRegister.Items ITEMS =
-        DeferredRegister.createItems(Aeronautics.MOD_ID);
+        DeferredRegister.createItems(TFCAeronautics.MOD_ID);
 
     public static final DeferredHolder<Item, Item> IMPREGNATED_BURLAP_CLOTH =
         ITEMS.register("impregnated_burlap_cloth", () -> new Item(new Item.Properties()));

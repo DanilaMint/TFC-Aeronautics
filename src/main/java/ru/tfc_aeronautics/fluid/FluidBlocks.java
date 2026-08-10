@@ -7,23 +7,23 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Registers fluid blocks. Rosin uses vanilla {@link LiquidBlock},
  * mirroring how TFC's alcohol fluids register their blocks.
  */
-public final class AeronauticsFluidBlocks
+public final class FluidBlocks
 {
     public static final DeferredRegister.Blocks BLOCKS =
-        DeferredRegister.createBlocks(Aeronautics.MOD_ID);
+        DeferredRegister.createBlocks(TFCAeronautics.MOD_ID);
 
     public static final DeferredHolder<Block, LiquidBlock> ROSIN =
         BLOCKS.register("fluid/rosin", () -> new LiquidBlock(
-            AeronauticsFluids.ROSIN.getSource(),
+            Fluids.ROSIN.getSource(),
             Block.Properties.ofFullCopy(Blocks.WATER).noLootTable()));
 
-    private AeronauticsFluidBlocks() {}
+    private FluidBlocks() {}
 
     public static void register(IEventBus bus)
     {

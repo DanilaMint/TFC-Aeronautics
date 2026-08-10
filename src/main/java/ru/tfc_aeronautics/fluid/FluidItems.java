@@ -7,7 +7,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Registers fluid bucket items. Vanilla {@link BucketItem} is used directly —
@@ -15,17 +15,17 @@ import ru.tfc_aeronautics.Aeronautics;
  * {@code FluidId.mapOf(...)} which is coupled to TFC's {@code Metal} enum,
  * so for new fluids we register the bucket by hand.
  */
-public final class AeronauticsFluidItems
+public final class FluidItems
 {
     public static final DeferredRegister.Items ITEMS =
-        DeferredRegister.createItems(Aeronautics.MOD_ID);
+        DeferredRegister.createItems(TFCAeronautics.MOD_ID);
 
     public static final DeferredHolder<Item, BucketItem> ROSIN_BUCKET =
         ITEMS.register("rosin_bucket", () -> new BucketItem(
-            AeronauticsFluids.ROSIN.getSource(),
+            Fluids.ROSIN.getSource(),
             new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
 
-    private AeronauticsFluidItems() {}
+    private FluidItems() {}
 
     public static void register(IEventBus bus)
     {

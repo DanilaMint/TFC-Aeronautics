@@ -5,7 +5,7 @@ import net.dries007.tfc.common.blockentities.TFCBlockEntities;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Wires Create's spout API to TFC's mold table: while a spout is placed above a
@@ -16,7 +16,7 @@ import ru.tfc_aeronautics.Aeronautics;
  * {@code BlockSpoutingBehaviour.BY_BLOCK_ENTITY} and TFC's block entity registry
  * must be live — TFC registers {@code mold_table} during its own common setup.
  */
-@EventBusSubscriber(modid = Aeronautics.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = TFCAeronautics.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public final class SpoutCompat
 {
     private SpoutCompat() {}

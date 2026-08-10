@@ -24,7 +24,7 @@ import net.dries007.tfc.common.blocks.devices.SealableDeviceBlock;
 import net.dries007.tfc.common.capabilities.DelegateItemHandler;
 import net.dries007.tfc.common.capabilities.InventoryItemHandler;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -44,15 +44,15 @@ import java.util.List;
  * </ul>
  */
 public final class TannerHouseEffects {
-    public static final String CHEST_ID = Aeronautics.MOD_ID + ":tanner_house_chest";
-    public static final String BARREL_ID = Aeronautics.MOD_ID + ":tanner_house_barrel";
+    public static final String CHEST_ID = TFCAeronautics.MOD_ID + ":tanner_house_chest";
+    public static final String BARREL_ID = TFCAeronautics.MOD_ID + ":tanner_house_barrel";
 
     private static final ResourceLocation LIMEWATER_ID = ResourceLocation.fromNamespaceAndPath("tfc", "limewater");
     private static final ResourceLocation TANNIN_ID = ResourceLocation.fromNamespaceAndPath("tfc", "tannin");
 
     private static final ResourceKey<LootTable> CHEST_TABLE = ResourceKey.create(
         net.minecraft.core.registries.Registries.LOOT_TABLE,
-        ResourceLocation.fromNamespaceAndPath(Aeronautics.MOD_ID, "tanner_house_chest"));
+        ResourceLocation.fromNamespaceAndPath(TFCAeronautics.MOD_ID, "tanner_house_chest"));
 
     // The fluids are resolved at static-init time so the worldgen code path stays
     // lookup-free. TFC is a hard dependency, so resolving to EMPTY would mean the
@@ -73,7 +73,7 @@ public final class TannerHouseEffects {
     private static Fluid resolveFluid(ResourceLocation id) {
         final Fluid fluid = BuiltInRegistries.FLUID.get(id);
         if (fluid == null) {
-            Aeronautics.LOGGER.error("TannerHouseEffects: required fluid {} is not registered", id);
+            TFCAeronautics.LOGGER.error("TannerHouseEffects: required fluid {} is not registered", id);
             return Fluids.EMPTY;
         }
         return fluid;
@@ -139,7 +139,7 @@ public final class TannerHouseEffects {
         try {
             items = chestItems(chest);
         } catch (ReflectiveOperationException e) {
-            Aeronautics.LOGGER.error("tanner_house_chest: failed to access chest items at {}", pos, e);
+            TFCAeronautics.LOGGER.error("tanner_house_chest: failed to access chest items at {}", pos, e);
             return;
         }
         // Idempotency: skip if anything is already inside.

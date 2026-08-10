@@ -159,6 +159,6 @@ public class GraveyardMaterialProcessor extends StructureProcessor {
 
     @Override
     protected StructureProcessorType<?> getType() {
-        return AeronauticsProcessorTypes.GRAVEYARD_MATERIAL.get();
+        return ProcessorTypes.GRAVEYARD_MATERIAL.get();
     }
 }

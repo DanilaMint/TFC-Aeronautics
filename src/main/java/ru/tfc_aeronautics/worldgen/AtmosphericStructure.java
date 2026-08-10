@@ -59,7 +59,7 @@ public class AtmosphericStructure extends Structure {
 
     @Override
     public StructureType<?> type() {
-        return AeronauticsStructureTypes.ATMOSPHERIC.get();
+        return StructureTypes.ATMOSPHERIC.get();
     }
 
     @Override

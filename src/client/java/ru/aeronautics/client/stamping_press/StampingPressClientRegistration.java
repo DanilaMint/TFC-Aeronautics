@@ -8,7 +8,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
 
 /**
@@ -22,7 +22,7 @@ import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
  *       pipeline when it is available.</li>
  * </ul>
  */
-@EventBusSubscriber(modid = Aeronautics.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = TFCAeronautics.MOD_ID, value = Dist.CLIENT)
 public final class StampingPressClientRegistration {
 
     private StampingPressClientRegistration() {}

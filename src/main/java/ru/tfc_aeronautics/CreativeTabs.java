@@ -11,7 +11,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
-import ru.tfc_aeronautics.fluid.AeronauticsFluidItems;
+import ru.tfc_aeronautics.fluid.FluidItems;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.MetalPowder;
@@ -26,7 +26,7 @@ import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
 public final class CreativeTabs
 {
     public static final DeferredRegister<CreativeModeTab> TABS =
-        DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Aeronautics.MOD_ID);
+        DeferredRegister.create(Registries.CREATIVE_MODE_TAB, TFCAeronautics.MOD_ID);
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main",
         () -> CreativeModeTab.builder()
@@ -41,7 +41,7 @@ public final class CreativeTabs
                 output.accept(StampingPressRegistration.STAMPING_PRESS_ITEM.get());
                 output.accept(ResinRegistration.RESIN_CLUMP.get());
                 output.accept(BurlapRegistration.IMPREGNATED_BURLAP_CLOTH.get());
-                output.accept(AeronauticsFluidItems.ROSIN_BUCKET.get());
+                output.accept(FluidItems.ROSIN_BUCKET.get());
             })
             .build());
 

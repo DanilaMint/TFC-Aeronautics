@@ -7,7 +7,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Registers the mod's custom {@link StructureType}s for the atmospheric structure framework.
@@ -20,9 +20,9 @@ import ru.tfc_aeronautics.Aeronautics;
  * <p>Registration follows the same pattern as the rest of the mod
  * (see {@link ru.tfc_aeronautics.heater.HeaterRegistration}, {@code StampingPressRegistration}).
  */
-public final class AeronauticsStructureTypes {
+public final class StructureTypes {
     public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES =
-        DeferredRegister.create(Registries.STRUCTURE_TYPE, Aeronautics.MOD_ID);
+        DeferredRegister.create(Registries.STRUCTURE_TYPE, TFCAeronautics.MOD_ID);
 
     public static final DeferredHolder<StructureType<?>, StructureType<AtmosphericStructure>> ATMOSPHERIC =
         STRUCTURE_TYPES.register("atmospheric", () -> () -> AtmosphericStructure.CODEC);
@@ -33,7 +33,7 @@ public final class AeronauticsStructureTypes {
     public static final DeferredHolder<StructureType<?>, StructureType<AtmosphericTemplateStructure>> ATMOSPHERIC_TEMPLATE =
         STRUCTURE_TYPES.register("atmospheric_template", () -> () -> AtmosphericTemplateStructure.CODEC);
 
-    private AeronauticsStructureTypes() {}
+    private StructureTypes() {}
 
     public static void register(IEventBus bus) {
         STRUCTURE_TYPES.register(bus);

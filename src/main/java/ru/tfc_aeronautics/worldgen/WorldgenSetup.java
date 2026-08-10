@@ -4,18 +4,18 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Registers runtime-only worldgen side-effects that have no datapack equivalent.
  *
- * <p>Static registries ({@link AeronauticsStructureTypes},
- * {@link AeronauticsStructurePieceTypes}, {@link AeronauticsProcessorTypes}) are wired
- * to the mod event bus in {@link Aeronautics}'s constructor. This subscriber handles the
+ * <p>Static registries ({@link StructureTypes},
+ * {@link StructurePieceTypes}, {@link ProcessorTypes}) are wired
+ * to the mod event bus in {@link TFCAeronautics}'s constructor. This subscriber handles the
  * rest: code-defined hooks that structures and pieces call into via
  * {@link AtmosphereSpec.Effect}.
  */
-@EventBusSubscriber(modid = Aeronautics.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = TFCAeronautics.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public final class WorldgenSetup {
     private WorldgenSetup() {}
 

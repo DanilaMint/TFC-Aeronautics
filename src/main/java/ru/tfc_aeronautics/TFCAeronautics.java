@@ -9,29 +9,29 @@ import org.slf4j.LoggerFactory;
 
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
-import ru.tfc_aeronautics.fluid.AeronauticsFluidBlocks;
-import ru.tfc_aeronautics.fluid.AeronauticsFluidItems;
-import ru.tfc_aeronautics.fluid.AeronauticsFluids;
+import ru.tfc_aeronautics.fluid.FluidBlocks;
+import ru.tfc_aeronautics.fluid.FluidItems;
+import ru.tfc_aeronautics.fluid.Fluids;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.resin.ResinRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
-import ru.tfc_aeronautics.worldgen.AeronauticsProcessorTypes;
-import ru.tfc_aeronautics.worldgen.AeronauticsStructurePieceTypes;
-import ru.tfc_aeronautics.worldgen.AeronauticsStructureTypes;
+import ru.tfc_aeronautics.worldgen.ProcessorTypes;
+import ru.tfc_aeronautics.worldgen.StructurePieceTypes;
+import ru.tfc_aeronautics.worldgen.StructureTypes;
 
 /**
  * Main entry point for the TFC Aeronautics mod.
  * Provides airships, gliders and other aerial contraptions
  * to integrate with TerraFirmaCraft's realistic survival experience.
  */
-@Mod(Aeronautics.MOD_ID)
-public class Aeronautics {
+@Mod(TFCAeronautics.MOD_ID)
+public class TFCAeronautics {
     public static final String MOD_ID = "tfc_aeronautics";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public Aeronautics(IEventBus modEventBus, ModContainer modContainer) {
+    public TFCAeronautics(IEventBus modEventBus, ModContainer modContainer) {
         LOGGER.info("Initializing TFC Aeronautics");
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -39,17 +39,17 @@ public class Aeronautics {
         PowderRegistration.register(modEventBus);
         CompositeRegistration.register(modEventBus);
         TightSheetRegistration.register(modEventBus);
-        AeronauticsFluidBlocks.register(modEventBus);
-        AeronauticsFluidItems.register(modEventBus);
-        AeronauticsFluids.register(modEventBus);
+        FluidBlocks.register(modEventBus);
+        FluidItems.register(modEventBus);
+        Fluids.register(modEventBus);
         HeaterRegistration.register(modEventBus);
         StampingPressRegistration.register(modEventBus);
         ResinRegistration.register(modEventBus);
         BurlapRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
 
-        AeronauticsStructureTypes.register(modEventBus);
-        AeronauticsStructurePieceTypes.register(modEventBus);
-        AeronauticsProcessorTypes.register(modEventBus);
+        StructureTypes.register(modEventBus);
+        StructurePieceTypes.register(modEventBus);
+        ProcessorTypes.register(modEventBus);
     }
 }

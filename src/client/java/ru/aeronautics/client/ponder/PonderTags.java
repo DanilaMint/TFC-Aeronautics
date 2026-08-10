@@ -5,7 +5,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 
 import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
 
@@ -19,25 +19,25 @@ import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
  *   tfc_aeronautics.ponder.tag.<tag_id>          — category title
  *   tfc_aeronautics.ponder.tag.<tag_id>.desc     — category description (if registered as such)
  */
-public final class AeronauticsPonderTags {
+public final class PonderTags {
 
-    public static final ResourceLocation AERONAUTICS_KINETICS =
-        ResourceLocation.fromNamespaceAndPath(Aeronautics.MOD_ID, "aeronautics_kinetics");
+    public static final ResourceLocation KINETICS =
+        ResourceLocation.fromNamespaceAndPath(TFCAeronautics.MOD_ID, "kinetics");
 
-    private AeronauticsPonderTags() {}
+    private PonderTags() {}
 
     public static void register(PonderTagRegistrationHelper<ResourceLocation> helper) {
         PonderTagRegistrationHelper<DeferredHolder<?, ?>> blockHelper =
             helper.withKeyFunction(h -> h.getKey().location());
 
-        helper.registerTag(AERONAUTICS_KINETICS)
+        helper.registerTag(KINETICS)
             .addToIndex()
             .item(HeaterRegistration.HEATER.get(), true, false)
-            .title("Aeronautics Kinetics")
+            .title("Kinetics")
             .description("Components built around Create's kinetic system")
             .register();
 
-        blockHelper.addToTag(AERONAUTICS_KINETICS)
+        blockHelper.addToTag(KINETICS)
             .add(HeaterRegistration.HEATER)
             .add(StampingPressRegistration.STAMPING_PRESS);
     }

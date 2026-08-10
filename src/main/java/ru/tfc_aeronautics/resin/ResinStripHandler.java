@@ -10,10 +10,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 import ru.tfc_aeronautics.Config;
 
-@EventBusSubscriber(modid = Aeronautics.MOD_ID)
+@EventBusSubscriber(modid = TFCAeronautics.MOD_ID)
 public final class ResinStripHandler {
     private ResinStripHandler() {}
 

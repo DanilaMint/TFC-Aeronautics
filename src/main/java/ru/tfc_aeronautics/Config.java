@@ -50,16 +50,16 @@ public class Config {
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 
-    @EventBusSubscriber(modid = Aeronautics.MOD_ID)
+    @EventBusSubscriber(modid = TFCAeronautics.MOD_ID)
     public static class ConfigEvents {
         @SubscribeEvent
         public static void onConfigLoad(ModConfigEvent.Loading event) {
-            Aeronautics.LOGGER.info("Loading aeronautics config");
+            TFCAeronautics.LOGGER.info("Loading aeronautics config");
         }
 
         @SubscribeEvent
         public static void onConfigReload(ModConfigEvent.Reloading event) {
-            Aeronautics.LOGGER.info("Reloading aeronautics config");
+            TFCAeronautics.LOGGER.info("Reloading aeronautics config");
         }
     }
 }

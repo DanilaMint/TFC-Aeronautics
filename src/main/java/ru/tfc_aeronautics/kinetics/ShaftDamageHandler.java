@@ -22,8 +22,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
-import ru.tfc_aeronautics.Aeronautics;
-import ru.tfc_aeronautics.AeronauticsDamageTypes;
+import ru.tfc_aeronautics.TFCAeronautics;
+import ru.tfc_aeronautics.DamageTypes;
 import ru.tfc_aeronautics.Config;
 
 /**
@@ -41,7 +41,7 @@ import ru.tfc_aeronautics.Config;
  * tick listener that scans the block cells overlapping the entity's hitbox rather
  * than an {@code entityInside} override.
  */
-@EventBusSubscriber(modid = Aeronautics.MOD_ID)
+@EventBusSubscriber(modid = TFCAeronautics.MOD_ID)
 public final class ShaftDamageHandler
 {
     /**
@@ -95,7 +95,7 @@ public final class ShaftDamageHandler
 
             final float damage = damageFor(rpm);
             // A failed hurt() means the entity is still in i-frames; skip the feedback too.
-            if (damage <= 0.0f || !living.hurt(AeronauticsDamageTypes.shaft(level), damage))
+            if (damage <= 0.0f || !living.hurt(DamageTypes.shaft(level), damage))
                 continue;
 
             applyKnockback(living, shaft.getRotationAxis(state), pos, rpm, startRpm);

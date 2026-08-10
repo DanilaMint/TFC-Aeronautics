@@ -5,7 +5,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Registers the two composite items:
@@ -20,7 +20,7 @@ import ru.tfc_aeronautics.Aeronautics;
 public final class CompositeRegistration
 {
     public static final DeferredRegister.Items ITEMS =
-        DeferredRegister.createItems(Aeronautics.MOD_ID);
+        DeferredRegister.createItems(TFCAeronautics.MOD_ID);
 
     public static final DeferredHolder<Item, Item> DRY_COMPOSITE =
         ITEMS.register("dry_composite", () -> new Item(new Item.Properties()));

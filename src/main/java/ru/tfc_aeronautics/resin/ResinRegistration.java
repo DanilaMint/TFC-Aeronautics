@@ -5,7 +5,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Registers the resin clump item. The item itself is a vanilla {@link Item}; all behaviour
@@ -14,7 +14,7 @@ import ru.tfc_aeronautics.Aeronautics;
  */
 public final class ResinRegistration {
     public static final DeferredRegister.Items ITEMS =
-        DeferredRegister.createItems(Aeronautics.MOD_ID);
+        DeferredRegister.createItems(TFCAeronautics.MOD_ID);
 
     public static final DeferredHolder<Item, Item> RESIN_CLUMP =
         ITEMS.register("resin_clump", () -> new Item(new Item.Properties()));

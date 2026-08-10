@@ -9,8 +9,8 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.dries007.tfc.client.extensions.FluidRendererExtension;
 import net.dries007.tfc.common.fluids.TFCFluids;
 
-import ru.tfc_aeronautics.Aeronautics;
-import ru.tfc_aeronautics.fluid.AeronauticsFluids;
+import ru.tfc_aeronautics.TFCAeronautics;
+import ru.tfc_aeronautics.fluid.Fluids;
 
 /**
  * Registers {@link net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions}
@@ -21,7 +21,7 @@ import ru.tfc_aeronautics.fluid.AeronauticsFluids;
  * {@link ResourceLocation} from {@code IClientFluidTypeExtensions.of(fluid).getStillTexture()}
  * and crashes the client with a {@code NullPointerException} in {@link TextureAtlas}.
  */
-@EventBusSubscriber(modid = Aeronautics.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = TFCAeronautics.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class FluidClientExtensions
 {
     private FluidClientExtensions() {}
@@ -36,6 +36,6 @@ public final class FluidClientExtensions
                 ResourceLocation.withDefaultNamespace("block/water_still"),
                 ResourceLocation.withDefaultNamespace("block/water_flow"),
                 null, null),
-            AeronauticsFluids.ROSIN.getType());
+            Fluids.ROSIN.getType());
     }
 }

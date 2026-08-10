@@ -7,7 +7,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Registers the mod's {@link StructureProcessorType}s.
@@ -16,9 +16,9 @@ import ru.tfc_aeronautics.Aeronautics;
  * than configured from a processor list, so each codec is only ever used to satisfy
  * {@link net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor#getType()}.
  */
-public final class AeronauticsProcessorTypes {
+public final class ProcessorTypes {
     public static final DeferredRegister<StructureProcessorType<?>> PROCESSOR_TYPES =
-        DeferredRegister.create(Registries.STRUCTURE_PROCESSOR, Aeronautics.MOD_ID);
+        DeferredRegister.create(Registries.STRUCTURE_PROCESSOR, TFCAeronautics.MOD_ID);
 
     public static final DeferredHolder<StructureProcessorType<?>, StructureProcessorType<GraveyardMaterialProcessor>> GRAVEYARD_MATERIAL =
         PROCESSOR_TYPES.register("graveyard_material", () -> () -> GraveyardMaterialProcessor.CODEC);
@@ -26,7 +26,7 @@ public final class AeronauticsProcessorTypes {
     public static final DeferredHolder<StructureProcessorType<?>, StructureProcessorType<LocalMaterialProcessor>> LOCAL_MATERIAL =
         PROCESSOR_TYPES.register("local_material", () -> () -> LocalMaterialProcessor.CODEC);
 
-    private AeronauticsProcessorTypes() {}
+    private ProcessorTypes() {}
 
     public static void register(IEventBus bus) {
         PROCESSOR_TYPES.register(bus);

@@ -35,12 +35,12 @@ public class AncientGraveyardPiece extends TemplateStructurePiece {
         new BlockIgnoreProcessor(List.of(Blocks.STRUCTURE_VOID, Blocks.STRUCTURE_BLOCK));
 
     public AncientGraveyardPiece(StructureTemplateManager manager, ResourceLocation template, BlockPos pos, Rotation rotation) {
-        super(AeronauticsStructurePieceTypes.ANCIENT_GRAVEYARD.get(), 0, manager, template, template.toString(),
+        super(StructurePieceTypes.ANCIENT_GRAVEYARD.get(), 0, manager, template, template.toString(),
             makeSettings(manager, template, rotation), pos);
     }
 
     public AncientGraveyardPiece(StructurePieceSerializationContext context, CompoundTag tag) {
-        super(AeronauticsStructurePieceTypes.ANCIENT_GRAVEYARD.get(), tag, context.structureTemplateManager(),
+        super(StructurePieceTypes.ANCIENT_GRAVEYARD.get(), tag, context.structureTemplateManager(),
             id -> makeSettings(context.structureTemplateManager(), id, Rotation.valueOf(tag.getString(ROTATION_KEY))));
     }
 

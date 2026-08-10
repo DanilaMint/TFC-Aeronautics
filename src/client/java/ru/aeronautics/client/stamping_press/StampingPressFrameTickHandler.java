@@ -21,7 +21,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 import ru.tfc_aeronautics.stamping_press.StampingPressBlockEntity;
 import ru.tfc_aeronautics.stamping_press.StampingPressFilterSlot;
 import ru.tfc_aeronautics.stamping_press.StampingPressInstances;
@@ -33,7 +33,7 @@ import ru.tfc_aeronautics.stamping_press.StampingPressInstances;
  * is looking at, and only on hover — here we make both sides visible whenever
  * a filter is installed, regardless of camera angle.
  */
-@EventBusSubscriber(modid = Aeronautics.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = TFCAeronautics.MOD_ID, value = Dist.CLIENT)
 public final class StampingPressFrameTickHandler {
 
     private static final AABB EMPTY_BB = new AABB(Vec3.ZERO, Vec3.ZERO);
