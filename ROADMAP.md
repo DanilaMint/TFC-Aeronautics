@@ -1,156 +1,259 @@
-# Roadmap for TFC Aeronautics mod
+# Roadmap
 
-## Metal Powder
+Статус реализованных механик мода. Будущие планы (PR, дополнительные языки) и ещё не начатые рефакторы — намеренно не включены.
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Add textures for metal powders | Complete | - |
-| Register items | Complete | - |
-| Add TFC Heating to items | Complete | Register |
-| Add TFC Heating recipe: powder -> molten metal | Complete | Register |
+| Раздел | Готово |
+|-|-|
+| Metal Powders | 6/6 ✅ |
+| Industrial Composite | 20/20 ✅ |
+| Resin | 4/4 ✅ |
+| Rosin | 5/5 ✅ |
+| Tight Sheets | 7/7 ✅ |
+| Saw Blade | 5/5 ✅ |
+| Impregnated Burlap Cloth | 5/5 ✅ |
+| Heater | 7/12 |
+| Stamping Press | 11/15 |
+| Create Spout + TFC Casting | 2/2 ✅ |
+| Quern / Millstone Sync | 9/9 ✅ |
+| Shaft Damage | 5/6 |
+| Worldgen Structures | 22/22 ✅ |
+| Ponder | 4/6 |
+| Localization | 1/6 |
 
-## Sync TFC `quern` onto Create `milling`, mark mod powders `only_quern`, support TFC result modifiers
+## Metal Powders
 
-The mod's 8 ingot→powder recipes were previously duplicated as both `tfc:quern` (slow, manual) and `create:milling` (fast, kinetic). The user wants ingot→powder to be quern-only (`tfc_aeronautics:only_quern`, folder/convention — not a new RecipeType), but every vanilla-convertible TFC `tfc:quern` recipe mirrored onto `create:milling` so the millstone becomes a superset of the quern. Additionally, the 6 grain→flour recipes need real `tfc:copy_food` modifier support — flat mirrors that drop the modifier are insufficient.
+- [x] **Регистрация**
+  - [x] 8 metal powders: copper, tin, zinc, bismuth, cast_iron, gold, silver, nickel
+  - [x] Item models для каждого порошка
+- [x] **Текстуры**
+  - [x] `tfc_aeronautics/textures/item/powder/bismuth.png`
+  - [x] `tfc_aeronautics/textures/item/powder/cast_iron.png`
+  - [x] `tfc_aeronautics/textures/item/powder/copper.png`
+  - [x] `tfc_aeronautics/textures/item/powder/gold.png`
+  - [x] `tfc_aeronautics/textures/item/powder/nickel.png`
+  - [x] `tfc_aeronautics/textures/item/powder/silver.png`
+  - [x] `tfc_aeronautics/textures/item/powder/tin.png`
+  - [x] `tfc_aeronautics/textures/item/powder/zinc.png`
+- [x] **Рецепты**
+  - [x] `tfc_aeronautics/recipe/heating/<metal>_powder.json`
+  - [x] `create:crushing` рецепты
+  - [x] `tfc:quern` рецепты из слитков
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Delete `data/tfc_aeronautics/recipe/milling/{8 metal}_powder.json` so the 8 ingot→powder recipes become quern-only | Complete | - |
-| Mirror convertible TFC `tfc:quern` recipes (single item / tag ingredient, simple `{count, id}` result) into `data/create/recipe/milling/<mirror_path>.json` with `processing_time: 250` | Complete | - |
-| Skip TFC recipes with multi-ingredient / compound ingredient (gem+ore powders, plant dyes) — they remain quern-only by construction | Complete | - |
-| Skip `bone_meal.json` mirror — Create already defines `bone.json` (input=minecraft:bone → 3× bone_meal + 25% white_dye) which is a strict superset of the TFC recipe | Complete | - |
-| Register `tfc_aeronautics:quern_milling` RecipeType + custom Serializer that reads TFC-shapes (`ingredient`, `result.stack`+`modifiers`, `processing_time`) via `ItemStackProvider.CODEC` | Complete | - |
-| Implement `Mixin` into `MillstoneBlockEntity` (`tick`/`process`/`canProcess`) that routes our type through `ItemStackProvider.getSingleStack(input)` so `tfc:copy_food` and other `ItemStackModifier`s actually run | Complete | - |
-| Replace 6 flat grain→flour mirrors with quern-shaped `tfc_aeronautics:quern_milling` recipes at `data/tfc_aeronautics/recipe/milling/food/` | Complete | - |
-| Enable [[mixins]] block in `neoforge.mods.toml` and wire `tfc_aeronautics.mixins.json` | Complete | - |
-| Update DOCS.md «Получение» section to describe `only_quern` convention, mirror scope, and the new `quern_milling` RecipeType + mixin mechanics | Complete | - |
-| Build sanity: `./gradlew compileJava` passes; `grep -r "create:milling" src/main/java src/client/java` shows only doc-string references | Complete | - |
+## Industrial Composite
 
-## Refactor shaft recipes
+Заменяет «andesite alloy» как базовый переходный материал между TFC и Create.
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Remove old recipe: 2 andesite alloy -> shaft | Complete | - |
-| Add forging recipe: andesite alloy -> 4 shafts | Complete | - |
+- [x] **Регистрация**
+  - [x] `dry_composite`
+  - [x] `composite`
+- [x] **Текстуры**
+  - [x] `composite.png` 
+  - [x] `dry_composite.png`
+- [x] **Рецепты** 
+  - [x] Shapeless: cast_iron powder + `igneous_gravels` tag → dry_composite
+  - [x] Barrel instant: 25 mB limewater + dry_composite → composite
+- [x] **TFC-интеграция**
+  - [x] Heating: composite @300 °C → `create:shaft`
+  - [x] `tfc/item_heat/composite.json`
+- [x] **Item application (корпуса из TFC-брёвен)**
+  - [x] `andesite_casing.json` — `stripped_logs` + composite → andesite_casing
+  - [x] `copper_casing.json` — `stripped_logs` + copper ingot → copper_casing
+  - [x] `brass_casing.json` — `stripped_logs` + brass ingot → brass_casing
+- [x] **Теги**
+  - [x] `tfc_aeronautics:stripped_logs` — 20 TFC-пород
+  - [x] `tfc_aeronautics:igneous_gravels` — 7 igneous gravel
 
-## Refactor casings
+## Resin
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Add create item application recipe: TFC stripped logs + andesite alloy ingot -> Andesite casing | Complete | - |
-| Add create item application recipe: TFC stripped logs + brass ingot -> Brass casing | Complete | - |
-| Add create item application recipe: TFC stripped logs + copper ingot -> Copper casing | Complete | - |
+- [x] **Resin clump**
+  - [x] Регистрация item `tfc_aeronautics:resin_clump`
+- [x] **Текстура**
+  - [x] `tfc_aeronautics/textures/item/resin_clump.png` 
+- [x] **Resin Strip Handler** — `BlockEvent.BlockToolModificationEvent`
+  - [x] Выпадение resin_clump при AXE_STRIP на `tfc_aeronautics:can_collect_resin` (5 conifer-пород)
+  - [x] Config: `resinDropChance` (0.0–1.0, default 0.15)
 
-## Override Create recipes using dried kelp
+## Rosin
 
-Create uses vanilla `minecraft:dried_kelp` / `minecraft:dried_kelp_block` in 8 recipes. Vanilla dried kelp doesn't exist in TFC's food chain, so all of these need to be shadowed at their original paths under `data/create/recipe/...` per [[feedback-recipe-override-convention]].
+- [x] **Rosin (жидкость)**
+  - [x] Регистрация: `tfc_aeronautics:rosin` (`MixingFluid.Source/Flowing`), `rosin_bucket` (`BucketItem`), `LiquidBlock`, Client extension (`FluidClientExtensions`) — amber-тинт
+  - [x] TFC-интеграция: Shadow `data/tfc/tags/fluid/ingredients.json` (rosin для TFC casting)
+- [x] **Barrel-рецепт rosin**
+  - [x] 50 mB `tfc_aeronautics:strong_alcohol` + 1× resin_clump → 50 mB rosin (1000 ticks sealed)
+  - [x] Тег `tfc_aeronautics:strong_alcohol` (vodka, rum, whiskey, rye_whiskey, corn_whiskey)
+- [x] **Barrel-рецепт impregnated burlap cloth**
+  - [x] 100 mB rosin + 1× burlap_cloth → 1× impregnated_burlap_cloth (7200 ticks sealed)
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Shadow `data/create/recipe/crafting/kinetics/belt_connector.json` (replace `minecraft:dried_kelp`) | Complete | - |
-| Shadow `data/create/recipe/crafting/kinetics/spout.json` (replace `minecraft:dried_kelp`) | | - |
-| Shadow `data/create/recipe/crafting/logistics/andesite_funnel.json` (replace `minecraft:dried_kelp`) | | - |
-| Shadow `data/create/recipe/crafting/logistics/andesite_tunnel.json` (replace `minecraft:dried_kelp`) | | - |
-| Shadow `data/create/recipe/crafting/logistics/brass_funnel.json` (replace `minecraft:dried_kelp`) | | - |
-| Shadow `data/create/recipe/crafting/logistics/brass_tunnel.json` (replace `minecraft:dried_kelp`) | | - |
-| Shadow `data/create/recipe/crafting/kinetics/hose_pulley.json` (replace `minecraft:dried_kelp_block`) | | - |
-| Shadow `data/create/recipe/crafting/kinetics/elevator_pulley.json` (replace `minecraft:dried_kelp_block`) | | - |
+## Tight Sheets
 
-## Stamping Press
+Тонкие листы Cu / wrought iron / steel.
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Add `tfc_aeronautics:stamping_press` block + item + block-entity | Complete | - |
-| Reuse Create press model + textures; animate head via `AllPartialModels.MECHANICAL_PRESS_HEAD` | Complete | - |
-| Implement TFC anvil recipe lookup on strike (input + filter item, heat-gated) | Complete | - |
-| Filter UI on back face via `FilteringBehaviour` + `StampingPressFilterSlot` | Complete | - |
-| Register 8.0 SU stress impact (matches Create press) | Complete | - |
-| Reject basin below (canSurvive) and skip basin processing (tryProcessInBasin=false) | Complete | - |
-| Fix the stamping press model (block renders wrong in world/inventory) | | - |
-| Make the shaft actually render inside the block + the striking head actually animate | | renderer |
-| Move filter slot to a perpendicular face (currently it overlaps the energy input face) | Complete | - |
-| Add running squeak/creak sound when the shaft turns | | - |
-| Add anvil strike sound when the head hits the item | | - |
-| Replace Create's press model + textures with a TFC-flavoured custom model and texture | | - |
+- [x] **Регистрация**
+  - [x] `tfc_aeronautics:metal/tight_sheet/{copper,wrought_iron,steel}`
+  - [x] Item models
+- [x] **Текстуры**
+  - [x] Для всех 3 металлов
+- [x] **Получение**
+  - [x] TFC anvil recipes (`recipe/anvil/tight_sheet_*.json`)
+  - [x] Create pressing (override `create/recipe/pressing/tight_sheet_*.json`)
+- [x] **TFC Heating**
+  - [x] tight_sheet → 100 mB metal (3 heating recipes)
+  - [x] `tfc/item_heat/*tight_sheet.json`
+
+## Saw Blade
+
+- [x] **Регистрация**
+  - [x] `tfc_aeronautics:saw_blade` — Item
+- [x] **Текстуры**
+  - [x] PNG + item model
+- [x] **Крафт**
+  - [x] Anvil tier 3: wrought_iron sheet → saw_blade (`recipe/anvil/saw_blade.json`)
+- [x] **TFC Heating**
+  - [x] saw_blade @1535 °C → 200 mB cast_iron (`recipe/heating/saw_blade.json`)
+  - [x] `tfc/item_heat/saw_blade.json`
+- [x] **Интеграция с Create saw** (`data/create/recipe/crafting/kinetics/mechanical_saw.json`)
+
+## Impregnated Burlap Cloth
+
+- [x] **Регистрация**
+  - [x] `tfc_aeronautics:impregnated_burlap_cloth` — Item
+- [x] **Текстуры**
+  - [x] PNG + item model
+- [x] **Получение**
+  - [x] Barrel sealed: 100 mB rosin + 1× burlap_cloth → 1× impregnated_burlap_cloth (7200 ticks)
+- [x] **Использование**
+  - [x] Belt connector override — допускает `impregnated_burlap_cloth` как замену кожи
+- [x] **Локализация**
+  - [x] `en_us.json` + `ru_ru.json`
 
 ## Heater
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Add `tfc_aeronautics:heater` block + item + block-entity | Complete | - |
-| IItemHandler capability on all faces (chute/funnel/hopper/arm) + IFluidHandler on DOWN face | Complete | - |
-| TFC integration: Fuel burn + Bellows boost + Encased Fan air + HeatingRecipe → molten tank | Complete | - |
-| LIT block-state property + light emission 14 when burning | Complete | - |
-| Max-temperature knob via Create `ValueSettingsBehaviour` (0..MAX_TEMP, 50 °C steps) | Complete | - |
-| Two-state block model via blockstate variants (lit/unlit) | Complete | - |
-| Animated flame overlay rendered by `HeaterBlockEntityRenderer` (Y-bob + scale flicker) | Complete | - |
-| Make heater textures | | - |
-|   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_side.png` | | - |
-|   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_top_off.png` (rest) | | - |
-|   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_top_on.png` (burning) | | - |
-|   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_bottom.png` | | - |
-|   &nbsp;&nbsp;↳ `src/main/resources/assets/tfc_aeronautics/textures/block/heater_flame.png` (animated overlay) | | - |
-| Fix heater texture | | - |
+Create-совместимый нагреватель с TFC-интеграцией.
 
-> Models already reference these textures; the files just don't exist on disk yet.
-> Models: `models/block/heater_off.json`, `models/block/heater_on.json`, `models/block/heater/flame.json`,
-> `blockstates/heater.json`, `models/item/heater.json`.
+- [x] **Ядро**
+  - [x] Регистрация `tfc_aeronautics:heater` (block + item + BE)
+  - [x] `IItemHandler` на всех гранях + `IFluidHandler` на DOWN
+  - [x] TFC-интеграция: fuel + bellows + Encased Fan + HeatingRecipe → molten tank
+  - [x] `LIT` block-state + light emission 14 при горении
+  - [x] Двух-статусная модель через blockstate variants (lit/unlit)
+  - [x] Макс-температура через `ValueSettingsBehaviour` (0..MAX_TEMP, шаг 50 °C)
+  - [x] Анимированное пламя через `HeaterBlockEntityRenderer` (Y-bob + scale flicker)
+- [ ] **Текстуры** (используются заглушки)
+  - [ ] `textures/block/heater_side.png`
+  - [ ] `textures/block/heater_top_off.png`
+  - [ ] `textures/block/heater_top_on.png`
+  - [ ] `textures/block/heater_bottom.png`
+  - [ ] `textures/block/heater_flame.png`
+
+## Stamping Press
+
+Create-пресс с TFC-наковальней: heat-gated anvil recipe на ударе.
+
+- [x] **Ядро блока**
+  - [x] Регистрация `tfc_aeronautics:stamping_press` (block + item + BE)
+  - [x] Reuse Create press model + текстуры; анимация головы через `AllPartialModels.MECHANICAL_PRESS_HEAD`
+  - [x] TFC anvil recipe lookup на ударе (input + filter item, heat-gated)
+  - [x] 8.0 SU stress impact
+  - [x] Запретить basin снизу (canSurvive) + пропустить basin processing
+  - [x] Flywheel `StampingPressVisual` (SingleAxisRotatingVisual + press head)
+  - [x] Vanilla `StampingPressRenderer` (KineticBlockEntityRenderer + FilteringRenderer)
+  - [x] Кастомный partial `STAMPING_PRESS_HEAD`
+- [x] **Фильтр**
+  - [x] `FilteringBehaviour` + `StampingPressFilterSlot` на задней грани
+  - [x] Перенос слота фильтра на перпендикулярную грань
+  - [x] `StampingPressFrameTickHandler` — value-box frame на обоих перпендикулярных гранях
+- [ ] **Визуал и звуки**
+  - [ ] Подключить bbmodel-набор (head + shaft + 5 граней) в blockstate — сейчас используется 1 модель
+  - [ ] Squeak/creak-звук вращения вала
+  - [ ] Anvil strike-звук удара
+  - [ ] Заменить модель + текстуры Create на TFC-flavoured custom
 
 ## Create Spout + TFC Casting
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Register `BlockSpoutingBehaviour` against `tfc:mold_table` so a Create spout placed above a mold table executes the matching `tfc:casting` recipe (drains `recipe.getFluidIngredient().amount()` mB from the spout, places result in mold table's `OUTPUT_SLOT`) | Complete | - |
-| Guard against double-casting: skip when mold stack is empty, mold already contains fluid, or `OUTPUT_SLOT` is occupied | Complete | - |
+- [x] Зарегистрировать `BlockSpoutingBehaviour` против `tfc:mold_table` (drains `recipe.getFluidIngredient().amount()` mB, кладёт результат в `OUTPUT_SLOT`)
+- [x] Guard против double-cast: пропустить, если mold stack пустой, mold уже содержит fluid, или `OUTPUT_SLOT` занят
 
-Implementation: `src/main/java/ru/tfc_aeronautics/recipe/SpoutCastingBehavior.java` + `SpoutCompat.java`. Pattern mirrors Create's own `com.simibubi.create.compat.tconstruct.SpoutCasting`.
+## Quern / Millstone Sync
 
-## Tight sheet
+- [x] **Milling-зеркала**
+  - [x] `data/create/recipe/milling/{ore_*, powder/*, salt, charcoal, flux, graphite, saltpeter, sulfur, sylvite, lime_dye, canola_paste}.json`
+  - [x] Пропустить multi-ingredient / compound (gem+ore powders, plant dyes) — остаются quern-only
+  - [x] Пропустить `bone_meal.json` — Create уже определяет `bone.json` (superset)
+- [x] **TFC quern → Create milling**
+  - [x] Quern-рецепты для 8 металлических порошков в `data/tfc_aeronautics/recipe/quern/`
+- [x] **Свой RecipeType + Mixin**
+  - [x] Зарегистрировать `tfc_aeronautics:quern_milling` RecipeType + Serializer (читает TFC-shapes через `ItemStackProvider.CODEC`)
+  - [x] Mixin в `MillstoneBlockEntity` (`tick` / `process` / `canProcess`) — роутит наш тип через `ItemStackProvider.getSingleStack(input)`
+- [x] **Зерно → мука**
+  - [x] 6 flat-зеркал на quern-shaped `tfc_aeronautics:quern_milling` рецепты в `data/tfc_aeronautics/recipe/milling/food/`
+- [x] **Инфраструктура и доки**
+  - [x] Включить `[[mixins]]` в `neoforge.mods.toml` + wire `tfc_aeronautics.mixins.json`
+  - [x] Обновить DOCS.md «Получение»: `only_quern`, scope зеркал, новый `quern_milling` RecipeType + mixin
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Register `tfc_aeronautics:metal/tight_sheet` for copper, wrought iron and steel | Complete | - |
-| Draw textures for them | | - |
-| Register TFC Heating recipe: tight sheet -> 100 Mb metal | Complete | - |
-| Register Create pressing recipe: ingot -> tight sheet | Complete | - |
-| Register TFC Forging recipe: ingot -> tight sheet | Complete | - |
+> **Известная проблема**: datagen-провайдеры `MetalCrushingRecipeProvider` / `AeronauticsDatagen` удалены из кодовой базы, но их выход в `src/generated/resources/data/create/recipe/milling/*` остался (~50 файлов-сирот). Файлы загружаются рантаймом, но не пересоздаются при `./gradlew runData`. При следующем прогоне без восстановленных провайдеров они исчезнут.
 
-## Shaft contact damage
+## Shaft Damage
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Register `tfc_aeronautics:shaft` damage type + death message | Complete | - |
-| Hurt living entities touching bare shafts/cogwheels, scaled by RPM (64 → 160 RPM) | Complete | damage type |
-| Leave andesite/brass encased shafts and cogwheels safe | Complete | - |
-| Knock the entity perpendicular to the rotation axis + crunch sound | Complete | - |
-| Expose start RPM, lethal RPM, lethal damage and a damage multiplier in the config | Complete | - |
-| Extend the mechanic to shafts on moving contraptions | | - |
+- [x] **Базовый урон**
+  - [x] Зарегистрировать `tfc_aeronautics:shaft` damage type + death message
+  - [x] Hurt living entities при контакте с bare shafts/cogwheels, scaled по RPM (64 → 160)
+  - [x] Andesite/brass encased shafts и cogwheels — safe
+  - [x] Knock perpendicular к оси вращения + crunch sound
+  - [x] Config: start RPM, lethal RPM, lethal damage, multiplier, knockback base / per RPM, sound volume (8 параметров)
+- [ ] **Contraptions**
+  - [ ] Распространить механику на shafts на движущихся contraptions
 
-## Refactor Create mechanical press
+## Worldgen Structures
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Delete old recipe | | - |
-| Register new recipe (same, but iron block replace to wrougth iron double ingot) | | - |
+- [x] **Фреймворк**
+  - [x] `AtmosphereSpec`, `MaterialConfig`, `LocalMaterialProcessor` — climate-aware подбор wood/soil/rock
+  - [x] `AtmosphericStructure`, `AtmosphericTemplateStructure`, `AtmosphericTemplatePiece`
+  - [x] `GraveyardMaterialProcessor` — для ancient_graveyard (обратная совместимость)
+  - [x] Все структуры используют `minecraft:random_spread` (spacing/salt)
+- [x] **Ancient Graveyard**
+  - [x] `data/tfc_aeronautics/worldgen/structure/ancient_graveyard.json` (spacing 32, salt 10387312)
+  - [x] NBT-шаблон + loot `graveyard_vessel` (`AncientGraveyardLoot.roll()`)
+  - [x] Биомный тег `has_structure/ancient_graveyard`
+- [x] **Ancient Shelter**
+  - [x] `worldgen/structure/ancient_shelter.json` (spacing 22, salt 100101)
+  - [x] NBT-шаблон + vessel + ash loot
+  - [x] `AncientShelterEffects` (climate-aware `AncientShelterLoot.roll()`)
+  - [x] Биомный тег `has_structure/ancient_shelter`
+- [x] **Farmer House**
+  - [x] `worldgen/structure/farmer_house.json` (spacing 26, salt 100102)
+  - [x] NBT-шаблон + vessel + tool rack loot
+  - [x] `FarmerHouseEffects` + `FarmerHouseCrops.pick()`
+  - [x] Биомный тег `has_structure/farmer_house`
+- [x] **Rich Graveyard**
+  - [x] `worldgen/structure/rich_graveyard.json` (spacing 32, salt 100103)
+  - [x] Подземная камера, NBT-шаблон + chest loot (`RichGraveyardEffects`)
+  - [x] Биомный тег `has_structure/rich_graveyard` (8 биомов)
+- [x] **Tanner House**
+  - [x] `worldgen/structure/tanner_house.json` (spacing 28, salt 100105)
+  - [x] NBT-шаблон + chest + barrel loot (`TannerHouseEffects`)
+  - [x] Биомный тег `has_structure/tanner_house`
+- [x] **Теги**
+  - [x] `has_structure/{ancient_graveyard, ancient_shelter, farmer_house, rich_graveyard, tanner_house}` — все biome-теги
 
-## PR
+## Ponder
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Make logo for the mod | | - |
-| Make the trailer | | - |
-| Publish to CurseForge | | - |
-| Publish to Modrinth | | - |
+- [x] **Регистрация**
+  - [x] `PonderPlugin` зарегистрирован через `PonderIndex.addPlugin`
+  - [x] `PonderTag` — `Kinetics`
+  - [x] `PonderScenes` — storyboard для heater и stamping_press
+- [ ] **NBT-схематики**
+  - [ ] `assets/tfc_aeronautics/ponder/heater/*.nbt` — папка создана, но пуста
+  - [ ] `assets/tfc_aeronautics/ponder/stamping_press/*.nbt` — отсутствуют
+- [x] **Общий текст**
+  - [x] `registerSharedText("hot_air_burn")` — заготовка под будущий воздушный шар
 
-## Translation
+## Localization
 
-| Task | Status | Dependencies |
-|-|-|-|
-| Make English US `en_us.lang` | | - |
-| Make Russian `ru_ru.lang` | | - |
-| Make Spanish `es_es.lang`, `es_mx.lang` | | - |
-| Make German `de_de.lang` | | - |
-| Make French `fr_fr.lang` | | - |
-| Make Chinese `zh_cn.lang`, `zh_tw.lang` | | - |
-| Make Japanese `ja_jp.lang` | | - |
-| Make Korean `ko_kr.lang` | | - |
+- [x] **en_us** — 35 ключей: items, blocks, fluids, config, damage types, barrel recipes
+- [ ] **ru_ru** — 21/35 ключей. Отсутствуют:
+  - [ ] `item.tfc_aeronautics.powder.*` (8 металлов)
+  - [ ] `item.tfc_aeronautics.resin_clump`
+  - [ ] `item.tfc_aeronautics.saw_blade`
+  - [ ] `fluid.tfc_aeronautics.rosin`
+  - [ ] `item.tfc_aeronautics.rosin_bucket`
+  - [ ] `tfc_aeronautics.barrel.rosin`
