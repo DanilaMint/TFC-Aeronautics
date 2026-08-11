@@ -1,0 +1,8 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": { "item": "tfc:metal/sheet/wrought_iron" },
+  "result": { "count": 1, "id": "tfc_aeronautics:saw_blade" },
+  "rules": ["hit_last", "hit_second_last", "hit_third_last"],
+  "apply_bonus": false,
+  "tier": 3
+}

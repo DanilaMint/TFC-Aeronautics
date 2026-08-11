@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "show_notification": false,
+  "category": "redstone",
+  "key": {
+    "S": { "item": "tfc_aeronautics:saw_blade" },
+    "C": { "item": "create:andesite_casing" },
+    "s": { "item": "create:shaft" }
+  },
+  "pattern": ["S", "C", "s"],
+  "result": { "count": 1, "id": "create:mechanical_saw" }
+}
