@@ -12,7 +12,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.dries007.tfc.common.blocks.TFCBlocks;
 import net.dries007.tfc.common.blocks.rock.Rock;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Post-placement effect for the rich graveyard:
@@ -26,7 +26,7 @@ import ru.tfc_aeronautics.Aeronautics;
  * injected into the template at build time and resolved on first chest open.
  */
 public final class RichGraveyardEffects {
-    public static final String MARKER_ID = Aeronautics.MOD_ID + ":rich_graveyard_marker";
+    public static final String MARKER_ID = TFCAeronautics.MOD_ID + ":rich_graveyard_marker";
 
     private RichGraveyardEffects() {}
 
@@ -45,7 +45,7 @@ public final class RichGraveyardEffects {
                 rock = LocalMaterialProcessor.lookupRock(settings);
             }
         } catch (RuntimeException e) {
-            Aeronautics.LOGGER.warn("rich_graveyard_marker: failed to resolve surface rock", e);
+            TFCAeronautics.LOGGER.warn("rich_graveyard_marker: failed to resolve surface rock", e);
         }
         if (rock == null) {
             rock = Rock.GRANITE;
@@ -61,9 +61,9 @@ public final class RichGraveyardEffects {
         final BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos(center.getX(), surfaceY, center.getZ());
         try {
             level.setBlock(cursor, marker, 3);
-            Aeronautics.LOGGER.info("rich_graveyard_marker placed {} at {}", marker, cursor);
+            TFCAeronautics.LOGGER.info("rich_graveyard_marker placed {} at {}", marker, cursor);
         } catch (RuntimeException | LinkageError e) {
-            Aeronautics.LOGGER.error("rich_graveyard_marker: failed to set block at {}", cursor, e);
+            TFCAeronautics.LOGGER.error("rich_graveyard_marker: failed to set block at {}", cursor, e);
         }
     }
 }

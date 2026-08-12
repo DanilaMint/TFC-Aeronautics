@@ -49,14 +49,14 @@ public class AtmosphericTemplatePiece extends TemplateStructurePiece {
         Rotation rotation,
         LocalMaterialProcessor.MaterialConfig materialConfig
     ) {
-        super(AeronauticsStructurePieceTypes.ATMOSPHERIC_TEMPLATE.get(), 0, manager, template, template.toString(),
+        super(StructurePieceTypes.ATMOSPHERIC_TEMPLATE.get(), 0, manager, template, template.toString(),
             makeSettings(manager, template, rotation), pos);
         this.materialConfig = materialConfig;
-        ru.tfc_aeronautics.Aeronautics.LOGGER.info("AtmosphericTemplatePiece constructed: template={}, material={}", template, materialConfig);
+        ru.tfc_aeronautics.TFCAeronautics.LOGGER.info("AtmosphericTemplatePiece constructed: template={}, material={}", template, materialConfig);
     }
 
     public AtmosphericTemplatePiece(StructurePieceSerializationContext context, CompoundTag tag) {
-        super(AeronauticsStructurePieceTypes.ATMOSPHERIC_TEMPLATE.get(), tag, context.structureTemplateManager(),
+        super(StructurePieceTypes.ATMOSPHERIC_TEMPLATE.get(), tag, context.structureTemplateManager(),
             id -> makeSettings(context.structureTemplateManager(), id, Rotation.valueOf(tag.getString(ROTATION_KEY))));
         // Vanilla's chunk generation pipeline reads the freshly-built piece back from the
         // chunk's NBT before running postProcess (it round-trips structure starts through
@@ -67,7 +67,7 @@ public class AtmosphericTemplatePiece extends TemplateStructurePiece {
         // player is far from spawn, where vanilla's structure-start caching is more
         // aggressive. Persist the three postProcess-relevant fields into NBT and read them
         // back here so both code paths land on the same MaterialConfig.
-        ru.tfc_aeronautics.Aeronautics.LOGGER.info("AtmosphericTemplatePiece deserialized: template={}, tagKeys={}", tag.contains("Template") ? tag.getString("Template") : "?", tag.getAllKeys());
+        ru.tfc_aeronautics.TFCAeronautics.LOGGER.info("AtmosphericTemplatePiece deserialized: template={}, tagKeys={}", tag.contains("Template") ? tag.getString("Template") : "?", tag.getAllKeys());
         final float cracked = tag.contains(CRACKED_CHANCE_KEY) ? tag.getFloat(CRACKED_CHANCE_KEY) : 0f;
         final float mossy = tag.contains(MOSSY_CHANCE_KEY) ? tag.getFloat(MOSSY_CHANCE_KEY) : 0f;
         final boolean replaceCrops = tag.contains(REPLACE_CROPS_KEY) && tag.getBoolean(REPLACE_CROPS_KEY);

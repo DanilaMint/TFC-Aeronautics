@@ -1,0 +1,18 @@
+{
+  "type": "create:crushing",
+  "ingredients": [
+    {
+      "item": "tfc:rock/cobble/phyllite"
+    }
+  ],
+  "processing_time": 250,
+  "results": [
+    {
+      "id": "tfc:rock/gravel/phyllite"
+    },
+    {
+      "chance": 0.1,
+      "id": "minecraft:flint"
+    }
+  ]
+}

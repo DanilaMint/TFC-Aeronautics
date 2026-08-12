@@ -15,7 +15,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 import net.dries007.tfc.common.capabilities.InventoryItemHandler;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ final class ContainerLootFiller
         }
         catch (RuntimeException e)
         {
-            Aeronautics.LOGGER.error("{}: failed to resolve loot table {}", tableKey, e);
+            TFCAeronautics.LOGGER.error("{}: failed to resolve loot table {}", tableKey, e);
             return;
         }
         if (table == LootTable.EMPTY)
@@ -106,7 +106,7 @@ final class ContainerLootFiller
                     }
                     catch (RuntimeException | LinkageError e)
                     {
-                        Aeronautics.LOGGER.error("{}: fill failed at {}", effectId, cursor, e);
+                        TFCAeronautics.LOGGER.error("{}: fill failed at {}", effectId, cursor, e);
                     }
                 }
             }

@@ -1,0 +1,16 @@
+{
+  "type": "tfc:barrel_sealed",
+  "duration": 1000,
+  "input_fluid": {
+    "amount": 50,
+    "tag": "tfc_aeronautics:strong_alcohol"
+  },
+  "input_item": {
+    "count": 1,
+    "item": "tfc_aeronautics:resin_clump"
+  },
+  "output_fluid": {
+    "amount": 50,
+    "id": "tfc_aeronautics:rosin"
+  }
+}

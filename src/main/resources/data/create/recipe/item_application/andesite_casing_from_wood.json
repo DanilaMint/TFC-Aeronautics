@@ -1,0 +1,16 @@
+{
+  "type": "create:item_application",
+  "ingredients": [
+    {
+      "tag": "tfc_aeronautics:stripped_logs"
+    },
+    {
+      "item": "tfc_aeronautics:composite"
+    }
+  ],
+  "results": [
+    {
+      "id": "create:andesite_casing"
+    }
+  ]
+}

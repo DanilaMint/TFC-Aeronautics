@@ -17,7 +17,7 @@ import net.dries007.tfc.common.blockentities.ToolRackBlockEntity;
 import net.dries007.tfc.common.blocks.crop.Crop;
 import net.dries007.tfc.common.capabilities.InventoryItemHandler;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,12 +34,12 @@ import java.util.List;
  */
 public final class FarmerHouseEffects
 {
-    public static final String VESSEL_ID = Aeronautics.MOD_ID + ":farmer_house_vessel";
-    public static final String TOOL_RACK_ID = Aeronautics.MOD_ID + ":farmer_house_tool_rack";
+    public static final String VESSEL_ID = TFCAeronautics.MOD_ID + ":farmer_house_vessel";
+    public static final String TOOL_RACK_ID = TFCAeronautics.MOD_ID + ":farmer_house_tool_rack";
 
     private static final ResourceKey<LootTable> TOOL_RACK_TABLE = ResourceKey.create(
         net.minecraft.core.registries.Registries.LOOT_TABLE,
-        ResourceLocation.fromNamespaceAndPath(Aeronautics.MOD_ID, "farmer_house_tool_rack"));
+        ResourceLocation.fromNamespaceAndPath(TFCAeronautics.MOD_ID, "farmer_house_tool_rack"));
 
     private FarmerHouseEffects() {}
 

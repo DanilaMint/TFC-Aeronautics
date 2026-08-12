@@ -21,7 +21,7 @@ import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 import java.util.Optional;
 
@@ -63,7 +63,7 @@ public class AtmosphericTemplateStructure extends AtmosphericStructure {
         this.placement = placement;
         this.template = template;
         this.material = material;
-        Aeronautics.LOGGER.info("AtmosphericTemplateStructure constructed: template={}, placement={}, material={}", template, placement, material);
+        TFCAeronautics.LOGGER.info("AtmosphericTemplateStructure constructed: template={}, placement={}, material={}", template, placement, material);
     }
 
     public Placement placement() {
@@ -80,7 +80,7 @@ public class AtmosphericTemplateStructure extends AtmosphericStructure {
 
     @Override
     public StructureType<?> type() {
-        return AeronauticsStructureTypes.ATMOSPHERIC_TEMPLATE.get();
+        return StructureTypes.ATMOSPHERIC_TEMPLATE.get();
     }
 
     @Override
@@ -139,14 +139,14 @@ public class AtmosphericTemplateStructure extends AtmosphericStructure {
 
             final Rotation rotation = Rotation.getRandom(context.random());
 
-            Aeronautics.LOGGER.info(
+            TFCAeronautics.LOGGER.info(
                 "Placing {} at chunk={}, surfaceBlockY={}, anchorY={}, origin={}, rotation={}",
                 template, chunkPos, surfaceBlockY, anchorY, origin, rotation);
 
             return Optional.of(new GenerationStub(origin, builder -> builder.addPiece(
                 new AtmosphericTemplatePiece(context.structureTemplateManager(), template, origin, rotation, material))));
         } catch (RuntimeException | LinkageError e) {
-            Aeronautics.LOGGER.error("{} findGenerationPoint failed at chunk {}", template, context.chunkPos(), e);
+            TFCAeronautics.LOGGER.error("{} findGenerationPoint failed at chunk {}", template, context.chunkPos(), e);
             return Optional.empty();
         }
     }
@@ -172,7 +172,7 @@ public class AtmosphericTemplateStructure extends AtmosphericStructure {
             BoundingBox structureBox = pieces.calculateBoundingBox();
             atmosphere().runEffects(level, random, structureBox.getCenter(), structureBox);
         } catch (RuntimeException | LinkageError e) {
-            Aeronautics.LOGGER.error("{} afterPlace (atmosphere) failed for chunk {}", template, chunkPos, e);
+            TFCAeronautics.LOGGER.error("{} afterPlace (atmosphere) failed for chunk {}", template, chunkPos, e);
         }
     }
 

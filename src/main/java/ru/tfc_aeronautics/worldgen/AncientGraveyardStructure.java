@@ -19,7 +19,7 @@ import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 import java.util.Optional;
 
@@ -59,7 +59,7 @@ public class AncientGraveyardStructure extends AtmosphericStructure {
 
     @Override
     public StructureType<?> type() {
-        return AeronauticsStructureTypes.ANCIENT_GRAVEYARD.get();
+        return StructureTypes.ANCIENT_GRAVEYARD.get();
     }
 
     @Override
@@ -95,14 +95,14 @@ public class AncientGraveyardStructure extends AtmosphericStructure {
                 z - size.getZ() / 2
             );
 
-            Aeronautics.LOGGER.info("Placing ancient_graveyard at chunk={}, surfaceY={}, origin={}, rotation={}", chunkPos, surfaceY, origin, rotation);
+            TFCAeronautics.LOGGER.info("Placing ancient_graveyard at chunk={}, surfaceY={}, origin={}, rotation={}", chunkPos, surfaceY, origin, rotation);
 
             return Optional.of(new GenerationStub(origin, builder -> builder.addPiece(
                 new AncientGraveyardPiece(context.structureTemplateManager(), template, origin, rotation))));
         } catch (RuntimeException | LinkageError e) {
             // Vanilla catches anything thrown here and puts the chunk into a retry state; left
             // unlogged, the symptom is a fully silent hang in chunk generation. Surface it.
-            Aeronautics.LOGGER.error("ancient_graveyard findGenerationPoint failed at chunk {}", context.chunkPos(), e);
+            TFCAeronautics.LOGGER.error("ancient_graveyard findGenerationPoint failed at chunk {}", context.chunkPos(), e);
             return Optional.empty();
         }
     }
@@ -126,7 +126,7 @@ public class AncientGraveyardStructure extends AtmosphericStructure {
             final net.minecraft.world.level.levelgen.structure.BoundingBox structureBox = pieces.calculateBoundingBox();
             atmosphere().runEffects(level, random, structureBox.getCenter(), structureBox);
         } catch (RuntimeException | LinkageError e) {
-            Aeronautics.LOGGER.error("ancient_graveyard afterPlace (atmosphere) failed for chunk {}", chunkPos, e);
+            TFCAeronautics.LOGGER.error("ancient_graveyard afterPlace (atmosphere) failed for chunk {}", chunkPos, e);
         }
     }
 }

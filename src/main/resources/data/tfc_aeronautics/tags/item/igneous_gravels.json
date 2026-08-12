@@ -1,0 +1,11 @@
+{
+  "values": [
+    "tfc:rock/gravel/granite",
+    "tfc:rock/gravel/diorite",
+    "tfc:rock/gravel/gabbro",
+    "tfc:rock/gravel/rhyolite",
+    "tfc:rock/gravel/basalt",
+    "tfc:rock/gravel/andesite",
+    "tfc:rock/gravel/dacite"
+  ]
+}

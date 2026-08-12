@@ -1,0 +1,18 @@
+{
+  "type": "create:crushing",
+  "ingredients": [
+    {
+      "item": "tfc:rock/cobble/gneiss"
+    }
+  ],
+  "processing_time": 250,
+  "results": [
+    {
+      "id": "tfc:rock/gravel/gneiss"
+    },
+    {
+      "chance": 0.1,
+      "id": "minecraft:flint"
+    }
+  ]
+}

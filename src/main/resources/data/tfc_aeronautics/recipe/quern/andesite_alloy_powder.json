@@ -1,5 +1,0 @@
-{
-  "type": "tfc:quern",
-  "ingredient": { "item": "create:andesite_alloy" },
-  "result": { "count": 20, "id": "tfc_aeronautics:powder/andesite_alloy" }
-}

@@ -12,7 +12,7 @@ import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
  *
  * The method signature
  *   public static void name(SceneBuilder builder, SceneBuildingUtil util)
- * is what addStoryBoard(...) registers; see AeronauticsPonderScenes for examples.
+ * is what addStoryBoard(...) registers; see PonderScenes for examples.
  */
 public final class TemplateScenes {
 

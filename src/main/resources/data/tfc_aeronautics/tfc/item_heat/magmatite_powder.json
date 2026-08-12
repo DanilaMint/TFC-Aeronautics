@@ -1,8 +1,0 @@
-{
-  "ingredient": {
-    "item": "tfc_aeronautics:powder/magmatite"
-  },
-  "heat_capacity": 0.6,
-  "forging_temperature": 625.0,
-  "welding_temperature": 833.0
-}

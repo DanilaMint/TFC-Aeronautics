@@ -14,13 +14,13 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Registers the {@code tfc_aeronautics:heater} block, its block-item, and its block-entity type.
  *
  * <p>Three {@code DeferredRegister}s initialised statically, with a single {@link #register(IEventBus)}
- * entry point called from {@link Aeronautics#Aeronautics}.
+ * entry point called from {@link TFCAeronautics#TFCAeronautics}.
  *
  * <p>Capability registration for the block entity (IItemHandler for chute/funnel/hopper,
  * IFluidHandler for the downward molten-metal pipe) lives in {@link HeaterCapabilities}.
@@ -28,13 +28,13 @@ import ru.tfc_aeronautics.Aeronautics;
 public final class HeaterRegistration {
 
     public static final DeferredRegister.Blocks BLOCKS =
-        DeferredRegister.createBlocks(Aeronautics.MOD_ID);
+        DeferredRegister.createBlocks(TFCAeronautics.MOD_ID);
 
     public static final DeferredRegister.Items ITEMS =
-        DeferredRegister.createItems(Aeronautics.MOD_ID);
+        DeferredRegister.createItems(TFCAeronautics.MOD_ID);
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
-        DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Aeronautics.MOD_ID);
+        DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, TFCAeronautics.MOD_ID);
 
     public static final DeferredHolder<Block, HeaterBlock> HEATER =
         BLOCKS.register("heater", () -> new HeaterBlock(

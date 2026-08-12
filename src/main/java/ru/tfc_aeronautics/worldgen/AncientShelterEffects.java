@@ -16,7 +16,7 @@ import net.dries007.tfc.common.blockentities.AbstractFirepitBlockEntity;
 import net.dries007.tfc.common.blockentities.LargeVesselBlockEntity;
 import net.dries007.tfc.common.capabilities.InventoryItemHandler;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 import java.util.List;
 
@@ -29,12 +29,12 @@ import java.util.List;
  * applied directly with {@link AbstractFirepitBlockEntity#setAsh}.
  */
 public final class AncientShelterEffects {
-    public static final String VESSEL_ID = Aeronautics.MOD_ID + ":ancient_shelter_vessel";
-    public static final String ASH_ID = Aeronautics.MOD_ID + ":ancient_shelter_ash";
+    public static final String VESSEL_ID = TFCAeronautics.MOD_ID + ":ancient_shelter_vessel";
+    public static final String ASH_ID = TFCAeronautics.MOD_ID + ":ancient_shelter_ash";
 
     private static final ResourceKey<LootTable> ASH_TABLE = ResourceKey.create(
         net.minecraft.core.registries.Registries.LOOT_TABLE,
-        ResourceLocation.fromNamespaceAndPath(Aeronautics.MOD_ID, "ancient_shelter_ash"));
+        ResourceLocation.fromNamespaceAndPath(TFCAeronautics.MOD_ID, "ancient_shelter_ash"));
 
     private AncientShelterEffects() {}
 

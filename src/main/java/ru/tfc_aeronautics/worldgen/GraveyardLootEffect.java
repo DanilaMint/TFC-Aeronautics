@@ -18,7 +18,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.dries007.tfc.common.blockentities.LargeVesselBlockEntity;
 import net.dries007.tfc.common.capabilities.InventoryItemHandler;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 import java.util.List;
 
@@ -44,11 +44,11 @@ import java.util.List;
  * state, so the loot still reaches disk.
  */
 public final class GraveyardLootEffect implements AtmosphereSpec.Effect {
-    public static final String ID = Aeronautics.MOD_ID + ":ancient_graveyard_loot";
+    public static final String ID = TFCAeronautics.MOD_ID + ":ancient_graveyard_loot";
 
     private static final ResourceKey<LootTable> LOOT_TABLE = ResourceKey.create(
         net.minecraft.core.registries.Registries.LOOT_TABLE,
-        ResourceLocation.fromNamespaceAndPath(Aeronautics.MOD_ID, "ancient_graveyard"));
+        ResourceLocation.fromNamespaceAndPath(TFCAeronautics.MOD_ID, "ancient_graveyard"));
 
     private static final int SEARCH_RADIUS = 4;
 
@@ -65,7 +65,7 @@ public final class GraveyardLootEffect implements AtmosphereSpec.Effect {
         try {
             table = serverLevel.getServer().reloadableRegistries().getLootTable(LOOT_TABLE);
         } catch (RuntimeException e) {
-            Aeronautics.LOGGER.error("ancient_graveyard_loot: failed to resolve loot table {}", LOOT_TABLE, e);
+            TFCAeronautics.LOGGER.error("ancient_graveyard_loot: failed to resolve loot table {}", LOOT_TABLE, e);
             return;
         }
         if (table == LootTable.EMPTY) {
@@ -82,7 +82,7 @@ public final class GraveyardLootEffect implements AtmosphereSpec.Effect {
                         try {
                             fill(vessel, table, serverLevel, cursor.immutable(), random);
                         } catch (RuntimeException | LinkageError e) {
-                            Aeronautics.LOGGER.error("ancient_graveyard_loot: fill failed at {}", cursor, e);
+                            TFCAeronautics.LOGGER.error("ancient_graveyard_loot: fill failed at {}", cursor, e);
                         }
                     }
                 }

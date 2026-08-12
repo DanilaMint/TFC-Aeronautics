@@ -1,6 +1,0 @@
-{
-  "type": "create:milling",
-  "ingredients": [ { "item": "tfc:metal/ingot/tin" } ],
-  "processing_time": 250,
-  "results": [ { "count": 20, "id": "tfc_aeronautics:powder/tin" } ]
-}

@@ -4,7 +4,7 @@ import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 
 import net.minecraft.resources.ResourceLocation;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
  * Partial models used by the {@link StampingPressRenderer}. The head model is
@@ -13,7 +13,7 @@ import ru.tfc_aeronautics.Aeronautics;
 public final class StampingPressPartialModels {
 
     public static final PartialModel STAMPING_PRESS_HEAD =
-        PartialModel.of(ResourceLocation.fromNamespaceAndPath(Aeronautics.MOD_ID, "block/stamping_press_head"));
+        PartialModel.of(ResourceLocation.fromNamespaceAndPath(TFCAeronautics.MOD_ID, "block/stamping_press_head"));
 
     private StampingPressPartialModels() {}
 }

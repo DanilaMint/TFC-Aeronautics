@@ -10,22 +10,19 @@
 
 1. [Конфигурация](#1-конфигурация)
 2. [Металлические порошки](#2-металлические-порошки)
-3. [Жидкие металлы (molten fluids)](#3-жидкие-металлы-molten-fluids)
-4. [Андезитовый сплав](#4-андезитовый-сплав)
-5. [Штамп-пресс (Stamping Press)](#5-штамп-пресс-stamping-press)
-6. [Нагреватель (Heater)](#6-нагреватель-heater)
-7. [Спут Create + TFC литьё](#7-спут-create--tfc-литьё)
-8. [Удалённые рецепты Create](#8-удалённые-рецепты-create)
-9. [Вентилятор Create → угольная кузня TFC](#9-вентилятор-create--угольная-кузня-tfc)
-10. [Тонкие листы (Tight sheet)](#10-тонкие-листы-tight-sheet)
-11. [Урон от вращающегося вала](#11-урон-от-вращающегося-вала)
-12. [Корпуса Create из брёвен TFC](#12-корпуса-create-из-брёвен-tfc)
-13. [Фреймворк атмосферных структур](#13-фреймворк-атмосферных-структур)
-14. [Древняя гробница (Ancient Graveyard)](#14-древняя-гробница-ancient-graveyard)
-15. [Древнее укрытие (Ancient Shelter)](#15-древнее-укрытие-ancient-shelter)
-16. [Дом фермера (Farmer House)](#16-дом-фермера-farmer-house)
-17. [Богатая гробница (Rich Graveyard)](#17-богатая-гробница-rich-graveyard)
-18. [Дом кожевника (Tanner House)](#18-дом-кожевника-tanner-house)
+3. [Штамп-пресс (Stamping Press)](#3-штамп-пресс-stamping-press)
+4. [Нагреватель (Heater)](#4-нагреватель-heater)
+5. [Спут Create + TFC литьё](#5-спут-create--tfc-литьё)
+6. [Тонкие листы (Tight sheet)](#6-тонкие-листы-tight-sheet)
+7. [Урон от вращающегося вала](#7-урон-от-вращающегося-вала)
+8. [Корпуса Create из брёвен TFC](#8-корпуса-create-из-брёвен-tfc)
+9. [Фреймворк атмосферных структур](#9-фреймворк-атмосферных-структур)
+10. [Древняя гробница (Ancient Graveyard)](#10-древняя-гробница-ancient-graveyard)
+11. [Древнее укрытие (Ancient Shelter)](#11-древнее-укрытие-ancient-shelter)
+12. [Дом фермера (Farmer House)](#12-дом-фермера-farmer-house)
+13. [Богатая гробница (Rich Graveyard)](#13-богатая-гробница-rich-graveyard)
+14. [Дом кожевника (Tanner House)](#14-дом-кожевника-tanner-house)
+15. [Пропитанная джутовая ткань (Impregnated Burlap Cloth)](#15-пропитанная-джутовая-ткань-impregnated-burlap-cloth)
 
 ---
 
@@ -37,10 +34,8 @@
 
 | Ключ | Тип | Диапазон | Назначение |
 |------|-----|----------|------------|
-| `balloonLiftMultiplier` | double | 0.1–10.0 | Множитель подъёмной силы воздушного шара на единицу горячего воздуха. Больше — «легче». |
-| `hotAirBurnRate` | int | 20–72000 | Скорость сжигания топлива в горелке воздушного шара (тиков на единицу топлива). |
-| `gliderDecayModifier` | double | 0.0–10.0 | Множитель износа планера. 1.0 = ванильная скорость, 0.0 = не изнашивается. |
-| `shaftDamageEnabled` | boolean | — | Включает урон от касания голого вращающегося вала. См. [раздел 11](#11-урон-от-вращающегося-вала). |
+| `resinDropChance` | double | 0.0–1.0 | Шанс выпадения комка смолы при обдирании коры. 0.15 = 15%. |
+| `shaftDamageEnabled` | boolean | — | Включает урон от касания голого вращающегося вала. См. [раздел 7](#7-урон-от-вращающегося-вала). |
 | `shaftDamageStartRpm` | double | 0.0–1024.0 | Минимальный порог оборотов, ниже которого вал безопасен. |
 | `shaftDamageLethalRpm` | double | 1.0–1024.0 | Обороты, на которых наносится `shaftDamageLethal`. Выше урон продолжает расти. |
 | `shaftDamageLethal` | double | 0.0–1000.0 | Урон в HP на смертельных оборотах. 6.67 ≈ треть HP игрока без брони. |
@@ -49,18 +44,12 @@
 | `shaftKnockbackPerRpm` | double | 0.0–0.1 | Прибавка к отбрасыванию за каждый оборот выше порога. |
 | `shaftSoundVolume` | double | 0.0–1.0 | Громкость звука удара. 0.0 — тишина. |
 
-Первые три ключа пока не используются фичами — это заготовка под аэронавтические
-блоки, которые ещё не реализованы. Сами значения уже подцеплены из
-`Config.java`, в момент загрузки/перезагрузки выводится лог-сообщение.
-Ключи `shaft*` работают и предназначены в первую очередь для сборок:
-`config/tfc_aeronautics-common.toml` можно положить в модпак и перенастроить
-жёсткость механики, не трогая код.
-
+Все ключи работают и предназначены в первую очередь для сборок:
 ---
 
 ## 2. Металлические порошки
 
-Мод вводит 10 металлических порошков — перемолотого сырья, пригодного для
+Мод вводит 8 металлических порошков — перемолотого сырья, пригодного для
 переплавки в стандартной TFC-печи.
 
 | Порошок | id | Температура плавления | Жидкий металл |
@@ -73,8 +62,6 @@
 | Золотой | `gold` | 1060 °C | `tfc:metal/gold` |
 | Серебряный | `silver` | 970 °C | `tfc:metal/silver` |
 | Никелевый | `nickel` | 1450 °C | `tfc:metal/nickel` |
-| Андезитового сплава | `andesite_alloy` | 1150 °C | `tfc_aeronautics:molten_andesite_alloy` |
-| Магматитовый | `magmatite` | 1250 °C | `tfc_aeronautics:molten_magmatite` |
 
 ### Регистрация
 
@@ -88,18 +75,106 @@
 
 ### Получение
 
-Два пути, оба добавляются рецептами:
+Один путь на сегодня — только через жернов (см. каталог
+`tfc_aeronautics:only_quern` ниже).
 
-* **`tfc:quern`** — жернов. Перемалывает руду (медленно, руками).
-* **`tfc:milling`** — фрезерный станок TFC. Перемалывает руду (быстро, через
-  кинетику).
+* **`tfc:quern`** — жернов. Перемалывает слиток в 20 ед. порошка (медленно,
+  руками). Рецепты лежат в `data/tfc_aeronautics/recipe/quern/<id>_powder.json`
+  с типом `tfc:quern`.
 
-Каждый порошок имеет оба рецепта
-(`data/tfc_aeronautics/recipe/quern/<id>_powder.json` и
-`.../milling/<id>_powder.json`).
+#### `tfc_aeronautics:only_quern` — каталог рецептов только для жернова
 
-Также для двух сплавов (`andesite_alloy`, `magmatite`) есть парные рецепты
-`create:crushing` — Create-мельница даёт тот же порошок.
+Это не отдельный `RecipeType`, а соглашение об именовании директорий. TFC
+обрабатывает любой рецепт с `"type": "tfc:quern"` независимо от вложенной
+папки, а Create-мельница видит только `"type": "create:milling"`. Поэтому,
+чтобы рецепт «видел только жернов», достаточно не публиковать его
+`create:milling`-зеркало.
+
+Сейчас в эту категорию попадают 8 слитков → порошков: bismuth, cast_iron,
+copper, gold, nickel, silver, tin, zinc.
+
+#### Зеркалирование TFC `tfc:quern` рецептов в Create `milling`
+
+Большинство TFC-рецептов `tfc:quern` мы зеркалируем в
+`data/create/recipe/milling/<тот_же_путь>.json` с типом `create:milling`,
+`processing_time: 250`, чтобы Create-мельница тоже их обрабатывала
+(зеркалирование — по конвенции в исходный неймспейс, см.
+[[feedback-recipe-override-convention]]).
+
+Зеркалируются как обычные `create:milling` (59 файлов под `data/create/recipe/milling/`):
+
+* `canola_paste.json`, `lime_dye.json` — одиночные ингредиенты;
+* `ore/gypsum.json` — известняк → 1 гипс;
+* `powder/*.json` (56 файлов) — одиночные рудные ингредиенты и `#tfc:fluxstone`.
+
+`bone` → 3 bone_meal уже покрыт собственным рецептом Create
+`data/create/recipe/milling/bone.json` (который ещё и бонусом даёт
+25% шанс white_dye), так что зеркало не публикуем — иначе бы затенили
+полезный бонус.
+
+#### `tfc_aeronautics:quern_milling` — поддержка TFC-модификаторов в мельнице
+
+У TFC `food/<grain>_flour.json` ингредиент — сложный `tfc:and { item: …, tfc:not_rotten }`,
+а результат несёт `result.modifiers: [{ type: tfc:copy_food }]` и обёртку
+`result.stack`. Стандартный `create:milling` не поддерживает ни сложные
+предикаты, ни модификаторы результата, поэтому для этих 6 рецептов
+заводим кастомный `RecipeType` и собственный маршрут обработки в
+Create-мельнице.
+
+JSON-форма (см. `data/tfc_aeronautics/recipe/milling/food/wheat_flour.json`):
+
+```json
+{
+  "type": "tfc_aeronautics:quern_milling",
+  "ingredient": {
+    "type": "tfc:and",
+    "children": [
+      { "item": "tfc:food/wheat_grain" },
+      { "type": "tfc:not_rotten" }
+    ]
+  },
+  "result": {
+    "modifiers": [{ "type": "tfc:copy_food" }],
+    "stack": { "count": 1, "id": "tfc:food/wheat_flour" }
+  },
+  "processing_time": 250
+}
+```
+
+Чтобы мельница вообще увидела этот `RecipeType`, реализация живёт в Java
+(`src/main/java/ru/tfc_aeronautics/recipe/`):
+
+* `QuernMillingRecipe` — наследник `MillingRecipe`, хранит `Ingredient` и
+  `ItemStackProvider` (включая модификаторы).
+* `QuernMillingRecipeSerializer` — `RecipeSerializer`, читает тот же TFC-формат
+  через `ItemStackProvider.CODEC` (включая `tfc:copy_food`).
+* `QuernMillingRecipeType` — `DeferredRegister` для `RecipeType` и
+  `RecipeSerializer` под id `tfc_aeronautics:quern_milling`.
+* `mixin/MillstoneBlockEntityMixin` — три `@Inject`/`@Redirect` в `tick()`,
+  `process()` и `canProcess()`. Когда вход соответствует нашему рецепсу,
+  `process()` вызывает `ItemStackProvider.getSingleStack(input)` вместо
+  стандартного `rollResults(random)` — поэтому `tfc:copy_food` (и любой
+  другой `ItemStackModifier`) реально применяется, а не теряется.
+
+Поведенческий результат неотличим от жернова: Create-мельница принимает
+**только несгнившее** зерно (через `tfc:not_rotten`), а получившаяся мука
+получает decay и food-data зерна (через `tfc:copy_food`).
+
+**Не зеркалируются** — естественно остаются только на жернове:
+
+* `redstone.json`, `blue_dye.json` … `yellow_dye.json` (13 + redstone) —
+  несколько ингредиентов; Create `milling` принимает только один
+  (`ProcessingRecipe.validate`, максимум один item-ингредиент).
+* `powder/amethyst.json`, `diamond.json`, `emerald.json`, `lapis_lazuli.json`,
+  `opal.json`, `ruby.json`, `sapphire.json`, `topaz.json` — `gem/<x>` ИЛИ
+  `ore/<x>` (массив из двух).
+
+#### Прочее
+
+Для порошков также есть парные рецепты `create:crushing` — Create-дробилка
+даёт тот же порошок (`data/tfc_aeronautics/recipe/crushing/<id>_powder.json`,
+как и для листов/двойных_листов/стержней — см. раздел про tight sheet и
+metal powder).
 
 ### Температура и плавка
 
@@ -114,8 +189,7 @@
 
 Рецепты `tfc:heating` (`.../recipe/heating/<id>_powder.json`) описывают, что
 получается из порошка при полном переплавлении: 100 мB (`amount: 100`)
-соответствующего жидкого металла. Для андезитового сплава двойной слиток
-даёт 200 мB — это и есть базовый стек TFC для двойного слитка.
+соответствующего жидкого металла.
 
 ### Поведение в инвентаре
 
@@ -125,191 +199,7 @@
 
 ---
 
-## 3. Жидкие металлы (molten fluids)
-
-В моде зарегистрированы два собственных расплавленных металла:
-
-* `tfc_aeronautics:molten_andesite_alloy` — андезитовый сплав.
-* `tfc_aeronautics:molten_magmatite` — магматит.
-
-Каждый из них — это связка из четырёх объектов, по образцу TFC
-(`TFCFluids.METALS`):
-
-| Объект | Регистрация | Назначение |
-|--------|-------------|------------|
-| `FluidType` | `AeronauticsFluids.FLUID_TYPES` | Физика жидкости: плотность, вязкость, свет, температура. |
-| `Fluid` source + flowing | `AeronauticsFluids.FLUIDS` | Текучий/стоячий блок жидкости. Использует TFC `MoltenFluid.Source` / `Flowing`. |
-| `FluidBlock` | `AeronauticsFluidBlocks` | Блок для рендера в мире, `MoltenFluidBlock` из TFC. |
-| `BucketItem` | `AeronauticsFluidItems` | Ведро для переноски, ванильный `BucketItem` поверх source-флюида. |
-
-### Свойства FluidType
-
-Оба флюида копируют TFC `lavaLike()`:
-
-```text
-adjacentPathType  = LAVA
-lightLevel        = 15
-density           = 3000
-viscosity         = 6000
-temperature       = 1300
-canDrown          = false
-canExtinguish     = false
-canHydrate        = false
-canPushEntity     = false
-canSwim           = false
-explosionResistance = 100
-```
-
-То есть это «лава на минималках»: светится, обжигает, не тушится водой, не
-даёт плавать, тяжёлая и вязкая. Температура 1300 °C — этого достаточно, чтобы
-через TFC-механику передавать тепло в `HeatCapability` соседним блокам.
-
-### Рендер-расширение клиента
-
-В `FluidClientExtensions` (`@Dist.CLIENT`) для обоих флюидов регистрируется
-`FluidRendererExtension` из TFC. Без него `ContainedFluidModel` для ведра
-упал бы с `NullPointerException` при попытке достать still/flowing-текстуру.
-
-* Андезитовый сплав: цвет `0xB06820` (тёмно-оранжевый), прозрачность по альфе.
-* Магматит: цвет `0x3F3F3F` (тёмно-серый).
-
-Текстуры не свои — мод переиспользует
-`tfc:block/molten_still` и `tfc:block/molten_flow` из JAR TFC. Это законно,
-поскольку текстура не копируется, а ссылается через `ResourceLocation`.
-
-### Нагрев соседних блоков
-
-В `data/tfc_aeronautics/tfc/fluid_heat/<fluid>.json` для TFC описаны
-характеристики флюида:
-
-```json
-{
-  "fluid": "tfc_aeronautics:molten_andesite_alloy",
-  "melt_temperature": 1150.0,
-  "specific_heat_capacity": 0.01
-}
-```
-
-Файл `lava.json` модифицирует стандартную лаву — у TFC ванильная лава имеет
-значения, не подходящие для нашей тех-цепочки; этот рецепт переопределяет
-температуру и удельную теплоёмкость лавы, чтобы наши металлы корректно
-взаимодействовали с ней.
-
-### Использование в формах
-
-В `data/tfc/tags/fluid/usable_in_ingot_mold.json` (с тегом `tfc`) добавлен
-`molten_andesite_alloy` — это разрешает заливать его в инготную форму
-через TFC-литьё.
-
----
-
-## 4. Андезитовый сплав
-
-Это основной материал мода. Идея: переосмыслить `create:andesite_alloy`: вместо
-того чтобы крафтить его из железа и андезита, его надо выплавить из магматита
-с добавкой чугуна.
-
-### Сплав (alloy recipe)
-
-`data/tfc_aeronautics/recipe/alloy/andesite_alloy.json`:
-
-```json
-{
-  "type": "tfc:alloy",
-  "contents": [
-    { "fluid": "tfc_aeronautics:molten_magmatite", "min": 0.95, "max": 0.98 },
-    { "fluid": "tfc:metal/cast_iron",             "min": 0.02, "max": 0.05 }
-  ],
-  "result": "tfc_aeronautics:molten_andesite_alloy"
-}
-```
-
-95–98 % магматита и 2–5 % чугуна → 100 % андезитового сплава. Рецепт
-регистрируется автоматически при запуске сервера, дальше TFC сам подбирает
-подходящие флюиды в любой TFC-печи.
-
-### Полный путь
-
-1. **Добыча магматита** — руда в мире TFC, дробится в `magmatite_powder`.
-2. **Порошок в печь** — 100 мB `molten_magmatite` на порошок.
-3. **Сплав в печи** — типель с магматитом и чугуном → 100 мB
-   `molten_andesite_alloy`.
-4. **Заливка в форму** — керамическая инготная форма, рецепт
-   `tfc:casting/andesite_alloy_ingot.json`:
-
-```json
-{ "type": "tfc:casting", "fluid": 100, "mold": "tfc:ceramic/ingot_mold",
-  "result": "create:andesite_alloy" }
-```
-
-На выходе — `create:andesite_alloy` (тот самый слиток Create, который встречается
-везде). Это сохраняет совместимость со всеми Create-рецептами, которые ждут
-именно этот предмет.
-
-### Двойной слиток
-
-В `data/tfc_aeronautics/recipe/welding/andesite_alloy_double_ingot.json`:
-
-```json
-{ "type": "tfc:welding", "first_input": "c:ingots/andesite_alloy",
-  "second_input": "c:ingots/andesite_alloy", "result":
-  "tfc_aeronautics:metal/double_ingot/andesite_alloy", "tier": 3 }
-```
-
-Свариваются два слитка андезитового сплава на третьем тире наковальни →
-`double_ingot/andesite_alloy`. И на двойном слитке висит `tfc:heating`
-(200 мB) — то есть двойной слиток можно переплавить обратно в металл.
-
-### Варианты нагрева
-
-* `tfc:item_heat/andesite_alloy.json` — `forging_temperature: 690 °C`,
-  `welding_temperature: 920 °C`. Это задаёт минимальные температуры, при
-  которых Create-механизмы и наковальня TFC считают слиток «рабочим».
-* `tfc:item_heat/andesite_alloy_double_ingot.json` — те же значения на двойной
-  слиток.
-
-### Теги
-
-В `data/c/tags/item/`:
-
-* `ingots/andesite_alloy.json` — добавляет `create:andesite_alloy`. Это
-  расширяет существующий тег Create, чтобы TFC-рецепты через `c:ingots/...`
-  находили наш слиток.
-* `double_ingots/andesite_alloy.json` — добавляет `tfc_aeronautics:metal/double_ingot/andesite_alloy`.
-  Аналог от Create, нужен для металлургии.
-
-### Кастинг через Create-спут
-
-Это работает и без нашего обходного пути — мод TFC изначально не понимает
-Create-спут, но `SpoutCastingBehavior` (раздел 7) ловит момент, когда спут
-стоит над `tfc:mold_table`, и вручную исполняет рецепт литья.
-
-### Регистрация
-
-Слиток: `create:andesite_alloy` — сохранили старый id, чтобы ничего не
-сломать.
-Двойной слиток: `tfc_aeronautics:metal/double_ingot/andesite_alloy`,
-реєстрируется в `DoubleIngotRegistration` через `DeferredHolder`.
-
-### Замена моделей
-
-Текстура `assets/create/textures/item/andesite_alloy.png` переопределяется
-нашим PNG: тот же путь, но без копейки ванильной текстуры. Внутри наш файл
-нарисован в TFC-стиле (тонкие грани, более «металлический» вид).
-
-### Замена крафтов
-
-`RecipeOverrides` (раздел 8) удаляет стандартные Create-крафты:
-
-* `create:crafting/materials/andesite_alloy` — железо + андезит → сплав.
-* `create:crafting/materials/andesite_alloy_from_zinc` — цинк + андезит.
-* `create:crafting/kinetics/shaft` — 2 слитка → 1 вал.
-
-Пилить вал теперь можно только через наковальню TFC (раздел 5).
-
----
-
-## 5. Штамп-пресс (Stamping Press)
+## 3. Штамп-пресс (Stamping Press)
 
 Это кинетическая машина, которая автоматизирует TFC-работу наковальни:
 сбрасывает нагретый предмет, проверяет, что выполняется TFC-рецепт наковальни,
@@ -452,7 +342,7 @@ recipe-filter (как у Create-механизмов), а не tag-filter.
 
 ---
 
-## 6. Нагреватель (Heater)
+## 4. Нагреватель (Heater)
 
 Главный блок мода. Принимает предмет, нагревает его, выдаёт результат (жидкий
 металл во встроенный бак либо готовый предмет). Поддерживает топливо,
@@ -607,7 +497,7 @@ Minecart hopper, руку-манипулятор — все они будут р
 
 ---
 
-## 7. Спут Create + TFC литьё
+## 5. Спут Create + TFC литьё
 
 Чтобы TFC-формовка работала в автоматических линиях Create, мы регистрируем
 кастомное `BlockSpoutingBehaviour` для блок-энтити TFC `mold_table`.
@@ -667,142 +557,17 @@ Create затем сам забирает `amount` мB из своего бак�
 
 ---
 
-## 8. Удалённые рецепты Create
-
-`RecipeOverrides` стирает три Create-рецепта на старте сервера, чтобы убрать
-«дешёвые» пути в обход TFC-механик.
-
-### Список
-
-```java
-List.of(
-  "create:crafting/materials/andesite_alloy",
-  "create:crafting/materials/andesite_alloy_from_zinc",
-  "create:crafting/kinetics/shaft"
-)
-```
-
-### Что они делали
-
-| ID | Что делал | Чем заменён |
-|----|-----------|-------------|
-| `andesite_alloy` | 2 железных слитка + 2 андезита → слиток андезитового сплава. | TFC-сплав через магматит + чугун. |
-| `andesite_alloy_from_zinc` | 2 цинковых слитка + 2 андезита → слиток. | То же. |
-| `shaft` | 2 слитка андезитового сплава → 1 вал. | TFC-кузнечный рецепт: 1 слиток → 4 вала. |
-
-### Механика
-
-Подписка на `ServerStartedEvent`. После старта сервера мод получает
-`RecipeManager`, фильтрует список рецептов через стрим и вызывает
-`replaceRecipes(kept)`. Возвращается копия `kept`, за вычетом удалённых.
-
-Лог `Removed {} recipes ... kept {N}` сообщает, сколько рецептов ушло.
-
-### Что не трогаем
-
-* `create:cutting/andesite_alloy` — пильный станок остаётся. Резка
-  андезитовых блоков в плиты — отдельная механика, не конкурирует с
-  металлургией.
-* Создание Create-механизмов через крафт — это уже зависит от
-  `create:shaft`, и оно автоматически отвалится, потому что валов нет.
-
----
-
 ## Принципы
 
-* **TFC-металлы.** Сплавы регистрируются как обычные TFC-флюиды
-  (`MoltenFluid.Source/Flowing`, `MoltenFluidBlock`), с теми же характеристиками.
 * **Кинетика через Create.** Все машины используют стандартные `KineticBlockEntity`
   и `ValueSettingsBehaviour`.
-* **Совместимость.** Слитки андезитового сплава остаются под id
-  `create:andesite_alloy`, чтобы ничего не сломать в ванильных
-  Create-рецептах.
 * **Data-driven.** Нагрев, формовка, сплавы — всё в JSON-датапаках. В Java
   только регистрация и поведение машин.
 * **Клиент отдельно.** `src/client/java/...` для рендера и `IClientFluidTypeExtensions`.
 
 ---
 
-## 9. Вентилятор Create → угольная кузня TFC
-
-В стандартном TFC `tfc:charcoal_forge` принимает воздух от TFC-меха через
-`IBellowsConsumer`. Create `Encased Fan` сам по себе этот интерфейс не
-реализует, поэтому без доработки вентилятор никак не влияет на кузню —
-даже если стоит в упор и дует прямо в неё.
-
-Эта механика закрывает разрыв: `tfc_aeronautics:forge/FanForgeIntake`
-каждый серверный тик сканирует загруженные угольные кузни и для каждой
-проверяет четыре горизонтальных соседа на наличие
-`EncasedFanBlockEntity`. Если вентилятор действительно дует **в сторону**
-кузни (т.е. `fan.getAirFlowDirection() == side.getOpposite()`) и у него
-ненулевая RPM, кузня получает воздух через публичный метод
-`CharcoalForgeBlockEntity.intakeAir(int)`.
-
-### Количество воздуха
-
-```text
-amount = floor(abs(fan.getSpeed()) * FAN_FORGE_AIR_PER_TICK)
-```
-
-* `FAN_FORGE_AIR_PER_TICK` — параметр конфигурации `common.toml`
-  (по умолчанию `1.5`, диапазон `0.0..20.0`).
-* При 64 RPM и default `1.5` → 96 air-ticks/тик. С учётом того, что
-  TFC `CharcoalForgeBlockEntity.serverTick` декрементит `airTicks--`
-  каждый тик, вентилятор средней мощности держит `airTicks` вблизи
-  потолка `BellowsBlockEntity.MAX_DEVICE_AIR_TICKS = 600`.
-* Один «пуш» TFC-меха выдаёт `BellowsBlockEntity.BELLOWS_AIR = 200`
-  air-ticks за раз, т.е. ~13 тиков работы вентилятора на 64 RPM
-  эквивалентны одному ручному нажатию меха.
-
-### Эффект в кузне
-
-Когда `airTicks > 0`, TFC `HeatCapability.targetDeviceTemp(...)`
-поднимает целевую температуру до `+min(4 * airTicks, 600)` °C
-(см. `HeatCapability.targetDeviceTemp`), а `adjustDeviceTemp(...)`
-ускоряет нагрев/остывание вдвое. Дополнительно `burnTicks -= 2`
-вместо `1`, пока кузня горячая. Итог: кузня с вентилятором рядом
-достигает максимальной температуры быстрее и сжигает топливо в 2×
-быстрее — точно так же, как от TFC-меха.
-
-### Дождь
-
-Дождь (`level.isRainingAt(forgePos.above())`) снижает целевую
-температуру на 300 °C и ускоряет сгорание топлива, как и в ванильном
-TFC. Эта механика не отменяет поведение TFC — она лишь подаёт воздух,
-всё остальное делает формула TFC.
-
-### Регистрация
-
-Класс `FanForgeIntake` помечен `@EventBusSubscriber(modid =
-Aeronautics.MOD_ID, bus = Bus.GAME)`, поэтому отдельной регистрации в
-`Aeronautics#Aeronautics` не требуется. Серверный тик-обработчик
-подписан на `LevelTickEvent.Post`.
-
-### Трекинг кузниц
-
-Чтобы не сканировать весь мир каждый тик, позиции кузниц хранятся в
-`Map<Level, Set<BlockPos>> FORGES`, который обновляется через:
-
-* `BlockEvent.EntityPlaceEvent` — кузню поставили.
-* `BlockEvent.BreakEvent` — кузню сломали.
-* `ChunkEvent.Load` — чанк загружен (для возобновления сессии).
-* `ChunkEvent.Unload` — чанк выгружен (чистка).
-
-При обходе позиции, по которой больше нет `CharcoalForgeBlockEntity`,
-она автоматически удаляется из трекера — это защищает от ситуации,
-когда блок был уничтожен, но событие `BlockEvent.BreakEvent` по
-какой-то причине не сработало.
-
-### Баланс
-
-Конфигурация `fanForgeAirPerTick` позволяет полностью отключить
-механику (`0.0`) или наоборот — сделать вентилятор мощнее меха
-(например, `5.0` → вентилятор на 256 RPM ≈ 1280 air-ticks/тик, т.е.
-моментально насыщает кузню).
-
----
-
-## 10. Тонкие листы (Tight sheet)
+## 6. Тонкие листы (Tight sheet)
 
 «Тонкий лист» — это промежуточный продукт между слитком и обычным
 TFC-листом: одна единица `metal/tight_sheet/<металл>` содержит 100 мB
@@ -858,7 +623,7 @@ TFC-листом: одна единица `metal/tight_sheet/<металл>` с�
 
 ---
 
-## 11. Урон от вращающегося вала
+## 7. Урон от вращающегося вала
 
 Голый вращающийся вал или шестерня Create наносят урон всему живому, что их
 касается. Урон растёт линейно с оборотами; закрытая корпусом передача
@@ -943,7 +708,7 @@ Create подключён как `compileOnly` и миксинов в проек
 
 ---
 
-## 12. Корпуса Create из брёвен TFC
+## 8. Корпуса Create из брёвен TFC
 
 Стандартные рецепты Create используют тег `c:stripped_logs`, в который
 обрубленные брёвна TFC не входят. Мод добавляет собственный тег
@@ -952,7 +717,7 @@ Create подключён как `compileOnly` и миксинов в проек
 
 | Основа | Наносимый материал | Результат |
 |--------|---------------------|-----------|
-| Обрубленное бревно TFC | `create:andesite_alloy` | `create:andesite_casing` |
+| Обрубленное бревно TFC | `tfc_aeronautics:composite` | `create:andesite_casing` |
 | Обрубленное бревно TFC | `c:ingots/brass` | `create:brass_casing` |
 | Обрубленное бревно TFC | `c:ingots/copper` | `create:copper_casing` |
 
@@ -963,7 +728,7 @@ Create подключён как `compileOnly` и миксинов в проек
 
 ---
 
-## 13. Фреймворк атмосферных структур
+## 9. Фреймворк атмосферных структур
 
 Пакет `ru.tfc_aeronautics.worldgen` предоставляет абстракции для регистрации
 структур с «нетипичными механиками» — пост-генерационными эффектами
@@ -1076,7 +841,7 @@ public record AtmosphereSpec(
 ### Что уже есть
 
 * `tfc_aeronautics:ancient_graveyard` — рабочий пример на фреймворке (см.
-  [раздел 14](#14-древнее-кладбище-ancient-graveyard)). Маленький склеп 5×5×5,
+  [раздел 10](#10-древняя-гробница-ancient-graveyard)). Маленький склеп 5×5×5,
   закопаный под поверхностью, с адаптацией материалов под TFC-почву/камень
   и лутом в сосуде.
 * `tfc_aeronautics:ancient_shelter` — наземный шалаш из брёвен с большим
@@ -1090,7 +855,7 @@ public record AtmosphereSpec(
 
 ---
 
-## 14. Древнее кладбище (Ancient Graveyard)
+## 10. Древняя гробница (Ancient Graveyard)
 
 Первая конкретная структура на фреймворке атмосферных структур. Маленький
 склеп 5×5×5, который **генерируется только на суше** (TFC-биомы с почвой на
@@ -1167,7 +932,7 @@ type-witness `RecordCodecBuilder.<AncientGraveyardStructure>mapCodec(...)`)
 — иначе DFU не выводит тип, и при десериализации всегда получался бы базовый
 `AtmosphericStructure`.
 
-### `findGenerationPoint` — как кладбище «прячется»
+### `findGenerationPoint` — как гробница «прячется»
 
 ```text
 1. surfaceY = getFirstOccupiedHeight(x, z, WORLD_SURFACE_WG)
@@ -1316,7 +1081,7 @@ salt_marsh`. Сознательно исключены океаны/пляжи, 
 
 ---
 
-## 15. Древнее укрытие (Ancient Shelter)
+## 11. Древнее укрытие (Ancient Shelter)
 
 Небольшой наземный шалаш — самый «древний» из наших строений. По сути это
 навес из брёвен с двумя контейнерами внутри: большим сосудом и потухшим
@@ -1326,7 +1091,7 @@ salt_marsh`. Сознательно исключены океаны/пляжи, 
 
 Все деревянные блоки (брёвна, доски, плиты, двери, бочки, полки, листва)
 переписываются под локальную породу дерева через `LocalMaterialProcessor`
-(см. раздел 13). Камня, самана и почвы в шаблоне нет — только дерево,
+(см. раздел 9). Камня, самана и почвы в шаблоне нет — только дерево,
 структурный пустоты вокруг и два контейнера.
 
 ### Эффекты (`AncientShelterEffects`)
@@ -1387,7 +1152,7 @@ low_canyons, river_valley, terrace_upper, terrace_lower, salt_marsh).
 
 ---
 
-## 16. Дом фермера (Farmer House)
+## 12. Дом фермера (Farmer House)
 
 Саманный дом с грядками под открытым небом. Саман и земля подстраиваются
 под локальную почву, брёвна — под локальное дерево. Внутри: закрытый
@@ -1468,7 +1233,7 @@ separation 4, salt 100102 (≈ 1/676 чанков, по дизайну «1/700 �
 
 ---
 
-## 17. Богатая гробница (Rich Graveyard)
+## 13. Богатая гробница (Rich Graveyard)
 
 Заглубленный каменный склеп с лутом в сундуке (или в бочке). В отличие от
 `ancient_graveyard`, эта структура сделана по общему фреймворку
@@ -1535,7 +1300,7 @@ level.setBlock(new BlockPos(x, surfaceY, z), marker, Block.UPDATE_ALL_IMMEDIATE)
 
 ---
 
-## 18. Дом кожевника (Tanner House)
+## 14. Дом кожевника (Tanner House)
 
 Деревянное здание с тремя бочками внутри — водой, известковым молоком и
 танином — и сундуком со шкурами и ножом.
@@ -1634,3 +1399,44 @@ TFC — жёсткая зависимость, так что `null` означа
 terrace_upper, terrace_lower). Жаркие и холодные биомы исключены —
 танин и известковое молоко там неуместны. Плотность: spacing 28,
 separation 4, salt 100105 (≈ 1/784 чанков, по дизайну «1/800 блоков»).
+
+---
+
+## 15. Пропитанная джутовая ткань (Impregnated Burlap Cloth)
+
+Полуфабрикат для будущих воздухоплавательных конструкций мода (оболочки
+аэростатов, дирижаблей, планера). Джутовая ткань, пропитанная канифолью,
+перестаёт пропускать воздух и влагу — то, что нужно для аэростата.
+
+### Регистрация
+
+Пакет `burlap/` (`src/main/java/ru/tfc_aeronautics/burlap/BurlapRegistration.java`)
+содержит `DeferredHolder<Item, Item> IMPREGNATED_BURLAP_CLOTH` — vanilla
+`Item` со стандартным `Properties`. Регистрируется в `Aeronautics.java`
+рядом с `ResinRegistration.register(...)` и выводится в `CreativeTabs.MAIN`
+после `resin_clump`.
+
+### Рецепт
+
+`data/tfc_aeronautics/recipe/barrel/impregnated_burlap_cloth.json` —
+`type: tfc:barrel_sealed`, `duration: 7200` (6 игровых часов),
+`input_item: tfc:burlap_cloth × 1`, `input_fluid: tfc_aeronautics:rosin × 100 мб`,
+`output_item: tfc_aeronautics:impregnated_burlap_cloth × 1`. Канифоль
+потребляется полностью (нет `output_fluid`). Параметры подобраны под
+стандарт TFC для замачивания (как `large_leather.json` в TFC).
+
+### Логика
+
+Это первое «заметное» применение канифоли в моде: раньше `rosin` шла
+только в производство (`rosin.json` растворяет `resin_clump` в спирте).
+Пропитка ткани замыкает первый производственный цикл: собираем смолу
+с брёвен → делаем канифоль → пропитываем ткань → будущая оболочка.
+
+### Текстура
+
+Берёт `tfc:textures/item/burlap_cloth.png` (16×16) и накладывает тёплый
+янтарный фильтр (умножение RGB на ~`0.95/0.70/0.30` + общее
+затемнение 0.85), чтобы передать «пропитанность» канифолью. Текстура
+хранится в `src/main/resources/assets/tfc_aeronautics/textures/item/
+impregnated_burlap_cloth.png`; модель — стандартный `item/generated`
+с `layer0` на эту текстуру.

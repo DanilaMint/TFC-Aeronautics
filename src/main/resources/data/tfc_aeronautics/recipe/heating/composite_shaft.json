@@ -1,0 +1,11 @@
+{
+  "type": "tfc:heating",
+  "ingredient": {
+    "item": "tfc_aeronautics:composite"
+  },
+  "result_item": {
+    "count": 1,
+    "id": "create:shaft"
+  },
+  "temperature": 300.0
+}

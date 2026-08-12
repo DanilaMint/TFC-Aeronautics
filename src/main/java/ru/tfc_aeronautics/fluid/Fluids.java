@@ -1,0 +1,67 @@
+package ru.tfc_aeronautics.fluid;
+
+import net.minecraft.core.registries.Registries;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.pathfinder.PathType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.SoundActions;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+
+import net.dries007.tfc.common.fluids.FluidHolder;
+import net.dries007.tfc.common.fluids.MixingFluid;
+import net.dries007.tfc.util.registry.RegistrationHelpers;
+
+import ru.tfc_aeronautics.TFCAeronautics;
+
+/**
+ * Registers mod fluids. Rosin uses vanilla {@link MixingFluid} Source/Flowing
+ * and mirrors TFC's water-like alcohol fluids.
+ */
+public final class Fluids
+{
+    public static final DeferredRegister<FluidType> FLUID_TYPES =
+        DeferredRegister.create(NeoForgeRegistries.FLUID_TYPES, TFCAeronautics.MOD_ID);
+    public static final DeferredRegister<net.minecraft.world.level.material.Fluid> FLUIDS =
+        DeferredRegister.create(Registries.FLUID, TFCAeronautics.MOD_ID);
+
+    public static final FluidHolder<BaseFlowingFluid> ROSIN =
+        RegistrationHelpers.registerFluid(
+            FLUID_TYPES, FLUIDS,
+            "rosin",
+            "rosin",
+            "flowing_rosin",
+            properties -> properties
+                .block(FluidBlocks.ROSIN)
+                .bucket(FluidItems.ROSIN_BUCKET),
+            () -> new FluidType(waterLikeRosin().descriptionId("fluid.tfc_aeronautics.rosin")),
+            MixingFluid.Source::new,
+            MixingFluid.Flowing::new);
+
+    private Fluids() {}
+
+    /** Water-like FluidType properties copied from {@code TFCFluids.waterLike()} for rosin. */
+    private static FluidType.Properties waterLikeRosin()
+    {
+        return FluidType.Properties.create()
+            .adjacentPathType(PathType.WATER)
+            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
+            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)
+            .canConvertToSource(true)
+            .canDrown(true)
+            .canExtinguish(true)
+            .canHydrate(true)
+            .canPushEntity(true)
+            .canSwim(true)
+            .supportsBoating(true)
+            .fallDistanceModifier(0);
+    }
+
+    public static void register(IEventBus bus)
+    {
+        FLUID_TYPES.register(bus);
+        FLUIDS.register(bus);
+    }
+}

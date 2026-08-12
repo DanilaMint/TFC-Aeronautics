@@ -39,7 +39,7 @@ import net.dries007.tfc.world.settings.RockSettings;
 
 import org.jetbrains.annotations.Nullable;
 
-import ru.tfc_aeronautics.Aeronautics;
+import ru.tfc_aeronautics.TFCAeronautics;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -175,7 +175,7 @@ public class LocalMaterialProcessor extends StructureProcessor {
      * counting in the world.
      */
     public void logBrickStats() {
-        Aeronautics.LOGGER.info(
+        TFCAeronautics.LOGGER.info(
             "LocalMaterialProcessor brick stats: processed={}, cracked={}, crackedFraction={}",
             bricksProcessed, bricksCracked,
             bricksProcessed == 0 ? 0f : (float) bricksCracked / bricksProcessed);
@@ -227,7 +227,7 @@ public class LocalMaterialProcessor extends StructureProcessor {
         // by Mth.getSeed(pos); all blocks in a small structure share near-identical
         // seeds and the float roll collapses to "all or nothing".
         final RandomSource blockRandom = RandomSource.create(random.nextLong());
-        Aeronautics.LOGGER.info(
+        TFCAeronautics.LOGGER.info(
             "LocalMaterialProcessor.resolve at {}: rock={}, crackedChance={}, mossyChance={}, replaceCrops={}",
             center, rock, config.crackedChance, config.mossyChance, config.replaceCrops);
         // The crop pick is keyed on the structure's centre BlockPos, not on the
@@ -277,7 +277,7 @@ public class LocalMaterialProcessor extends StructureProcessor {
         if (climateHit != null) {
             return climateHit;
         }
-        Aeronautics.LOGGER.warn("LocalMaterialProcessor: no wood found in scan radius and no climate-valid species for {}; defaulting to acacia", center);
+        TFCAeronautics.LOGGER.warn("LocalMaterialProcessor: no wood found in scan radius and no climate-valid species for {}; defaulting to acacia", center);
         return Wood.ACACIA;
     }
 
@@ -578,6 +578,6 @@ public class LocalMaterialProcessor extends StructureProcessor {
 
     @Override
     protected StructureProcessorType<?> getType() {
-        return AeronauticsProcessorTypes.LOCAL_MATERIAL.get();
+        return ProcessorTypes.LOCAL_MATERIAL.get();
     }
 }
