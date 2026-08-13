@@ -12,6 +12,7 @@ import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.fluid.FluidBlocks;
 import ru.tfc_aeronautics.fluid.FluidItems;
 import ru.tfc_aeronautics.fluid.Fluids;
+import ru.tfc_aeronautics.heat.HeatDealerRegistration;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
@@ -46,6 +47,7 @@ public class TFCAeronautics {
         FluidItems.register(modEventBus);
         Fluids.register(modEventBus);
         HeaterRegistration.register(modEventBus);
+        HeatDealerRegistration.register(modEventBus);
         StampingPressRegistration.register(modEventBus);
         ResinRegistration.register(modEventBus);
         BurlapRegistration.register(modEventBus);

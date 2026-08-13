@@ -23,6 +23,7 @@
 13. [Богатая гробница (Rich Graveyard)](#13-богатая-гробница-rich-graveyard)
 14. [Дом кожевника (Tanner House)](#14-дом-кожевника-tanner-house)
 15. [Пропитанная джутовая ткань (Impregnated Burlap Cloth)](#15-пропитанная-джутовая-ткань-impregnated-burlap-cloth)
+16. [Нагревательные элементы (Heat Dealers)](#16-нагревательные-элементы-heat-dealers)
 
 ---
 
@@ -1440,3 +1441,137 @@ separation 4, salt 100105 (≈ 1/784 чанков, по дизайну «1/800 �
 хранится в `src/main/resources/assets/tfc_aeronautics/textures/item/
 impregnated_burlap_cloth.png`; модель — стандартный `item/generated`
 с `layer0` на эту текстуру.
+
+---
+
+## 16. Нагревательные элементы (Heat Dealers)
+
+Общая шина тепла между устройствами TFC и механиками Create. Нагревательный
+элемент — это блок, который умеет ответить на вопрос «какая у тебя сейчас
+температура». Ответ всегда в градусах Цельсия по шкале TFC (0…1600,
+`Heat.maxVisibleTemperature()`), а не в грубых уровнях Create.
+
+Смысл абстракции — один реестр вместо попарных интеграций. Без него каждая
+механика, которой нужен нагрев (паровой двигатель, паровой вентиль,
+`create:mixing`, дистиллятор, змеевик-конденсатор), решала бы задачу «а что за
+блок подо мной» заново и своим способом.
+
+### Реестр
+
+`ru.tfc_aeronautics.heat.HeatDealer` — функциональный интерфейс с одним
+методом `float getTemperature(Level, BlockPos, BlockState)`. Возвращает
+`HeatDealer.NO_HEAT` (`-1f`), если блок сейчас не греет.
+
+Реестр `HeatDealer.REGISTRY` — это `SimpleRegistry<Block, HeatDealer>` из
+публичного API Create (`com.simibubi.create.api.registry.SimpleRegistry`), тот
+же класс, на котором построен `BoilerHeater.REGISTRY`. Своего реестра мод не
+изобретает: этот потокобезопасен, поддерживает провайдеры по тегам и уже
+загружен в память.
+
+Запрос делается статикой: `HeatDealer.findTemperature(level, pos)` либо
+перегрузкой с готовым `BlockState`. Для случаев, когда нужно узнать «а это
+вообще нагреватель?» без чтения block entity, есть `isHeatDealer(BlockState)`.
+
+### Зарегистрированные блоки
+
+| Блок | Реализация | Источник температуры |
+|------|-----------|----------------------|
+| `tfc:firepit` | `HeatDealers.FIREPIT` | `AbstractFirepitBlockEntity#getTemperature` |
+| `tfc:stove`, `tfc:stove_pot`, `tfc:grill`, `tfc:pot` | `HeatDealers.FIREPIT` | то же — все четыре наследуют `FirepitBlock` |
+| `tfc_aeronautics:heater` | `HeatDealers.HEATER` | `HeaterBlockEntity#getTemperature` |
+
+`tfc:charcoal_forge` в реестр **намеренно не входит**: кузня тушится, если над
+ней стоит блок (проверка по тегу `#tfc:charcoal_forge_invisible`), поэтому басин
+или котёл сверху её просто погасит — регистрировать её как нагревательный
+элемент бессмысленно.
+
+Регистрация живёт в `heat/HeatDealerRegistration.java` и выполняется в
+`FMLCommonSetupEvent` через `enqueueWork`: холдеры `TFCBlocks` на момент
+конструирования мода ещё не разрешены.
+
+Критерий «блок не греет» — температура `<= 0`, а не block-state property
+`LIT`/`HEAT`. Это осознанное решение: костёр, у которого только что прогорело
+топливо, ещё несколько минут остаётся раскалённым, и обрывать по нему рецепты
+было бы неверно физически и раздражающе в игре.
+
+### Маппинги в шкалы Create
+
+У Create две несовместимые шкалы нагрева, и обе грубее TFC-градусов, поэтому
+конвертация односторонняя — из °C.
+
+`HeatDealers.toHeatLevel(float)` → `BlazeBurnerBlock.HeatLevel` (для басина):
+
+| °C | HeatLevel |
+|----|-----------|
+| < 80 | `NONE` |
+| 80…399 | `SMOULDERING` |
+| 400…799 | `FADING` |
+| 800…1399 | `KINDLED` |
+| ≥ 1400 | `SEETHING` |
+
+`HeatDealers.toBoilerHeat(float)` → шкала `BoilerHeater` (для парового котла):
+
+| °C | SU |
+|----|----|
+| < 80 | `NO_HEAT` (-1) |
+| 80…279 | 0 (пассивный) |
+| 280…479 | 1 |
+| 480…679 | 2 |
+| 680…879 | 3 |
+| 880…1079 | 4 |
+| 1080…1279 | 5 |
+| 1280…1479 | 6 |
+| 1480…1600 | 7 |
+
+`SU` суммируется по всем нагревателям под котлом в `BoilerData.activeHeat`;
+потолок — `min(18, boilerSize / 4)`. Шаг 200 °C выбран так, чтобы каждое видимое
+изменение температуры костра/нагревателя двигало стрелку SU. Старая формула
+(`0 / 1 / 2` по полосам 800/1400 °C) давала одинаковый SU на огромных участках
+шкалы — игрок не видел эффекта от разведения огня.
+
+### Привязка к паровому котлу
+
+Кода почти нет: `BoilerHeater.REGISTRY.registerProvider(...)` отдаёт адаптер
+`HeatDealers::boilerAdapter` для любого блока, у которого есть `HeatDealer`.
+Сигнатура адаптера совпадает с `BoilerHeater#getHeat`, поэтому передаётся
+method reference'ом. Реестр Create публичный — миксин не нужен, и новые
+нагреватели подключаются к котлу автоматически, без правок здесь.
+
+### Привязка к `create:mixing` (миксин на басин)
+
+С басином так не вышло. `BasinBlockEntity.getHeatLevelOf(BlockState)`
+принимает **только** состояние блока, а температура костра живёт в его block
+entity и из состояния не восстанавливается. Единственное место с доступом к
+`level` и позиции — package-private `BasinBlockEntity#getHeatLevel()`, поэтому
+`mixin/BasinBlockEntityMixin.java` инжектится туда на `HEAD`.
+
+Два неочевидных момента:
+
+- **Если под басином не зарегистрированный `HeatDealer`, миксин ничего не
+  возвращает и просто отдаёт управление оригиналу.** Благодаря этому blaze
+  burner и всё содержимое тега `#create:passive_boiler_heaters` (лава, магма,
+  ванильные костры) продолжают работать как раньше — регрессии нет.
+- **Поле `cachedHeatLevel` намеренно не заполняется.** Температура костра
+  меняется каждый тик, пока он разгорается и остывает; закэшированный уровень
+  заморозил бы басин на том, что он увидел первым. Выход на `HEAD` этот кэш
+  обходит и перечитывает источник при каждом вызове.
+
+### Отдача тепла вверх
+
+`HeaterBlockEntity#tick()` вызывает
+`HeatCapability.provideHeatTo(level, worldPosition.above(), Direction.DOWN, temperature)` —
+ровно как это делают `AbstractFirepitBlockEntity` и `CharcoalForgeBlockEntity`
+в TFC. Это push-канал, дополняющий pull-реестр: любой блок сверху,
+выставляющий TFC-capability `BlockCapabilities.HEAT` (`IHeatConsumer`),
+начинает греться от нагревателя без единой строчки специального кода.
+
+### Как подключить свой блок
+
+```java
+HeatDealer.REGISTRY.register(MyRegistration.MY_BURNER.get(),
+    (level, pos, state) -> /* температура в °C, либо HeatDealer.NO_HEAT */);
+```
+
+Одна строка в `HeatDealerRegistration#registerHeatDealers` — и блок сразу
+работает и с басином, и с паровым котлом, и со всеми будущими потребителями.
+Именно так будет подключён `tfc_aeronautics:spirit_burner`.

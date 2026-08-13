@@ -193,26 +193,29 @@ public class HeaterBlockEntity extends SmartBlockEntity implements IBellowsConsu
         temperature = HeatCapability.adjustDeviceTemp(temperature, baseTarget, airTicks, isRaining);
         temperature = Mth.clamp(temperature, 0f, MAX_TEMP + 200f); // hard physical cap (visible scale + small headroom)
 
-        // 5. Heat the item in slot 0
+        // 5. Hand our device temperature up to whatever consumes heat above us
+        HeatCapability.provideHeatTo(level, worldPosition.above(), Direction.DOWN, temperature);
+
+        // 6. Heat the item in slot 0
         ItemStack stack = inventory.getStackInSlot(SLOT_ITEM);
         @Nullable IHeat heat = HeatCapability.get(stack);
         if (heat != null && temperature > 0f) {
             HeatCapability.addTemp(heat, temperature);
         }
 
-        // 6. Apply any HeatingRecipe transformation
+        // 7. Apply any HeatingRecipe transformation
         if (heat != null) {
             tryApplyHeatingRecipe(stack, heat);
         }
 
-        // 7. Sync the LIT block-state property when burning toggles on/off
+        // 8. Sync the LIT block-state property when burning toggles on/off
         boolean isLit = burnTicks > 0;
         if (isLit != wasLit) {
             wasLit = isLit;
             level.setBlock(worldPosition, getBlockState().setValue(BlockStateProperties.LIT, isLit), Block.UPDATE_ALL);
         }
 
-        // 8. Emit flame/smoke particles while burning
+        // 9. Emit flame/smoke particles while burning
         if (isLit && level instanceof ServerLevel serverLevel && level.getGameTime() % 3 == 0) {
             double x = worldPosition.getX() + 0.5;
             double y = worldPosition.getY() + 0.375; // 6 px above the block bottom — inside the coal cavity

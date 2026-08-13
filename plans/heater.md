@@ -1,6 +1,6 @@
 # Heater
 
-**Прогресс:** 21/26 ⏳
+**Прогресс:** 22/26 ⏳
 
 ## Регистрация
 - [x] block `tfc_aeronautics:heater` — `heater/HeaterBlock.java` (`Block implements IBE<HeaterBlockEntity>, IWrenchable`, props `LIT` + `HORIZONTAL_FACING`, light 14, analog signal 15, `mapColor STONE, strength 2.0/6.0, sound STONE, pushReaction BLOCK`)
@@ -33,7 +33,7 @@
 - [x] `heater/HeaterCapabilities.java` — IItemHandler все грани, IFluidHandler DOWN
 - [x] `heater/HeaterValueBoxTransform.java` — UI transform для value-box
 - [ ] Ускорить нагрев в 1.5 раз
-- [ ] Добавить возможность нагревать жидкостные баки для создания парового двигателя и дистиллятора
+- [x] Добавить возможность нагревать жидкостные баки для создания парового двигателя и дистиллятора — реализовано через шину `HeatDealer`, см. `plans/update-heaters.md`
 
 ### Клиент
 Нет client-only файлов; анимированное пламя не реализовано (см. Текстурирование).

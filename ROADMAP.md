@@ -3,7 +3,7 @@
 Статус механик мода. Каждая подсистема — отдельный файл в [`plans/`](plans/).
 Прогресс = выполнено / всего задач. ✓ — закрыто, ⏳ — в работе, ☐ — не начато.
 
-**Итого:** 206 / 241 (≈ 86 %).
+**Итого:** 226 / 317 (≈ 71 %).
 
 - [Metal Powders](plans/metal-powders.md) — 10/10 ✓
 - [Industrial Composite](plans/industrial-composite.md) — 13/13 ✓
@@ -12,7 +12,10 @@
 - [Tight Sheets](plans/tight-sheets.md) — 10/10 ✓
 - [Saw Blade](plans/saw-blade.md) — 8/8 ✓
 - [Impregnated Burlap Cloth](plans/impregnated-burlap-cloth.md) — 6/6 ✓
-- [Heater](plans/heater.md) — 21/26 ⏳
+- [Heater](plans/heater.md) — 22/26 ⏳
+- [Heat Dealers](plans/update-heaters.md) — 19/28 ⏳
+- [Spirit Burner](plans/spirit-burner.md) — 0/26 ☐
+- [Combustion Engine](plans/combustion-engine.md) — 0/22 ☐
 - [Stamping Press](plans/stamping-press.md) — 25/27 ⏳
 - [Condenser Coil](plans/condenser-coil.md) — 0/18
 - [Spout / Casting](plans/spout-casting.md) — 3/3 ✓
