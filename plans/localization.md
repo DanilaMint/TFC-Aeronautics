@@ -1,6 +1,6 @@
 # Localization
 
-**Прогресс:** 28/35 ⏳
+**Прогресс:** 28/37 ⏳
 
 ## en_us
 - [x] `itemGroup.tfc_aeronautics` — "TFC Aeronautics"
@@ -13,6 +13,7 @@
 - [x] `item.tfc_aeronautics.rosin_bucket`
 - [x] 3× `item.tfc_aeronautics.metal.tight_sheet.{copper,wrought_iron,steel}`
 - [x] `item.tfc_aeronautics.saw_blade`
+- [ ] `item.tfc_aeronautics.metal.wrench_head.brass`
 - [x] `block.tfc_aeronautics.heater`
 - [x] `tfc_aeronautics.heater.max_temperature`
 - [x] `block.tfc_aeronautics.stamping_press`
@@ -36,6 +37,7 @@
 - [ ] 8× `item.tfc_aeronautics.powder.{copper,tin,zinc,bismuth,cast_iron,gold,silver,nickel}`
 - [ ] `item.tfc_aeronautics.resin_clump`
 - [ ] `item.tfc_aeronautics.saw_blade`
+- [ ] `item.tfc_aeronautics.metal.wrench_head.brass`
 - [ ] `fluid.tfc_aeronautics.rosin`
 - [ ] `item.tfc_aeronautics.rosin_bucket`
 - [ ] `tfc.recipe.barrel.tfc_aeronautics.barrel.rosin`
