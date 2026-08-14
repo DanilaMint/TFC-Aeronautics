@@ -7,7 +7,7 @@
 - [x] `saw/SawBladeRegistration.java`
 
 ## Текстурирование
-- [x] `assets/tfc_aeronautics/textures/item/saw_blade.png`
+- [ ] `assets/tfc_aeronautics/textures/item/saw_blade.png`
 
 ## Моделирование
 - [x] `assets/tfc_aeronautics/models/item/saw_blade.json` (`parent: item/generated`)
