@@ -25,6 +25,7 @@
 15. [Пропитанная джутовая ткань (Impregnated Burlap Cloth)](#15-пропитанная-джутовая-ткань-impregnated-burlap-cloth)
 16. [Нагревательные элементы (Heat Dealers)](#16-нагревательные-элементы-heat-dealers)
 17. [Топливо TFC в портативных двигателях](#17-топливо-tfc-в-портативных-двигателях)
+18. [Скрытие TFC-кинематики](#18-скрытие-tfc-кинематики)
 
 ---
 
@@ -1694,3 +1695,90 @@ Purity по умолчанию `1.0` (`Fuel.CODEC`), поэтому у TFC-за�
 - **Миксинов нет.** Simulated не нужен на classpath: `getBurnTime`
   перехватывается на game bus, до того как Simulated-сервис успевает
   вернуть что-либо.
+
+---
+
+## 18. Скрытие TFC-кинематики
+
+TFC содержит собственную, полностью независимую от Create подсистему
+механического вращения: `RotationNetworkManager` + `Node`/`SourceNode`/
+`SinkNode`/`AxleNode`, отдельные пакеты `common.blocks.rotation.*` и
+`common.blockentities.rotation.*`, 39 Java-файлов (см. ресёрч
+`tmp_docs/tfc_rotation_research.md`). Это конкурирует с Create-кинетикой
+за ресурсы и внимание игрока, плюс раздаёт бесполезные TFC-ачивки
+(`tfc:story/windmill`, `tfc:story/water_wheel`, и т.д.).
+
+Мод скрывает TFC-кинематику на уровне **рецептов**: все 145 рецептов,
+ведущих к TFC-вращательным блокам и их зависимостям, перекрыты
+datapack-тенями в нашем моде. Так как `tfc_aeronautics` объявляет TFC
+как обязательную зависимость (`mods.toml`, `required`), наш datapack
+загружается строго после TFC и перетирает оригиналы по тому же пути
+`data/tfc/recipe/<...>.json`. Никакого Java-кода не добавлено.
+
+### Что блокируется
+
+| Категория | Файлов | Что |
+|---|---|---|
+| `crafting/crankshaft.json` | 1 | `tfc:crankshaft` |
+| `crafting/power_loom.json` | 1 | `tfc:power_loom` |
+| `crafting/steel_pump.json` | 1 | `tfc:steel_pump` |
+| `crafting/trip_hammer.json` | 1 | `tfc:trip_hammer` |
+| `crafting/{lattice,rustic}_windmill_blade.json` | 2 | ножницы ветряка |
+| `crafting/windmill_blade/white.json` | 1 | белая лопасть |
+| `crafting/wood/{axle,bladed_axle,clutch,encased_axle,gear_box,water_wheel}/<wood>.json` | 120 | 6 типов × 20 пород |
+| `anvil/steel_pipe.json` | 1 | `tfc:steel_pipe` (через наковальню) |
+| `barrel/windmill_blade/<color>.json` × 16 | 16 | цветные лопасти (через бочку) |
+| `barrel/bleach_windmill_blade.json` | 1 | отбеливание цветных → белую |
+| **Итого** | **145** | |
+
+### Формат пустышек
+
+Все recipes — валидные, но выдают `minecraft:stick` вместо TFC-предмета:
+
+- **Crafting** (`minecraft:crafting_shaped`, 127 файлов): 1×1 grid, ключ `X = stick`, result `1× stick`. `ShapedRecipePattern` требует ≥1 непустого ряда и непустой key, и валидатор 1.21.1 отвергает `count: 0`.
+- **Anvil** (`tfc:anvil`, 1 файл `steel_pipe`): реальный `ingredient` (`c:sheets/steel`), `tier: 4` (wrought iron), `rules: ["draw_last"]`, result = stick.
+- **Barrel** (`tfc:barrel_sealed`, 17 файлов): реальный `input_fluid` (`tfc:limewater` — всегда есть в TFC, парсер резолвит fluid при загрузке datapack и падает на неизвестных ID), `input_item = stick`, `output_item = stick`.
+
+### Что НЕ блокируется
+
+- `crafting/wood/loom/*.json` — loom не входит в ротационную сеть (отдельный hand-driven блок для ткачества).
+- `crafting/bloomery/*.json`, `casting/*.json`, `heating/*.json`, `knapping/*.json` — не связаны с вращением.
+- `tfc:brass_mechanisms` — используется в погодных приборах (anemometer, vane, observer, piston), не трогаем.
+
+### Что НЕ делается (намеренно)
+
+- **Предметы остаются в креатив-вкладках TFC и в JEI/EMI.** Косметический недостаток: игрок видит их в поиске, но скрафтить не может. Полное скрытие потребовало бы `BuildCreativeModeTabContentsEvent` + JEI/EMI plugin + блокировку размещения через `BlockEvent.EntityPlaceEvent` — не входит в текущий scope.
+- **Уже размещённые блоки в старых мирах остаются как декорации** и продолжают тикать через TFC `RotationNetworkManager`. Полное отключение тиков потребовало бы mixin в TFC.
+- **Ачивки TFC остаются доступными** (`/advancement grant @s only tfc:story/windmill` сработает). Чтобы скрыть — нужно положить пустышки в `data/tfc/advancement/story/...`.
+
+### Где лежит
+
+```
+src/main/resources/data/tfc/recipe/
+├── crafting/{6 standalone + windmill_blade/white + wood/{6 типов × 20 пород}}.json
+├── anvil/steel_pipe.json
+└── barrel/{bleach_windmill_blade + windmill_blade/16 цветов}.json
+```
+
+Скрипты-генераторы для воспроизводимости: `tmp/gen_disabled_recipes.sh`
+(первый проход, невалидный — сохранён как история) и
+`tmp/fix_disabled_recipes.sh` (второй проход, валидный).
+
+### Диагностика при падении datapack
+
+При апдейте TFC или смене версии `ShapedRecipePattern` может начать
+отвергать пустышки. Симптом: экран "Errors in currently selected data
+packs prevented the world from loading" при запуске мира. Лечение:
+смотреть `logs/latest.log`, искать `ShapedRecipePattern.unpack` /
+`RecipeManager.apply` → первый свалившийся recipe. Частые причины:
+
+- пустой `pattern` / `key` — нужна хотя бы одна непустая строка и один ключ;
+- `count: 0` в `result` — валидатор 1.21.1+ требует `count ≥ 1`;
+- неизвестный fluid в `tfc:barrel_sealed.input_fluid.fluid` — заменить на реальный TFC-fluid (`tfc:limewater`, `tfc:red_dye`, и т.п.).
+
+### Когда пересобирать
+
+При каждом бампе версии TFC: продифференцировать
+`code_references/TerraFirmaCraft/src/generated/resources/data/tfc/recipe/...`
+против нашего `src/main/resources/data/tfc/recipe/...` — добавить новые
+shadow-файлы для появившихся ротационных рецептов.

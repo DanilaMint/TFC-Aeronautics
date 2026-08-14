@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "X": {"item": "minecraft:stick"}
+  },
+  "pattern": ["X"],
+  "result": {
+    "count": 1,
+    "id": "minecraft:stick"
+  }
+}

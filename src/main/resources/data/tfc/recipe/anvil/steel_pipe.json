@@ -1,0 +1,10 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {"tag": "c:sheets/steel"},
+  "result": {
+    "count": 1,
+    "id": "minecraft:stick"
+  },
+  "rules": ["draw_last"],
+  "tier": 4
+}
