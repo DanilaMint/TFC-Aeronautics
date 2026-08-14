@@ -163,6 +163,22 @@ JSON-форма (см. `data/tfc_aeronautics/recipe/milling/food/wheat_flour.jso
 **только несгнившее** зерно (через `tfc:not_rotten`), а получившаяся мука
 получает decay и food-data зерна (через `tfc:copy_food`).
 
+**Синхронизация срока годности.** В первой реализации срок у муки из мельницы
+сбрасывался: `MillstoneBlockEntity.process()` сначала делал `inputSlot.shrink(1)`,
+потом уже вызывал `rollResults` — к этому моменту в слоте оставалось
+`ItemStack.EMPTY`, и `FoodCapability.updateFoodFromPrevious(EMPTY, flour)`
+отказывался копировать FOOD-данные (`oldFood == null` → ранний возврат). TFC-жернов
+работает иначе: `recipe.assemble(inputStack)` вызывается **до** `shrink(1)`, поэтому
+input всегда non-empty. Mixin теперь захватывает pre-shrink input в начале
+`process()` через `@Inject(at = @At("HEAD"))` и сохраняет в `@Unique`-поле
+**копию** (`inputInv.getStackInSlot(0).copy()`, а не голую ссылку — иначе
+последующий in-place `shrink(1)` обнулит count у нашего снимка, и `ItemStack.copy()`
+внутри `getSingleStack` отдаст `EMPTY`); redirect `aeronautics$rollResults`
+подставляет его в `ItemStackProvider.getSingleStack`. `CopyFoodModifier` получает
+реальное зерно и корректно применяет TFC-формулу `Cf = (1 - p) * T + p * Ci` с
+`p = newDecay / oldDecay` — мука из мельницы теперь имеет тот же
+`creationDate`, что и мука из жернова, помолотого из того же зерна.
+
 **Не зеркалируются** — естественно остаются только на жернове:
 
 * `redstone.json`, `blue_dye.json` … `yellow_dye.json` (13 + redstone) —

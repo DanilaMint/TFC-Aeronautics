@@ -15,6 +15,7 @@ import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -29,9 +30,10 @@ import ru.tfc_aeronautics.recipe.QuernMillingRecipeType;
 /**
  * Extends Create's millstone to process TFC-shaped quern recipes through the
  * {@code tfc_aeronautics:quern_milling} recipe type. The millstone itself stays
- * pointed at {@code create:milling} — we only intercept the three hot spots
- * (recipe lookup, result application, item-validity check) so the original
- * behavior continues to work for ordinary {@code create:milling} recipes.
+ * pointed at {@code create:milling} — we only intercept the four hot spots
+ * (input capture, recipe lookup, result application, item-validity check) so
+ * the original behavior continues to work for ordinary {@code create:milling}
+ * recipes.
  *
  * <p>{@code sendData()} lives four levels up the inheritance chain
  * ({@code SyncedBlockEntity ← CachedRenderBBBlockEntity ← SmartBlockEntity ← KineticBlockEntity}),
@@ -46,6 +48,35 @@ public abstract class MillstoneBlockEntityMixin
     @Shadow private MillingRecipe lastRecipe;
 
     @Shadow public int timer;
+
+    /**
+     * Pre-shrink input snapshot. Create's {@code MillstoneBlockEntity.process()}
+     * shrinks the input and writes the slot BEFORE invoking
+     * {@code lastRecipe.rollResults(...)}, so by the time
+     * {@link #aeronautics$rollResults} fires the input slot is already empty
+     * for single-item recipes. Capturing at HEAD of {@code process()} gives
+     * {@code QuernMillingRecipe#getResult()} a real source stack for
+     * {@code CopyFoodModifier} to read expiry/creationDate from.
+     * <p>
+     * Must be a {@code .copy()} snapshot, not a raw reference: the captured
+     * value would otherwise be the same {@link ItemStack} object that
+     * {@code process()} subsequently mutates via {@code shrink(1)}, leaving
+     * the captured copy with {@code count == 0}. {@code ItemStack.copy()}
+     * then returns {@link ItemStack#EMPTY} for a zero-count stack, dropping
+     * the FOOD component that {@code CopyFoodModifier} needs.
+     */
+    @Unique
+    private ItemStack aeronautics$capturedInput = ItemStack.EMPTY;
+
+    /**
+     * Input capture: snapshot the input slot before Create shrinks it.
+     */
+    @Inject(method = "process", at = @At("HEAD"))
+    private void aeronautics$captureInput(CallbackInfo ci)
+    {
+        ItemStack inSlot = inputInv.getStackInSlot(0);
+        aeronautics$capturedInput = inSlot.copy();
+    }
 
     /**
      * Tick tail: if the original {@code tick()} couldn't find a recipe via
@@ -88,7 +119,12 @@ public abstract class MillstoneBlockEntityMixin
     /**
      * Result application: when the cached recipe is one of ours, route through
      * {@link QuernMillingRecipe#getResult()} so {@code tfc:copy_food} and
-     * friends actually run. The input slot is already post-shrink here, but
+     * friends actually run. The captured input from
+     * {@link #aeronautics$captureInput} is used instead of
+     * {@code inputInv.getStackInSlot(0)} because Create shrinks the input slot
+     * before invoking {@code rollResults} — the slot is already
+     * {@link ItemStack#EMPTY} for single-item grains, which would silently
+     * skip {@code CopyFoodModifier}.
      * {@link com.dries007.tfc.common.recipes.outputs.ItemStackProvider#getSingleStack}
      * resets the count to 1 so output count is deterministic.
      */
@@ -103,7 +139,8 @@ public abstract class MillstoneBlockEntityMixin
     {
         if (recipe instanceof QuernMillingRecipe quern)
         {
-            ItemStack input = inputInv.getStackInSlot(0);
+            ItemStack input = aeronautics$capturedInput;
+            aeronautics$capturedInput = ItemStack.EMPTY;
             return List.of(quern.getResult().getSingleStack(input));
         }
         return recipe.rollResults(random);
