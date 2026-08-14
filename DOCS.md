@@ -24,6 +24,7 @@
 14. [Дом кожевника (Tanner House)](#14-дом-кожевника-tanner-house)
 15. [Пропитанная джутовая ткань (Impregnated Burlap Cloth)](#15-пропитанная-джутовая-ткань-impregnated-burlap-cloth)
 16. [Нагревательные элементы (Heat Dealers)](#16-нагревательные-элементы-heat-dealers)
+17. [Топливо TFC в портативных двигателях](#17-топливо-tfc-в-портативных-двигателях)
 
 ---
 
@@ -35,6 +36,7 @@
 
 | Ключ | Тип | Диапазон | Назначение |
 |------|-----|----------|------------|
+| `tfcFuelInEngines` | boolean | — | Включает распознавание TFC-топлива в `simulated:portable_engine` (и любых других потребителях `getBurnTime`). См. [раздел 17](#17-топливо-tfc-в-simulated-portable_engine). |
 | `resinDropChance` | double | 0.0–1.0 | Шанс выпадения комка смолы при обдирании коры. 0.15 = 15%. |
 | `shaftDamageEnabled` | boolean | — | Включает урон от касания голого вращающегося вала. См. [раздел 7](#7-урон-от-вращающегося-вала). |
 | `shaftDamageStartRpm` | double | 0.0–1024.0 | Минимальный порог оборотов, ниже которого вал безопасен. |
@@ -1575,3 +1577,104 @@ HeatDealer.REGISTRY.register(MyRegistration.MY_BURNER.get(),
 Одна строка в `HeatDealerRegistration#registerHeatDealers` — и блок сразу
 работает и с басином, и с паровым котлом, и со всеми будущими потребителями.
 Именно так будет подключён `tfc_aeronautics:spirit_burner`.
+
+---
+
+## 17. Топливо TFC в портативных двигателях
+
+`simulated:portable_engine` — кинетический двигатель Simulated, аналог
+Create-паровых машин: один слот под твёрдое топливо, на выходе 32 RPM.
+Проверка «что считать топливом» в Simulated жёстко завязана на
+`ItemStack.getBurnTime(RecipeType.SMELTING)` — ровно тот же путь, что и у
+ванильной печи. Никаких тегов, рецептов или хардкода нет.
+
+TFC регистрирует своё топливо параллельно, через `net.dries007.tfc.util.data.Fuel`
+(см. [раздел 4](#4-нагреватель-heater) — нагреватель использует тот же источник).
+Без перехвата TFC-предметы (`tfc:wood/log/oak`, `tfc:peat`, `tfc:ore/lignite`,
+`minecraft:charcoal` с TFC-записью) для двигателя невидимы: их `getBurnTime`
+возвращает 0, слот отвергает вставку.
+
+### Перехват
+
+`ru.tfc_aeronautics.portable_engine.PortableEngineFuelHandler` слушает
+`FurnaceFuelBurnTimeEvent` на game bus с `EventPriority.HIGH`. На каждый вызов:
+
+1. Ранний выход, если `Config.TFC_FUEL_IN_ENGINES.get() == false`.
+2. `Fuel.get(stack)` из TFC; `null` — выход, ванильная логика остаётся.
+3. `duration = Mth.floor(fuel.duration() * fuel.purity())`.
+4. `event.setBurnTime(duration)` — внутри отменяет событие, останавливая
+   default-priority листенеры.
+
+`@EventBusSubscriber(modid = TFCAeronautics.MOD_ID)` без аргумента `bus` —
+это `Bus.GAME`. Подключения в `TFCAeronautics.java` не нужно: аннотация
+регистрирует хендлер сама через сканер FML — ровно как
+`ShaftDamageHandler`, другой хендлер на game bus.
+
+Запись `setBurnTime` автоотменяет событие при `burnTime >= 0`, поэтому
+аннотация `@SubscribeEvent` идёт **без** `cancellable = true`.
+
+### Почему `EventPriority.HIGH`
+
+Событие `FurnaceFuelBurnTimeEvent` — `ICancellableEvent`. Как только любой
+листенер вызывает `setBurnTime`, default-priority листенеры дальше не
+получают событие. Чтобы выиграть гонку у модов, которые могут добавить
+свой хендлер на нормальном приоритете (Tech Reborn, Mekanism, сторонние
+TFC-аддоны), мы подписываемся на `HIGH`. `HIGHEST` не используется —
+оставляем зазор для модов, которые захотят перебить уже TFC-оверрайд.
+
+### Pure as a factor
+
+Перемножение на `purity` — не косметика. Без него `minecraft:leaves`
+(600 тиков, purity 0.25) стоит ровно столько же, сколько уголь
+(1415 °C, 2000 тиков, purity 1.0): возобновляемый ресурс кормит двигатель
+на полную. С purity leaves → 150 тиков, pinecone → 33, driftwood → 160.
+Purity по умолчанию `1.0` (`Fuel.CODEC`), поэтому у TFC-записей без
+явного `purity` (`coal`, `charcoal`, `peat`, `lignite`, planks) поведение
+не меняется.
+
+### Численные примеры
+
+| Топливо | TFC duration | Purity | Engine burn time |
+|---------|--------------|--------|------------------|
+| `minecraft:coal` | 2000 | 1.0 | 2000 |
+| `minecraft:charcoal` | 1800 | 1.0 | 1800 (vs vanilla 1600) |
+| `tfc:wood/log/oak` | 1000 | 0.95 | 950 |
+| `tfc:wood/planks/oak` | 900 | 1.0 | 900 |
+| `tfc:peat` | 2500 | 1.0 | 2500 |
+| `tfc:ore/lignite` | 2200 | 1.0 | 2200 |
+| `minecraft:leaves` | 600 | 0.25 | 150 |
+| `tfc:groundcover/pinecone` | 220 | 0.15 | 33 |
+| `tfc:groundcover/driftwood` | 400 | 0.40 | 160 |
+
+### Поверхность воздействия
+
+Хук **глобальный**: касается не только `simulated:portable_engine`, но и
+ванильной печи, коптильни, домны, Create Blaze Burner, Create Trains —
+всего, что вызывает `ItemStack.getBurnTime`. Гейтинг по
+`RecipeType.SMELTING` сознательно не используется: он даёт несогласованное
+разделение (печь + двигатель да, коптильня + домна нет), а главное — не
+изолирует двигатель от печи. В TFC-аддоне глобальная семантика
+естественна: TFC-топливо должно гореть везде, где кто-то попросит.
+
+Для сборок, где это поведение нежелательно, есть escape hatch —
+`Config.TFC_FUEL_IN_ENGINES = false` в `common.toml` и `/reload`.
+
+### Ограничения
+
+- **Super-heat** для TFC-топлива остаётся `false`. TFC не в датамапе
+  `create:superheated_blaze_burner_fuels`, поэтому `getNextSuperHeated()`
+  возвращает 0, и `getGeneratedSpeed()` не удваивается. Это сознательно:
+  удвоение скорости — прерогатива blaze cake, а не углей.
+- **Гейт вставки.** `PortableEngineInventory.canInsertItem` зовёт
+  `getBurnTime(info.type().getDefaultInstance())`. Все 49 TFC fuel JSON
+  используют `item`/`tag` ингредиенты (без component-sensitive types), так
+  что `Fuel.get(defaultInstance) ≡ Fuel.get(actualStack)`. Вставка и
+  сгорание согласованы.
+- **`/reload` mid-burn.** `Fuel.CACHE` перезагружается через
+  `IndirectHashCollection.reloadAllCaches`. Никакой лок не нужен — это
+  та же модель, что в `FireboxBlockEntity` и `AbstractFirepitBlockEntity`
+  у TFC. Новые значения разрешаются на лету, горелка продолжает
+  декрементироваться.
+- **Миксинов нет.** Simulated не нужен на classpath: `getBurnTime`
+  перехватывается на game bus, до того как Simulated-сервис успевает
+  вернуть что-либо.

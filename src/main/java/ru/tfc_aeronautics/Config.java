@@ -12,6 +12,10 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
+    public static final ModConfigSpec.BooleanValue TFC_FUEL_IN_ENGINES = BUILDER
+            .comment("If true, TFC fuel items (looked up via Fuel.get) burn in any machine that calls ItemStack.getBurnTime, including simulated:portable_engine, with duration × purity ticks. Disable if a pack needs vanilla burn times.")
+            .define("tfcFuelInEngines", true);
+
     public static final ModConfigSpec.DoubleValue RESIN_DROP_CHANCE = BUILDER
             .comment("Chance that stripping (right-clicking with an axe) a resin-bearing log drops a resin clump. 0.15 = 15%.")
             .defineInRange("resinDropChance", 0.15, 0.0, 1.0);
