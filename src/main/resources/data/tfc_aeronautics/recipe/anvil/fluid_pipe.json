@@ -1,0 +1,17 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {
+    "item": "tfc_aeronautics:metal/tight_sheet/copper"
+  },
+  "result": {
+    "count": 1,
+    "id": "create:fluid_pipe"
+  },
+  "rules": [
+    "hit_last",
+    "hit_second_last",
+    "hit_third_last"
+  ],
+  "apply_bonus": false,
+  "tier": 1
+}

@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BasinBlockEntityMixin",
-    "MillstoneBlockEntityMixin"
+    "MillstoneBlockEntityMixin",
+    "RecipeManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

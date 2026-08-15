@@ -15,5 +15,12 @@ public final class RecipeRegistration
     {
         QuernMillingRecipeType.RECIPE_TYPES.register(modEventBus);
         QuernMillingRecipeType.RECIPE_SERIALIZERS.register(modEventBus);
+        // Recipe-removal stripping runs in mixin/RecipeManagerMixin; no event-bus
+        // registration needed — @Inject fires on every RecipeManager reload.
+        RecipeRemoval.LOGGER.debug(
+            "Recipe removal armed for {} recipe(s): {}",
+            RecipeRemoval.BANNED_RECIPES.size(),
+            RecipeRemoval.BANNED_RECIPES
+        );
     }
 }
