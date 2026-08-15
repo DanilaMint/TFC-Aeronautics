@@ -2,19 +2,22 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "tfc_aeronautics:composite"
+    "P": {
+      "tag": "tfc:lumber"
     },
-    "K": {
+    "C": {
       "tag": "tfc:cloths"
+    },
+    "I": {
+      "item": "tfc_aeronautics:composite"
     }
   },
   "pattern": [
-    "A",
-    "K"
+    "PC",
+    "CI"
   ],
   "result": {
     "count": 2,
-    "id": "create:andesite_funnel"
+    "id": "create:white_sail"
   }
 }

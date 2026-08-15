@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "tfc_aeronautics:metal/tight_sheet/copper"
+    },
+    "C": {
+      "tag": "tfc:barrels"
+    }
+  },
+  "pattern": [
+    "B",
+    "C",
+    "B"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:fluid_tank"
+  }
+}

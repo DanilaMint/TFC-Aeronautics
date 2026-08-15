@@ -6,7 +6,7 @@
       "item": "tfc_aeronautics:composite"
     },
     "K": {
-      "item": "minecraft:dried_kelp"
+      "tag": "tfc:cloths"
     }
   },
   "pattern": [

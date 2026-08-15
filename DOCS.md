@@ -1782,3 +1782,38 @@ packs prevented the world from loading" при запуске мира. Лече
 `code_references/TerraFirmaCraft/src/generated/resources/data/tfc/recipe/...`
 против нашего `src/main/resources/data/tfc/recipe/...` — добавить новые
 shadow-файлы для появившихся ротационных рецептов.
+
+---
+
+## 19. Простые замены рецептов (Recipe overrides)
+
+Некоторые рецепты Create предполагают наличие ингредиентов, которых в TFC
+нет вовсе (ванильные бочки, стандартные пластины) или они должны
+использовать модовые tight sheets вместо тяжёлых plates. Для таких случаев
+остаётся только простая замена одного-двух ingredients — отдельный JSON-файл
+override-рецепта по пути оригинала в namespace источника
+(`data/create/recipe/...`). Это тот же convention, что для переноса
+milling/pressing/квен-моста — см. `feedback_recipe_override_convention.md`.
+
+Сюда не пишутся:
+- сложные рецепты-мосты (milling↔quern, spout+casting, anvil-совмещение) — у
+  них свои подробные разделы выше;
+- блокировка/скрытие рецептов (раздел 18);
+- перенос recipes между namespace в рамках адаптации нового TFC-контента
+  (tight sheets в Create pressing и т.п.) — это идёт в профильный plan
+  (`plans/tight-sheets.md`).
+
+### Актуальный список
+
+| Override | Заменено | На |
+|---|---|---|
+| `data/create/recipe/crafting/kinetics/fluid_tank.json` | `c:plates/copper` (Create plates) | `tfc_aeronautics:metal/tight_sheet/copper` |
+| | `c:barrels/wooden` (minecraft barrels) | `tfc:barrels` |
+| `data/create/recipe/crafting/kinetics/white_sail.json` | `create:andesite_alloy` + `minecraft:wool` + `c:rods/wooden` (pattern `WS/SA`) | `tfc_aeronautics:composite` + `tfc:cloths` + `tfc:lumber` (pattern `PC/CI`) |
+| `data/create/recipe/crafting/logistics/andesite_funnel.json` | `minecraft:dried_kelp` | `tfc:cloths` |
+| `data/create/recipe/crafting/logistics/andesite_tunnel.json` | `minecraft:dried_kelp` | `tfc:cloths` |
+
+Для sail/funnel/tunnel потребовался shadow-тег `tfc:cloths`
+(`data/tfc/tags/item/cloths.json`): burlap + wool + silk (других cloth items TFC не имеет).
+
+Сюда же добавлять новые простые замены (зеркально — в `plans/recipe-overrides.md`).
