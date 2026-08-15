@@ -11,7 +11,7 @@
 - [Rosin](plans/rosin.md) — 6/6 ✓
 - [Tight Sheets](plans/tight-sheets.md) — 10/10 ✓
 - [Saw Blade](plans/saw-blade.md) — 8/8 ✓
-- [Wrench Head](plans/wrench-head.md) — 0/7 ☐
+- [Wrench Head](plans/wrench-head.md) — 7/8 ⏳ (texturing остаётся placeholder)
 - [Impregnated Burlap Cloth](plans/impregnated-burlap-cloth.md) — 6/6 ✓
 - [Heater](plans/heater.md) — 22/26 ⏳
 - [Heat Dealers](plans/update-heaters.md) — 19/28 ⏳

@@ -13,7 +13,7 @@
 - [x] `item.tfc_aeronautics.rosin_bucket`
 - [x] 3× `item.tfc_aeronautics.metal.tight_sheet.{copper,wrought_iron,steel}`
 - [x] `item.tfc_aeronautics.saw_blade`
-- [ ] `item.tfc_aeronautics.metal.wrench_head.brass`
+- [x] `item.tfc_aeronautics.metal.wrench_head.brass`
 - [x] `block.tfc_aeronautics.heater`
 - [x] `tfc_aeronautics.heater.max_temperature`
 - [x] `block.tfc_aeronautics.stamping_press`

@@ -20,6 +20,7 @@ import ru.tfc_aeronautics.recipe.RecipeRegistration;
 import ru.tfc_aeronautics.resin.ResinRegistration;
 import ru.tfc_aeronautics.saw.SawBladeRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
+import ru.tfc_aeronautics.wrench.WrenchHeadRegistration;
 import ru.tfc_aeronautics.worldgen.ProcessorTypes;
 import ru.tfc_aeronautics.worldgen.StructurePieceTypes;
 import ru.tfc_aeronautics.worldgen.StructureTypes;
@@ -43,6 +44,7 @@ public class TFCAeronautics {
         CompositeRegistration.register(modEventBus);
         TightSheetRegistration.register(modEventBus);
         SawBladeRegistration.register(modEventBus);
+        WrenchHeadRegistration.register(modEventBus);
         FluidBlocks.register(modEventBus);
         FluidItems.register(modEventBus);
         Fluids.register(modEventBus);

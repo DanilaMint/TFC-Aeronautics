@@ -1,0 +1,8 @@
+{
+  "ingredient": {
+    "item": "tfc_aeronautics:metal/wrench_head/brass"
+  },
+  "heat_capacity": 4.5,
+  "forging_temperature": 558.0,
+  "welding_temperature": 744.0
+}
