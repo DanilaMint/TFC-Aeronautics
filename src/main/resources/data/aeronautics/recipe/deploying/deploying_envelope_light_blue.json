@@ -1,0 +1,17 @@
+{
+  "type": "create:deploying",
+  "ingredients": [
+    {
+      "item": "aeronautics:white_envelope"
+    },
+    {
+      "item": "minecraft:light_blue_dye"
+    }
+  ],
+  "results": [
+    {
+      "count": 1,
+      "id": "aeronautics:light_blue_envelope"
+    }
+  ]
+}

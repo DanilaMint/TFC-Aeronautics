@@ -1816,6 +1816,9 @@ milling/pressing/квен-моста — см. `feedback_recipe_override_convent
 | `data/create/recipe/crafting/logistics/andesite_tunnel.json` | `minecraft:dried_kelp` | `tfc:cloths` |
 | `data/simulated/recipe/mechanical_crafting/plunger_launcher.json` | `minecraft:slime_ball` (ключ `P`) | `c:slimeballs` (тег; см. [раздел 20](#20-замена-slimeball-на-tfcglue)) |
 | `data/create/recipe/crafting/kinetics/super_glue.json` | Create-рецепт `["AS","NA"]` с `c:slimeballs + c:nuggets/iron + c:plates/iron` — невозможен в TFC-сборке (iron-теги пусты) | shapeless `tfc_aeronautics:metal/tight_sheet/steel + tfc:glue` (см. [раздел 20](#20-замена-slimeball-на-tfcglue)) |
+| `data/aeronautics/recipe/white_envelope.json` | shaped `["WS","SW"]` с `minecraft:white_wool + minecraft:stick` → 4 | shaped `["CCC","C C"," R "]`: 5× `#tfc:cloths` + `tfc:rope` (снизу-середка) → 8 `aeronautics:white_envelope`. Выход ×2: TFC-ткань реже ванильной шерсти. Требует shadow-тег `tfc:cloths` |
+| `data/aeronautics/recipe/{color}_envelope.json` (×15) | shaped `["WS","SW"]` с `minecraft:<color>_wool + minecraft:stick` → 4 | shapeless: `aeronautics:white_envelope` + `minecraft:<color>_dye` → 1 `aeronautics:<color>_envelope` (перекрашивание через ванильные красители) |
+| `data/aeronautics/recipe/deploying/deploying_envelope_{color}.json` (×16) | `create:deploying` с `minecraft:<color>_wool + minecraft:stick` → 3 | тень-отключение: оба ингредиента `minecraft:bedrock` (недобываем → рецепт фактически мёртв) |
 
 Для sail/funnel/tunnel потребовался shadow-тег `tfc:cloths`
 (`data/tfc/tags/item/cloths.json`): burlap + wool + silk (других cloth items TFC не имеет).
