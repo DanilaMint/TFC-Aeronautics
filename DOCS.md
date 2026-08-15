@@ -26,6 +26,8 @@
 16. [Нагревательные элементы (Heat Dealers)](#16-нагревательные-элементы-heat-dealers)
 17. [Топливо TFC в портативных двигателях](#17-топливо-tfc-в-портативных-двигателях)
 18. [Скрытие TFC-кинематики](#18-скрытие-tfc-кинематики)
+19. [Простые замены рецептов (Recipe overrides)](#19-простые-замены-рецептов-recipe-overrides)
+20. [Замена slimeball на `tfc:glue`](#20-замена-slimeball-на-tfcglue)
 
 ---
 
@@ -1812,8 +1814,76 @@ milling/pressing/квен-моста — см. `feedback_recipe_override_convent
 | `data/create/recipe/crafting/kinetics/white_sail.json` | `create:andesite_alloy` + `minecraft:wool` + `c:rods/wooden` (pattern `WS/SA`) | `tfc_aeronautics:composite` + `tfc:cloths` + `tfc:lumber` (pattern `PC/CI`) |
 | `data/create/recipe/crafting/logistics/andesite_funnel.json` | `minecraft:dried_kelp` | `tfc:cloths` |
 | `data/create/recipe/crafting/logistics/andesite_tunnel.json` | `minecraft:dried_kelp` | `tfc:cloths` |
+| `data/simulated/recipe/mechanical_crafting/plunger_launcher.json` | `minecraft:slime_ball` (ключ `P`) | `c:slimeballs` (тег; см. [раздел 20](#20-замена-slimeball-на-tfcglue)) |
+| `data/create/recipe/crafting/kinetics/super_glue.json` | Create-рецепт `["AS","NA"]` с `c:slimeballs + c:nuggets/iron + c:plates/iron` — невозможен в TFC-сборке (iron-теги пусты) | shapeless `tfc_aeronautics:metal/tight_sheet/steel + tfc:glue` (см. [раздел 20](#20-замена-slimeball-на-tfcglue)) |
 
 Для sail/funnel/tunnel потребовался shadow-тег `tfc:cloths`
 (`data/tfc/tags/item/cloths.json`): burlap + wool + silk (других cloth items TFC не имеет).
 
 Сюда же добавлять новые простые замены (зеркально — в `plans/recipe-overrides.md`).
+
+---
+
+## 20. Замена slimeball на `tfc:glue`
+
+TFC регистрирует собственный клей — `tfc:glue` (`TFCItems.java:223`, простой `Item` без capability и без fluid-формы). Тематически это аналог ванильного slimeball: клейкий ингредиент для клейки, склеивания и пропитки. В Create и Simulated slimeball встречается во многих местах, и эта механика делает `tfc:glue` полностью взаимозаменяемым с ним — везде, где slimeball принимается сейчас, клей тоже будет принят.
+
+Подробный дизайн: `docs/superpowers/specs/2026-08-15-tfc-glue-slimeball-substitution-design.md`. Реализация — план `plans/glue-substitution.md`.
+
+### Подход
+
+Большинство контекстов, где Create и Simulated принимают slimeball, уже фильтруют по тегу, а не по конкретному предмету. Поэтому основной путь — **расширить slimeball-теги** клеем. Исключения:
+
+- Один рецепт Simulated (`plunger_launcher`) использует хардкод `minecraft:slime_ball` в JSON и не покрывается тегом — для него сделан shadow-override.
+- Рецепт `create:super_glue` формально фильтрует по `c:slimeballs` (то есть подстановка тега работает), но **второй и третий ингредиенты** (`c:nuggets/iron`, `c:plates/iron`) в TFC-сборке пусты — TFC заменяет железо на wrought iron и не публикует `c:`-теги для nuggets/plates. Поэтому весь рецепт переписан на shapeless из двух TFC-шных предметов: `tfc_aeronautics:metal/tight_sheet/steel` + `tfc:glue`.
+
+### Что покрывается
+
+| Контекст | Где | Покрытие |
+|----------|-----|----------|
+| Create recipe `super_glue` | `data/create/recipe/crafting/kinetics/super_glue.json` | **полная замена** на shapeless `tight_sheet/steel + tfc:glue` (исходный recipe невозможен в TFC) |
+| Create recipe `sticker` | `data/create/recipe/crafting/kinetics/sticker.json` | фильтр по `c:slimeballs` |
+| Create recipe `sticky_mechanical_piston` | `data/create/recipe/crafting/kinetics/sticky_mechanical_piston.json` | фильтр по `c:slimeballs` |
+| Create recipe `package_frogport` | `data/create/recipe/crafting/logistics/package_frogport.json` | фильтр по `c:slimeballs` |
+| Create runtime: нанесение клея на chassis | `AbstractChassisBlock#useItemOn` | `Tags.Items.SLIMEBALLS` |
+| Create runtime: конверсия механического поршня в sticky | `MechanicalPistonBlock#useItemOn` | `Tags.Items.SLIMEBALLS` |
+| Simulated logic: merging glue | `simulated:merging_glue` item tag | `#c:slime_balls` (с подчёркиванием) |
+| Simulated recipe `plunger_launcher` | `data/simulated/recipe/mechanical_crafting/plunger_launcher.json` | хардкод slimeball → shadow-override |
+| Simulated recipe `honey_glue` (басин) | `data/simulated/recipe/filling/honey_glue.json` | **тень-отключение** (см. ниже) |
+
+### Файлы
+
+| Файл | Действие | Назначение |
+|------|----------|------------|
+| `src/main/resources/data/c/tags/item/slimeballs.json` | создать | добавить `tfc:glue` в `c:slimeballs` (Create-тег, без подчёркивания) |
+| `src/main/resources/data/c/tags/item/slime_balls.json` | создать | добавить `tfc:glue` в `c:slime_balls` (Simulated-тег, с подчёркиванием) |
+| `src/main/resources/data/simulated/recipe/mechanical_crafting/plunger_launcher.json` | создать | shadow оригинального рецепта; ключ `P`: `"item": "minecraft:slime_ball"` → `"tag": "c:slimeballs"` |
+| `src/main/resources/data/create/recipe/crafting/kinetics/super_glue.json` | создать | полная замена: вместо `["AS","NA"]` (slimeball + iron nugget + iron plate) — shapeless `tfc_aeronautics:metal/tight_sheet/steel + tfc:glue`. Исходный рецепт в TFC-сборке невозможно скрафтить: `c:nuggets/iron` и `c:plates/iron` пусты, так как TFC заменяет железо на wrought iron и не публикует `c:`-теги для nuggets/plates |
+| `src/main/resources/data/simulated/recipe/filling/honey_glue.json` | создать | тень, отключающая исходный басин-рецепт `create:filling`. Исходный рецепт требует `create:iron_sheet` (нет в TFC) + 500 мБ `c:honey` (тег пуст в TFC) → `simulated:honey_glue`. Новая тень требует `minecraft:bedrock` + несуществующий fluid-тег → `minecraft:stick`: никогда не сматчится, но остаётся валидным datapack-JSON, чтобы datapack-загрузчик не ругался |
+
+### Что НЕ меняется
+
+- **Java-код** — ни одного изменения, всё data-only.
+- **Рецепт `simulated:honey_glue` через басин** — исходный `create:filling`-рецепт отключён, потому что в TFC-сборке он невозможен (`create:iron_sheet` не существует, `c:honey` пуст). Альтернативный путь к `simulated:honey_glue` — это наш собственный shapeless-рецепт `tfc:glue + tfc_aeronautics:resin_clump + tfc_aeronautics:metal/tight_sheet/steel` (`data/simulated/recipe/crafting/honey_glue.json`); сам предмет переименован в «Смоляной клей» (`Resin Glue`).
+- **`SuperGlueItem.java:63`** — там формируется return-стек `minecraft:slime_ball`, это косметика, на поведение клея-как-ингредиента не влияет.
+- **Ponder-сцены Simulated** — там slimeball используется только как визуальная подсказка.
+- **Поведение slimeball** — slimeball по-прежнему работает во всех исходных рецептах без изменений; добавление `tfc:glue` аддитивно.
+
+### Почему два тега, а не один
+
+Create и Simulated исторически используют разные slimeball-теги:
+
+- `c:slimeballs` (без подчёркивания) — NeoForge common tag, разрешается в `Tags.Items.SLIMEBALLS`. Create использует именно его.
+- `c:slime_balls` (с подчёркиванием) — Simulated вводит свой tag и подключает его к `simulated:merging_glue` через `addTag`.
+
+Оба тега нужно расширить, чтобы покрыть все контексты. Для shadow-override рецепта используется `c:slimeballs` как более распространённый и идиоматичный для Create.
+
+### Smoke-проверка в игре
+
+- [x] Скрафтить `super_glue` через новый shapeless-рецепт `tight_sheet/steel + tfc:glue` — должно сработать.
+- [x] Скрафтить `sticker`, `sticky_mechanical_piston`, `package_frogport` — должны принимать `tfc:glue` (через тег `c:slimeballs`).
+- [x] ПКМ по chassis с клеем в руке — должно приклеить.
+- [x] ПКМ по механическому поршню с клеем — должно превратить в sticky.
+- [x] Использовать клей на блоке merging glue — должно сработать.
+- [x] Собрать `plunger_launcher` через Create mechanical craft с клеем вместо slimeball — должно сработать.
+

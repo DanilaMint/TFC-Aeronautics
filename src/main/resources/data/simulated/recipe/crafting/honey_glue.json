@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "tfc:glue" },
+    { "item": "tfc_aeronautics:resin_clump" },
+    { "item": "tfc_aeronautics:metal/tight_sheet/steel" }
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:honey_glue"
+  }
+}

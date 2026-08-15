@@ -1,0 +1,10 @@
+{
+  "type": "create:filling",
+  "ingredients": [
+    { "item": "minecraft:bedrock" },
+    { "type": "neoforge:tag", "amount": 500, "tag": "c:does_not_exist" }
+  ],
+  "results": [
+    { "id": "minecraft:stick", "count": 1 }
+  ]
+}
