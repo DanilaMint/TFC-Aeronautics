@@ -24,6 +24,7 @@ code_references/
 # local-only
 .claude/
 crashlog.txt
+latest.log
 libs/
 PROJECT_STRUCTURE.md
 CLAUDE.md
