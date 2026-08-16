@@ -7,6 +7,7 @@ import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.tfc_aeronautics.anvil.AnvilRegistration;
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.fluid.FluidBlocks;
@@ -53,6 +54,7 @@ public class TFCAeronautics {
         StampingPressRegistration.register(modEventBus);
         ResinRegistration.register(modEventBus);
         BurlapRegistration.register(modEventBus);
+        AnvilRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
         RecipeRegistration.register(modEventBus);
 

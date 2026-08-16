@@ -9,6 +9,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import ru.tfc_aeronautics.anvil.AnvilRegistration;
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.fluid.FluidItems;
@@ -39,6 +40,7 @@ public final class CreativeTabs
                 TightSheetRegistration.TIGHT_SHEETS.values().forEach(s -> output.accept(s.get()));
                 output.accept(HeaterRegistration.HEATER_ITEM.get());
                 output.accept(StampingPressRegistration.STAMPING_PRESS_ITEM.get());
+                AnvilRegistration.ANVIL_ITEMS.values().forEach(i -> output.accept(i.get()));
                 output.accept(ResinRegistration.RESIN_CLUMP.get());
                 output.accept(BurlapRegistration.IMPREGNATED_BURLAP_CLOTH.get());
                 output.accept(FluidItems.ROSIN_BUCKET.get());

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "tfc_aeronautics:block/metal/anvil/silver",
+      "y": 90
+    },
+    "facing=east": {
+      "model": "tfc_aeronautics:block/metal/anvil/silver",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "tfc_aeronautics:block/metal/anvil/silver",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "tfc_aeronautics:block/metal/anvil/silver"
+    }
+  }
+}

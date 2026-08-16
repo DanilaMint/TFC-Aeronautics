@@ -28,6 +28,7 @@
 18. [Скрытие TFC-кинематики](#18-скрытие-tfc-кинематики)
 19. [Простые замены рецептов (Recipe overrides)](#19-простые-замены-рецептов-recipe-overrides)
 20. [Замена slimeball на `tfc:glue`](#20-замена-slimeball-на-tfcglue)
+21. [Наковальни для остальных металлов (Tier-1 Anvils)](#21-наковальни-для-остальных-металлов-tier-1-anvils)
 
 ---
 
@@ -1889,4 +1890,71 @@ Create и Simulated исторически используют разные sli
 - [x] ПКМ по механическому поршню с клеем — должно превратить в sticky.
 - [x] Использовать клей на блоке merging glue — должно сработать.
 - [x] Собрать `plunger_launcher` через Create mechanical craft с клеем вместо slimeball — должно сработать.
+
+---
+
+## 21. Наковальни для остальных металлов (Tier-1 Anvils)
+
+TFC регистрирует наковальню только для металлов с `toolTier` (медь, бронзы, кованое железо, стали). Остальные 19 металлов — висмут, латунь, золото, никель, розовое золото, серебро, олово, цинк, стерлинговое серебро, чугун, кричное железо, слабые стали, высокоуглеродистые стали, неизвестный сплав — наковальни не имеют. Эта подсистема добавляет для каждого из них tier-1 наковальню: «даунгрейд»-вариант с полной функциональностью TFC-Forge, но с тиром ниже «настоящих» наковален из тех металлов, где они есть. Подробный дизайн: [`plans/anvil.md`](../plans/anvil.md).
+
+### Регистрация
+
+Точка входа: `ru.tfc_aeronautics.anvil.AnvilRegistration`. На статической инициализации перебирает `Metal.values()`, фильтрует металлы, у которых TFC уже регистрирует наковальню (`Metal.BlockType.ANVIL.has(metal)`), и для оставшихся 19 регистрирует блок + BlockItem.
+
+- Блок: TFC-овский `net.dries007.tfc.common.blocks.devices.AnvilBlock` напрямую (без подкласса). Тир жёстко зашит как `1` в конструкторе. Это работает, потому что мы цепляем блок к `TFCBlockEntities.ANVIL` — его `static interactWithAnvil` хелпер и `AnvilContainer` меню-фабрика ожидают именно этот BE-тип.
+- BlockEntity: TFC-овский `AnvilBlockEntity`, без подкласса. Его 2-arg конструктор хардкодит `TFCBlockEntities.ANVIL.get()` как `this.type`, поэтому `getType()` совпадает с тем, что меню-фабрика TFC передаёт в `level.getBlockEntity(pos, type)` — иначе открытие меню падает с `NoSuchElementException`.
+- Свойства блока: `ExtendedProperties.of().mapColor(metal.mapColor()).noOcclusion().sound(SoundType.ANVIL).strength(10F, 10F).requiresCorrectToolForDrops().blockEntity(TFCBlockEntities.ANVIL)` — тот же набор, что в TFC-фабрике `Metal.BlockType.ANVIL`.
+- Имя: `tfc_aeronautics:metal/anvil/<металл>` (например, `metal/anvil/bismuth`, `metal/anvil/high_carbon_red_steel`, `metal/anvil/unknown`). Совпадает с TFC-овским `tfc:metal/anvil/<металл>` по структуре — мы идём тем же путём, чтобы в логах и табе группа «metal/anvil» визуально стояла рядом.
+- Карта `Map<Metal, DeferredHolder<...>>` в публичных полях `ANVILS` / `ANVIL_ITEMS` — для итерирования в креатив-табе и будущих рецептах.
+
+`AnvilRegistration.register(modEventBus)` вызывается в `TFCAeronautics#TFCAeronautics` после `BurlapRegistration` и до `CreativeTabs`. Внутри регистрирует два `DeferredRegister`: `BLOCKS` и `ITEMS`. Также подписывается на `RegisterEvent` для реестра `BLOCK_ENTITY_TYPE` — когда TFC забиндит свой `TFCBlockEntities.ANVIL`, мы расширяем его `validBlocks` через рефлексию (см. ниже). Раньше расширение делалось жадно из supplier'а регистрации блока — это приводило к NPE при запуске, потому что `TFCBlockEntities.ANVIL` ещё не был забинден. Креатив-таб пополняется через `AnvilRegistration.ANVIL_ITEMS.values().forEach(i -> output.accept(i.get()))`.
+
+### Расширение `TFCBlockEntities.ANVIL.validBlocks`
+
+У TFC-овского `TFCBlockEntities.ANVIL.get().validBlocks` нет наших 19 блоков, и `BlockEntityType.create(pos, state)` валится с `IllegalStateException`, если в `validBlocks` нет блока, который пытаются поставить. Подменить BE-тип на свой — нельзя: TFC-овская меню-фабрика `AnvilContainer` хардкодит `TFCBlockEntities.ANVIL.get()` при поиске BE (см. `RegistrationHelpers.registerBlockEntityContainer`), поэтому иначе клиент не откроет меню.
+
+Решение — рефлексивно дополнить `validBlocks` нашими 19 блоками в `extendTfcAnvilTypeValidBlocks()`. Метод вызывается из `RegisterEvent` для `BLOCK_ENTITY_TYPE` (т.е. когда TFC уже забиндил свой `ANVIL`-тип, а наши блоки уже зарегистрированы в `BLOCKS`):
+
+- `BlockEntityType.validBlocks` — `private final Set<Block>`. В Minecraft 1.21.1 — `ObjectLinkedOpenHashSet` (мутабельный), `addAll(ours)` обычно работает. Если это всё же `ImmutableSet` (на каком-нибудь форке Mojang-а) — `UnsupportedOperationException` ловится, и поле подменяется новой мутабельной копией через рефлексию.
+- Метод `synchronized` + `extendedTfcAnvilType` флаг, чтобы не прогонять рефлексию 19 раз подряд при cold-start.
+
+Альтернатива через mixin рассматривалась, но отвергнута: `validBlocks = final`, mixin-ом не переопределить, а перезапись сеттера слишком хрупкая.
+
+### Получение
+
+Крафт из слитков (3×3 с пустым центром, 8 слитков на наковальню):
+
+- `data/tfc_aeronautics/recipe/crafting/metal/anvil/<металл>.json` (×19) — shaped `minecraft:crafting_shaped`, паттерн `###` / ` # ` / `###`, ключ `#` → `c:ingots/<металл>`, результат — блок наковальни, count 1.
+- Зеркалит форму рецепта TFC для собственных наковален (`data/tfc/recipe/crafting/metal/anvil/<металл>.json` — те же 3×3, та же полая середина), но использует одинарные слитки (`c:ingots/<металл>`) вместо двойных (`c:double_ingots/<металл>`). Суммарный расход металла тот же (8 слитков = 4 двойных слитка), но без обязательного промежуточного шага «слить двойной слиток».
+
+### Модель и текстура
+
+Полностью TFC-овские ассеты, ничего нового не рисуем:
+
+- `assets/tfc_aeronautics/blockstates/metal/anvil/<металл>.json` — 4 facing-варианта, повороты `y=90/180/270/0` (как у TFC-овской `metal/anvil/<металл>.json`).
+- `assets/tfc_aeronautics/models/block/metal/anvil/<металл>.json` — `parent: tfc:block/anvil`, `textures.all = tfc:block/metal/smooth/<металл>`, `textures.particle = tfc:block/metal/smooth/<металл>`.
+- `assets/tfc_aeronautics/models/item/metal/anvil/<металл>.json` — однострочный `parent: tfc_aeronautics:block/metal/anvil/<металл>` (текстура `#all` наследуется через блок-модель, как и в TFC).
+
+`UNKNOWN` — единственный специальный случай: `tfc:block/metal/smooth/unknown.png` существует (серый placeholder), так что рецепт и текстура работают штатно.
+
+### Конвенции
+
+- Имя блока: `metal/anvil/<металл>` (английское TFC-овское имя через `Metal.getSerializedName()`). Тот же путь, что у TFC-овских наковален (`tfc:metal/anvil/<металл>`), чтобы в логах/табе было визуальное соседство.
+- Lang-ключ: `block.tfc_aeronautics.metal.anvil.<металл>` (с точками — слеши в путях конвертируются в точки по TFC-овской конвенции).
+- Все 19 блоков — tier-1, без исключений. Tier передаётся вторым аргументом в конструктор `AnvilBlock`. Tier=0 не используется: TFC-овский `AnvilBlockEntityRenderer` имеет мёртвую ветку `tier == 0 ? 0.875f : 0.6875f` для Y-offset рендера предметов, из-за чего предметы «парят» над поверхностью. Rock anvil TFC использует другой `BlockEntity` и этот рендерер не вызывает, поэтому аналогия с rock anvil не работает.
+- Подклассы `TierZeroAnvilBlock` и `CustomAnvilBlockEntity` НЕ нужны: `TFCBlockEntities.ANVIL.get()` принимается меню-фабрикой TFC, а 19 наших блоков мы добавляем в её `validBlocks` через рефлексию. Альтернативный путь (свой BE-тип) ломает клиентское открытие меню — подробнее см. секцию «Расширение `TFCBlockEntities.ANVIL.validBlocks`» выше.
+- Рецепт `minecraft:crafting_shaped`, не `tfc:anvil`: tier-1 наковальня доступна с самого начала, не требуется наковальня-же для крафта наковальни.
+- Lang-ключи: `block.tfc_aeronautics.metal.anvil.<металл>` → «<Metal> Anvil» (`en_us.json`, например «Bismuth Anvil») / «<металл-по-русски> наковальня» или «Наковальня из <металл-по-русски>» (`ru_ru.json`, по TFC-овской конвенции: «Висмутовая наковальня», «Наковальня из слабой синей стали»).
+
+### Совместимость с TFC-овскими `tfc:anvil`-рецептами
+
+`AnvilRecipe.getAll(level, input, MAX_TIER)` фильтрует рецепты по `minTier <= tier`. У всех металлических `tfc:anvil`-рецептов `minTier = metal.tier() >= 1`. С tier=1 наши наковальни автоматически принимают любые `tfc:anvil`-рецепты с `minTier = 1` (например, для олова или розового золота, если такие рецепты есть). Это by design: downgrade-наковальня должна быть совместима с низкотировыми рецептами.
+
+### Чего НЕ делать
+
+- **Не добавлять варианты tier≥2** для этих металлов. Идея подсистемы — единый tier-1 даунгрейд. Если понадобится «настоящая» наковальня из этих металлов — пусть это делает TFC.
+- **Не использовать tier=0.** TFC-овский `AnvilBlockEntityRenderer` рисует предметы выше на `tier == 0` (мёртвая ветка `0.875f` vs `0.6875f`), и в vanilla TFC tier=0 для `AnvilBlockEntity` не используется — он зарезервирован для rock anvil, который использует другой BE.
+- **Не модифицировать TFC-овские наковальни.** 9 «настоящих» TFC-наковален (`copper, wrought_iron, bronze, bismuth_bronze, black_bronze, steel, black_steel, blue_steel, red_steel`) живут как жили, фильтрация через `Metal.BlockType.ANVIL.has(metal)` их не затрагивает.
+- **Не подменять BE-тип на свой.** TFC-овская `AnvilContainer` меню-фабрика хардкодит `TFCBlockEntities.ANVIL.get()` при поиске BE, поэтому свой BE-тип (`tfc_aeronautics:anvil`) приводит к крашу при открытии меню (`NoSuchElementException`). Используем TFC-овский BE-тип и расширяем его `validBlocks` через рефлексию — единственный способ сохранить совместимость с TFC-меню.
+- **Не подменять `c:ingots` на `c:double_ingots`.** Суммарный расход металла одинаковый, но требовать предварительного слияния в двойной слиток — лишний шаг, который усложняет early-game прогрессию (tier-1 наковальни по дизайну дешёвые).
 

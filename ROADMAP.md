@@ -3,13 +3,14 @@
 Статус механик мода. Каждая подсистема — отдельный файл в [`plans/`](plans/).
 Прогресс = выполнено / всего задач. ✓ — закрыто, ⏳ — в работе, ☐ — не начато.
 
-**Итого:** 233 / 326 (≈ 71 %).
+**Итого:** 252 / 345 (≈ 73 %).
 
 - [Metal Powders](plans/metal-powders.md) — 10/10 ✓
 - [Industrial Composite](plans/industrial-composite.md) — 13/13 ✓
 - [Resin](plans/resin.md) — 8/8 ✓
 - [Rosin](plans/rosin.md) — 6/6 ✓
 - [Tight Sheets](plans/tight-sheets.md) — 10/10 ✓
+- [Anvils (tier-1 downgrade для остальных металлов)](plans/anvil.md) — 19/19 ✓
 - [Saw Blade](plans/saw-blade.md) — 8/8 ✓
 - [Wrench Head](plans/wrench-head.md) — 7/8 ⏳ (texturing остаётся placeholder)
 - [Impregnated Burlap Cloth](plans/impregnated-burlap-cloth.md) — 6/6 ✓
