@@ -1820,9 +1820,11 @@ milling/pressing/квен-моста — см. `feedback_recipe_override_convent
 | `data/aeronautics/recipe/white_envelope.json` | shaped `["WS","SW"]` с `minecraft:white_wool + minecraft:stick` → 4 | shaped `["CCC","C C"," R "]`: 5× `#tfc:cloths` + `tfc:rope` (снизу-середка) → 8 `aeronautics:white_envelope`. Выход ×2: TFC-ткань реже ванильной шерсти. Требует shadow-тег `tfc:cloths` |
 | `data/aeronautics/recipe/{color}_envelope.json` (×15) | shaped `["WS","SW"]` с `minecraft:<color>_wool + minecraft:stick` → 4 | shapeless: `aeronautics:white_envelope` + `minecraft:<color>_dye` → 1 `aeronautics:<color>_envelope` (перекрашивание через ванильные красители) |
 | `data/aeronautics/recipe/deploying/deploying_envelope_{color}.json` (×16) | `create:deploying` с `minecraft:<color>_wool + minecraft:stick` → 3 | тень-отключение: оба ингредиента `minecraft:bedrock` (недобываем → рецепт фактически мёртв) |
+| `data/create/recipe/crafting/kinetics/encased_chain_drive.json` | Create shapeless `andesite_casing` + 3× `c:nuggets/iron` — bypasses TFC-металлургию (iron-нугеты не требуют цепи) | shapeless `create:andesite_casing + create:shaft + tag:c:chains` (`show_notification: false`). Тег `c:chains` задан самим TFC и содержит 9 металлических цепей (bismuth_bronze, black_bronze, bronze, copper, wrought_iron, steel, black_steel, blue_steel, red_steel); ванльная железная цепь в тег не входит. Параллельно цинковый вариант `create:crafting/kinetics/encased_chain_drive_from_zinc` удалён через `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java` (по образцу `fluid_pipe`/`fluid_pipe_vertical`), чтобы chain drive добывался только через TFC-цепи |
 
 Для sail/funnel/tunnel потребовался shadow-тег `tfc:cloths`
 (`data/tfc/tags/item/cloths.json`): burlap + wool + silk (других cloth items TFC не имеет).
+Для `encased_chain_drive` ничего не понадобилось: `c:chains` уже определён в датапаке TFC и закрывает все нужные металлы.
 
 Сюда же добавлять новые простые замены (зеркально — в `plans/recipe-overrides.md`).
 
@@ -1957,4 +1959,108 @@ TFC регистрирует наковальню только для метал
 - **Не модифицировать TFC-овские наковальни.** 9 «настоящих» TFC-наковален (`copper, wrought_iron, bronze, bismuth_bronze, black_bronze, steel, black_steel, blue_steel, red_steel`) живут как жили, фильтрация через `Metal.BlockType.ANVIL.has(metal)` их не затрагивает.
 - **Не подменять BE-тип на свой.** TFC-овская `AnvilContainer` меню-фабрика хардкодит `TFCBlockEntities.ANVIL.get()` при поиске BE, поэтому свой BE-тип (`tfc_aeronautics:anvil`) приводит к крашу при открытии меню (`NoSuchElementException`). Используем TFC-овский BE-тип и расширяем его `validBlocks` через рефлексию — единственный способ сохранить совместимость с TFC-меню.
 - **Не подменять `c:ingots` на `c:double_ingots`.** Суммарный расход металла одинаковый, но требовать предварительного слияния в двойной слиток — лишний шаг, который усложняет early-game прогрессию (tier-1 наковальни по дизайну дешёвые).
+
+---
+
+## 22. Цепи TFC в `chain_conveyor`
+
+`create:chain_conveyor` принимает только `minecraft:chain` для подключения соседних конвейеров. TFC поставляет 9 металлических цепей (`bismuth_bronze, black_bronze, bronze, copper, wrought_iron, steel, black_steel, blue_steel, red_steel`), все они объединены в теге `c:chains` — но Java-код Create хардкодит `Items.CHAIN` в 5 местах и не консультируется с тегом. Игрок не может построить `chain_conveyor` из стальной цепи.
+
+Эта механика делает любую цепь из `c:chains` (плюс vanilla `minecraft:chain`) пригодной для подключения. Тип цепи запоминается per-connection в NBT, и при разрушении/отключении игрок получает обратно ту же цепь, которую потратил. Рендер использует текстуру TFC-цепи, которой реально подключён каждый сегмент.
+
+Подробный дизайн: [`docs/superpowers/specs/2026-08-16-chain-conveyor-tfc-chains-design.md`](../docs/superpowers/specs/2026-08-16-chain-conveyor-tfc-chains-design.md). Реализация — план [`plans/chain_conveyor.md`](../plans/chain_conveyor.md).
+
+### Подход
+
+Create хардкодит `Items.CHAIN` в 5 Java-путях (`ChainConveyorConnectionHandler.isChain`, `ChainConveyorBlock.useItemOn`, `ChainConveyorBlock.onSneakWrenched`, `ChainConveyorBlockEntity.chainDestroyed` × 2, `ChainConveyorRenderer.renderChain`). Ни один из них не сверяется с тегом — tag-shadow бесполезен, поэтому всё делается через runtime-миксины.
+
+Центральная идея — **per-connection `Map<BlockPos, ResourceLocation> aeronautics$chainTypes`** в миксине `ChainConveyorBlockEntity`. Ключ — тот же относительный `BlockPos`, что и в `ChainConveyorBlockEntity.connections`. Эта карта — источник истины для рендера (текстура per-segment) и для дропа/возврата при разрушении/отключении.
+
+### Пять точек вмешательства
+
+| Слой | Что делает | Mixin-класс |
+|---|---|---|
+| Item check | `isChain` → тег `c:chains` | `ChainConveyorCompatHandlerMixin` |
+| Item check | `useItemOn` → тег `c:chains` | `ChainConveyorCompatBlockMixin` |
+| Item drop | break/destroy → возвращает тип из NBT, а не `Items.CHAIN` | `ChainConveyorCompatBlockEntityMixin` (`@Inject chainDestroyed`, `cancellable`) |
+| Item refund | sneak+wrench disconnect → возвращает тип из NBT | `ChainConveyorCompatBlockMixin` (`@Overwrite onSneakWrenched`) + `ChainConveyorCompatConnectionPacketMixin` (`@Overwrite applySettings`) |
+| BE storage | NBT read/write для `aeronautics$chainTypes`, очистка в `removeConnectionTo` | `ChainConveyorCompatBlockEntityMixin` |
+| Server sync | запись `chain.getItem().builtInRegistryHolder().key().location()` в обе BE при `addConnectionTo` | `ChainConveyorCompatConnectionPacketMixin` |
+| Renderer | `CHAIN_LOCATION` → per-segment texture из `aeronautics$chainTypes` | `ChainConveyorCompatRendererMixin` (client) |
+
+### Где хранится тип цепи
+
+`ChainConveyorBlockEntity` уже ключует connection-bookkeeping относительным `BlockPos` (поля `connections`, `connectionStats`). Миксин добавляет параллельную `@Unique Map<BlockPos, ResourceLocation> aeronautics$chainTypes`, ключи — те же относительные смещения. Карта сериализуется под ключом `"aeronautics_chain_types"` в `write`/`read` (TAIL-инжекты), поэтому после chunk-reload, world save/load, server restart рендер и дроп-логика видят корректный тип.
+
+### Какая текстура для рендера
+
+`ChainConveyorRenderer.renderChain` — `static`, не знает, какой именно connection рисует, и всегда берёт `RenderTypes.chain(CHAIN_LOCATION)` (vanilla). Per-segment текстура требует переменной цикла `blockPos`, которую статический helper не видит. Поэтому `renderChains` (цикл) `@Overwrite`'ится целиком — копия тела, в которой текстура каждого сегмента резолвится из `aeronautics$chainTypes` и передаётся в текстуро-aware helper. `renderChain` оставлен живым (overwrite, делегирующий на текстуро-aware helper с vanilla-текстурой) — для совместимости с любыми внешними вызовами.
+
+`renderPart` / `renderQuad` / `addVertex` приватные на рендере; они дублируются внутри mixin, а не шэдоуятся — call site уже перенаправлен в текстуро-aware helper, и шэдоуинжекция только усложнила бы. Цепочка vertex использует Mojang'овский `VertexConsumer.addVertex / setColor / setUv / setLight / setNormal` (Parchment-названия).
+
+Соответствие item ID → текстура:
+
+| Цепь | Текстура |
+|---|---|
+| `minecraft:chain` | `minecraft:block/chain` |
+| `tfc:metal/chain/wrought_iron` | `tfc:block/metal/chain/wrought_iron` |
+| … для остальных 8 металлов | `tfc:block/metal/chain/<metal>` |
+| Любая другая цепь из `c:chains` (другого мода) | fallback на vanilla |
+
+Хелпер: `chainTextureFor(chainItem)` берёт последний сегмент пути (`tfc:metal/chain/wrought_iron` → `wrought_iron`) и подставляет его в `tfc:block/metal/chain/<last>`.
+
+### Когда обновляется chain type
+
+`ChainConveyorConnectionPacket.applySettings` вызывается на сервере при connect/disconnect. У него уже есть `chain` ItemStack как поле. В `@Overwrite`:
+- На `connect=true`, после успешного `addConnectionTo` на обеих сторонах — пишем `chain.getItem().builtInRegistryHolder().key().location()` в `aeronautics$chainTypes` на обеих BE (используя их относительные смещения — `localTargetForSource = targetPos - be.pos`, `localSourceForTarget = be.pos - targetPos`).
+- На `connect=false` — refund через `getChainsFromInventory` подменяется на lookup типа из BE и `placeItemBackInInventory` правильного предмета.
+
+`getChainsFromInventory` уже матчит по `chain.getItem()` — никаких изменений. Игрок потратит именно ту цепь, которой подключал.
+
+### Когда удаляется chain type
+
+Две ситуации, обе покрыты:
+
+1. **Sneak+wrench disconnect** (`ChainConveyorBlock.onSneakWrenched`): `@Overwrite` подменяет refund-цикл. Возврат default-поведения через `IWrenchable.super.onSneakWrenched(state, context)` — это работает, потому что mixin декларирует `implements IWrenchable` (все методы IWrenchable — `default`, абстрактных нет). BE-lookup инлайнится (`getBlockEntity(...) instanceof ChainConveyorBlockEntity ccbe`) вместо `IBE.withBlockEntityDo` — у `IBE<T>` два абстрактных метода (`getBlockEntityClass`, `getBlockEntityType`), которые мы не хотим шэдоуить.
+2. **Полное разрушение `chain_conveyor`** (`ChainConveyorBlockEntity.destroy` → `chainDestroyed` для каждого подключения): `@Inject method="chainDestroyed" at=HEAD cancellable=true` подменяет обе `Items.CHAIN` ссылки (scatter через `forPointsAlongChains` + fallback через `Block.popResource`) на drop типа из `aeronautics$chainTypes`. Эффект-сигнал отправляется через `@Shadow`-поле `chainDestroyedEffectToSend` (package-private на target — доступ через cast к mixin-типу).
+
+### Что НЕ делается
+
+- **Рецепт** — `chain_conveyor` крафтится из `large_cogwheel + andesite_casing`, цепь в рецепте не используется. Прецедент `data/create/recipe/crafting/kinetics/encased_chain_drive.json` уже использует `c:chains` для смежного блока — см. раздел 19.
+- **Новый тег** — `c:chains` уже публикуется TFC и содержит все 9 цепей. Свой `tfc_aeronautics:chains` дублировал бы 9 записей и требовал ручного апдейта при добавлении нового металла в TFC.
+- **Конфиг** — поведение включено по умолчанию. Toggle не нужен.
+- **`chainCost`** — distance-based стоимость (`max(round(d / 2.5), 1)`) не меняется. Тип металла в cost не учитывается.
+- **Ponder-сцены** — стандартные сцены Create работают как есть; тип цепи — чисто визуальная и балансовая деталь.
+
+### Файлы
+
+| Путь | Действие | Назначение |
+|------|----------|------------|
+| `src/main/java/ru/tfc_aeronautics/chain/ChainConveyorCompat.java` | создать | `CHAINS_TAG`, `VANILLA_CHAIN_TEXTURE`, `isAeronauticsChain`, `chainTextureFor`, `resolveChainItem` (fallback на vanilla) |
+| `src/main/java/ru/tfc_aeronautics/mixin/chain/ChainConveyorCompatHandlerMixin.java` | создать | `@Overwrite ChainConveyorConnectionHandler.isChain` |
+| `src/main/java/ru/tfc_aeronautics/mixin/chain/ChainConveyorCompatBlockMixin.java` | создать | `@Redirect` в `useItemOn`; `@Overwrite onSneakWrenched` (BE-lookup инлайном, `IWrenchable.super` через `implements IWrenchable`) |
+| `src/main/java/ru/tfc_aeronautics/mixin/chain/ChainConveyorCompatBlockEntityMixin.java` | создать | NBT `aeronautics_chain_types` (`@Inject` TAIL в `write`/`read`); очистка в `removeConnectionTo`; `@Inject HEAD cancellable` в `chainDestroyed` |
+| `src/main/java/ru/tfc_aeronautics/mixin/chain/ChainConveyorCompatConnectionPacketMixin.java` | создать | `@Overwrite applySettings` для connect (запись типа на обе BE) и disconnect (refund по типу) |
+| `src/client/java/ru/aeronautics/client/mixin/chain/ChainConveyorCompatRendererMixin.java` | создать | `@Overwrite renderChains` + `renderChain` с per-segment текстурой |
+| `src/main/resources/tfc_aeronautics.mixins.json` | edit | Зарегистрировать 4 server-side mixin-класса под `package: "ru.tfc_aeronautics.mixin"` (резёрвит только поддерево mixin, не `TFCAeronautics`) |
+| `src/main/resources/tfc_aeronautics.client.mixins.json` | edit | Зарегистрировать renderer mixin под `package: "ru.aeronautics.client.mixin"` |
+
+### Совместимость
+
+- **TFC не загружен** — `c:chains` содержит только `minecraft:chain` (TFC — единственный источник тега). Поведение совпадает с vanilla.
+- **Create не загружен** — ни один миксин не активируется, мод бездействует.
+- **Цепь удалена из реестра другим модом** — `resolveChainItem` падает на `Items.CHAIN`, текстура — vanilla, NPE нет.
+- **Legacy-чанк без `aeronautics_chain_types` NBT** — карта пустая; рендер/дроп идут через fallback на vanilla chain.
+
+### Smoke-проверка в игре
+
+- [ ] Подключить два `chain_conveyor` ванильной цепью — связь работает.
+- [ ] Подключить `tfc:metal/chain/wrought_iron` — работает.
+- [ ] Подключить `tfc:metal/chain/steel` — работает (любой из 9 TFC-металлов).
+- [ ] Sneak+wrench disconnect — возврат той же цепи, которой подключал.
+- [ ] Уничтожить `chain_conveyor` — drop той же цепи по каждому подключению.
+- [ ] Multi-segment BE: одно подключение бронзой, другое сталью — разные текстуры на сегментах, drop правильного типа.
+- [ ] Перезайти в мир / перезагрузить чанк — типы цепей сохраняются, рендер совпадает.
+- [ ] Save → load — типы цепей сохраняются через серверный restart.
+
 
