@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "tfc_aeronautics:block/chain_conveyor/block" }
+  }
+}

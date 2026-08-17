@@ -44,7 +44,8 @@ public final class RecipeRemoval
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe_vertical"),
-        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/encased_chain_drive_from_zinc")
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/encased_chain_drive_from_zinc"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/chain_conveyor")
     );
 
     private RecipeRemoval() {}

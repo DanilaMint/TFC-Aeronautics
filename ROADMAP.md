@@ -26,3 +26,4 @@
 - [Worldgen](plans/worldgen.md) — 46/46 ✓
 - [Ponder](plans/ponder.md) — 7/9 ⏳
 - [Localization](plans/localization.md) — 28/37 ⏳
+- [Chain Conveyor (TFC-aware)](plans/chain-conveyor.md) — ✓

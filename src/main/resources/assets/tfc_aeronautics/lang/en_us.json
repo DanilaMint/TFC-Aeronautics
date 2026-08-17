@@ -54,5 +54,6 @@
   "block.tfc_aeronautics.metal.anvil.zinc": "Zinc Anvil",
   "block.tfc_aeronautics.heater": "Heater",
   "tfc_aeronautics.heater.max_temperature": "Max Temperature",
-  "block.tfc_aeronautics.stamping_press": "Stamping Press"
+  "block.tfc_aeronautics.stamping_press": "Stamping Press",
+  "block.tfc_aeronautics.chain_conveyor": "Chain Conveyor"
 }

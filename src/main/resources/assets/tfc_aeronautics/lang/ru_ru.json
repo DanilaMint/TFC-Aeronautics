@@ -38,5 +38,6 @@
   "block.tfc_aeronautics.heater": "Нагреватель",
   "tfc_aeronautics.heater.max_temperature": "Максимальная температура",
   "block.tfc_aeronautics.stamping_press": "Штамп-пресс",
-  "tfc.recipe.barrel.tfc_aeronautics.barrel.impregnated_burlap_cloth": "Пропитанная джутовая ткань"
+  "tfc.recipe.barrel.tfc_aeronautics.barrel.impregnated_burlap_cloth": "Пропитанная джутовая ткань",
+  "block.tfc_aeronautics.chain_conveyor": "Цепной конвейер"
 }

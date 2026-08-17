@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import ru.tfc_aeronautics.anvil.AnvilRegistration;
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
+import ru.tfc_aeronautics.chain.ChainConveyorRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.fluid.FluidBlocks;
 import ru.tfc_aeronautics.fluid.FluidItems;
@@ -55,6 +56,7 @@ public class TFCAeronautics {
         ResinRegistration.register(modEventBus);
         BurlapRegistration.register(modEventBus);
         AnvilRegistration.register(modEventBus);
+        ChainConveyorRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
         RecipeRegistration.register(modEventBus);
 

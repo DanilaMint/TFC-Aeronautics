@@ -1962,104 +1962,320 @@ TFC регистрирует наковальню только для метал
 
 ---
 
-## 22. Цепи TFC в `chain_conveyor`
+## 22. Цепи TFC в `chain_conveyor` (TFC-aware Chain Conveyor)
 
-`create:chain_conveyor` принимает только `minecraft:chain` для подключения соседних конвейеров. TFC поставляет 9 металлических цепей (`bismuth_bronze, black_bronze, bronze, copper, wrought_iron, steel, black_steel, blue_steel, red_steel`), все они объединены в теге `c:chains` — но Java-код Create хардкодит `Items.CHAIN` в 5 местах и не консультируется с тегом. Игрок не может построить `chain_conveyor` из стальной цепи.
+`create:chain_conveyor` жёстко зашит на `Items.CHAIN` в пяти местах Java-кода (`ChainConveyorConnectionHandler.isChain`, `ChainConveyorBlock.useItemOn`, `ChainConveyorBlock.onSneakWrenched`, `ChainConveyorBlockEntity.chainDestroyed` × 2, `ChainConveyorRenderer.renderChain`). Ни одно из них не сверяется с тегом — datapack-тени бесполезны. TFC поставляет 9 металлических цепей (`bismuth_bronze, black_bronze, bronze, copper, wrought_iron, steel, black_steel, blue_steel, red_steel`), все объединены в `c:chains`. Игрок не может построить `chain_conveyor` из стальной цепи.
 
-Эта механика делает любую цепь из `c:chains` (плюс vanilla `minecraft:chain`) пригодной для подключения. Тип цепи запоминается per-connection в NBT, и при разрушении/отключении игрок получает обратно ту же цепь, которую потратил. Рендер использует текстуру TFC-цепи, которой реально подключён каждый сегмент.
+Решение — **полный source-copy** исходников Create в наш пакет `ru.tfc_aeronautics.chain` под id `tfc_aeronautics:chain_conveyor`. Никаких mixin-ов: 16 verbatim-копий + 2 frogport-файла + 3 инфраструктурных файла регистрации. Старый `create:chain_conveyor` остаётся в мире (забанен по рецепту и убран из creative-таба `create:base`); миграция не делается.
 
-Подробный дизайн: [`docs/superpowers/specs/2026-08-16-chain-conveyor-tfc-chains-design.md`](../docs/superpowers/specs/2026-08-16-chain-conveyor-tfc-chains-design.md). Реализация — план [`plans/chain_conveyor.md`](../plans/chain_conveyor.md).
+> **Disclaimer по устаревшей спеке:** документ
+> `docs/superpowers/specs/2026-08-16-chain-conveyor-tfc-chains-design.md`
+> описывает провалившийся mixin-подход (см.
+> `InvalidMixinException ... contains non-private static method
+> aeronautics$renderChainWithTexture`). **Не использовать как референс.**
+> Актуальный план реализации — [`plans/chain-conveyor.md`](plans/chain-conveyor.md).
 
-### Подход
+### Решение: source-copy
 
-Create хардкодит `Items.CHAIN` в 5 Java-путях (`ChainConveyorConnectionHandler.isChain`, `ChainConveyorBlock.useItemOn`, `ChainConveyorBlock.onSneakWrenched`, `ChainConveyorBlockEntity.chainDestroyed` × 2, `ChainConveyorRenderer.renderChain`). Ни один из них не сверяется с тегом — tag-shadow бесполезен, поэтому всё делается через runtime-миксины.
+Полностью скопированы 16 Java-классов из
+`code_references/Create/src/main/java/com/simibubi/create/content/kinetics/chainConveyor/`
+в наш пакет `ru.tfc_aeronautics.chain` (общие) и `ru.aeronautics.client.chain`
+(клиентские). Имена короткие (без префикса `ChainConveyor`):
+`Block`, `BlockEntity`, `ConnectionHandler`, `ConnectionPacket`,
+`InteractionHandler`, `Package`, `Shape`, `RoutingTable`,
+`ChainPackageInteractionPacket`, `ServerboundRidingPacket`,
+`ClientboundRidingPacket` — плюс клиентские `Renderer`, `Visual`,
+`RidingHandler`, `PackageInteractionHandler`. Префикс остаётся только там,
+где он исторически устоялся и его трогать вредно (`ChainPackageInteractionPacket`,
+`ClientboundRidingPacket`).
 
-Центральная идея — **per-connection `Map<BlockPos, ResourceLocation> aeronautics$chainTypes`** в миксине `ChainConveyorBlockEntity`. Ключ — тот же относительный `BlockPos`, что и в `ChainConveyorBlockEntity.connections`. Эта карта — источник истины для рендера (текстура per-segment) и для дропа/возврата при разрушении/отключении.
+Классы Create (`com.simibubi.create.content.kinetics.chainConveyor.*`)
+импортировать нельзя — нигде в наших файлах. Базовые публичные классы Create
+(`KineticBlock`, `KineticBlockEntity`, `AllTags`, `AllPartialModels`,
+`FrogportBlockEntity`, `PackagePortTarget`, `CreateRegistries`) импортируются
+свободно. Сеттеры `Items.CHAIN` / `Blocks.CHAIN` заменены на per-connection
+lookup (см. ниже).
 
-### Пять точек вмешательства
+### Per-connection тип цепи
 
-| Слой | Что делает | Mixin-класс |
-|---|---|---|
-| Item check | `isChain` → тег `c:chains` | `ChainConveyorCompatHandlerMixin` |
-| Item check | `useItemOn` → тег `c:chains` | `ChainConveyorCompatBlockMixin` |
-| Item drop | break/destroy → возвращает тип из NBT, а не `Items.CHAIN` | `ChainConveyorCompatBlockEntityMixin` (`@Inject chainDestroyed`, `cancellable`) |
-| Item refund | sneak+wrench disconnect → возвращает тип из NBT | `ChainConveyorCompatBlockMixin` (`@Overwrite onSneakWrenched`) + `ChainConveyorCompatConnectionPacketMixin` (`@Overwrite applySettings`) |
-| BE storage | NBT read/write для `aeronautics$chainTypes`, очистка в `removeConnectionTo` | `ChainConveyorCompatBlockEntityMixin` |
-| Server sync | запись `chain.getItem().builtInRegistryHolder().key().location()` в обе BE при `addConnectionTo` | `ChainConveyorCompatConnectionPacketMixin` |
-| Renderer | `CHAIN_LOCATION` → per-segment texture из `aeronautics$chainTypes` | `ChainConveyorCompatRendererMixin` (client) |
+Публичное поле в `ChainConveyorBlockEntity` (рядом с `connections: Set<BlockPos>`):
 
-### Где хранится тип цепи
+```java
+public Map<BlockPos, ResourceLocation> connectionChains = new HashMap<>();
+```
 
-`ChainConveyorBlockEntity` уже ключует connection-bookkeeping относительным `BlockPos` (поля `connections`, `connectionStats`). Миксин добавляет параллельную `@Unique Map<BlockPos, ResourceLocation> aeronautics$chainTypes`, ключи — те же относительные смещения. Карта сериализуется под ключом `"aeronautics_chain_types"` в `write`/`read` (TAIL-инжекты), поэтому после chunk-reload, world save/load, server restart рендер и дроп-логика видят корректный тип.
+Ключ — относительный `BlockPos` (как у `connections`); значение — `ResourceLocation`
+предмета-цепи. Карта сериализуется под NBT-ключом `ConnectionChains` в
+`write(...)` и `writeSafe(...)` (две точки — синк клиент/сервер). `read(...)`
+десериализует обратно. **Lazy-fallback** на `Items.CHAIN.getKey()` для соединений
+из `connections`, отсутствующих в `connectionChains` (старые чанки без нового
+NBT-ключа).
 
-### Какая текстура для рендера
+#### Жизненный цикл `connectionChains`
 
-`ChainConveyorRenderer.renderChain` — `static`, не знает, какой именно connection рисует, и всегда берёт `RenderTypes.chain(CHAIN_LOCATION)` (vanilla). Per-segment текстура требует переменной цикла `blockPos`, которую статический helper не видит. Поэтому `renderChains` (цикл) `@Overwrite`'ится целиком — копия тела, в которой текстура каждого сегмента резолвится из `aeronautics$chainTypes` и передаётся в текстуро-aware helper. `renderChain` оставлен живым (overwrite, делегирующий на текстуро-aware helper с vanilla-текстурой) — для совместимости с любыми внешними вызовами.
+| Действие | Что делается |
+|---|---|
+| `addConnectionTo(BlockPos target, ResourceLocation chainItemId)` | Новая двухпараметровая сигнатура: `connectionChains.put(localTarget, chainItemId)` сразу после `connections.add(...)`. |
+| `removeConnectionTo(BlockPos target)` | `connectionChains.remove(localTarget)` параллельно `connectionStats.remove(localTarget)`. |
+| `chainDestroyed(BlockPos, boolean, boolean)` | Оба места `new ItemStack(Items.CHAIN, ...)` и `new ItemStack(Blocks.CHAIN.asItem(), ...)` → `new ItemStack(getChainItemForConnection(target), ...)`. |
+| `transform(BlockEntity, StructureTransform)` (контрапции) | Перенести записи map по новым относительным смещениям вместе с `connections`. |
 
-`renderPart` / `renderQuad` / `addVertex` приватные на рендере; они дублируются внутри mixin, а не шэдоуятся — call site уже перенаправлен в текстуро-aware helper, и шэдоуинжекция только усложнила бы. Цепочка vertex использует Mojang'овский `VertexConsumer.addVertex / setColor / setUv / setLight / setNormal` (Parchment-названия).
+### Хелперы на BE
 
-Соответствие item ID → текстура:
+```java
+public Item getChainItemForConnection(BlockPos localTarget) {
+    ResourceLocation rl = connectionChains.getOrDefault(localTarget,
+                                                        Items.CHAIN.getKey());
+    return BuiltInRegistries.ITEM.get(rl);
+}
+
+public ResourceLocation getChainTextureForConnection(BlockPos localTarget) {
+    ResourceLocation rl = connectionChains.getOrDefault(localTarget,
+                                                        Items.CHAIN.getKey());
+    if (rl.getNamespace().equals("minecraft")) {
+        return ResourceLocation.withDefaultNamespace("block/chain");
+    }
+    // TFC: tfc:metal/chain/<metal> → tfc:item/metal/chain/<metal>
+    String last = rl.getPath().substring(rl.getPath().lastIndexOf('/') + 1);
+    return ResourceLocation.fromNamespaceAndPath(rl.getNamespace(),
+                                                 "item/metal/chain/" + last);
+}
+```
+
+Маппинг item → текстура:
 
 | Цепь | Текстура |
 |---|---|
 | `minecraft:chain` | `minecraft:block/chain` |
-| `tfc:metal/chain/wrought_iron` | `tfc:block/metal/chain/wrought_iron` |
-| … для остальных 8 металлов | `tfc:block/metal/chain/<metal>` |
-| Любая другая цепь из `c:chains` (другого мода) | fallback на vanilla |
+| `tfc:metal/chain/wrought_iron` | `tfc:item/metal/chain/wrought_iron` (атлас предмета!) |
+| остальные 8 TFC-металлов | `tfc:item/metal/chain/<metal>` |
+| Любая другая цепь из `c:chains` | fallback на vanilla |
 
-Хелпер: `chainTextureFor(chainItem)` берёт последний сегмент пути (`tfc:metal/chain/wrought_iron` → `wrought_iron`) и подставляет его в `tfc:block/metal/chain/<last>`.
+> В TFC атлас предмета (`item/metal/chain/...`) отличается от атласа блока
+> (`block/metal/chain/...`) — это разные `.png`. Используем именно item-атлас,
+> как в tooltip и в руке.
 
-### Когда обновляется chain type
+### API
 
-`ChainConveyorConnectionPacket.applySettings` вызывается на сервере при connect/disconnect. У него уже есть `chain` ItemStack как поле. В `@Overwrite`:
-- На `connect=true`, после успешного `addConnectionTo` на обеих сторонах — пишем `chain.getItem().builtInRegistryHolder().key().location()` в `aeronautics$chainTypes` на обеих BE (используя их относительные смещения — `localTargetForSource = targetPos - be.pos`, `localSourceForTarget = be.pos - targetPos`).
-- На `connect=false` — refund через `getChainsFromInventory` подменяется на lookup типа из BE и `placeItemBackInInventory` правильного предмета.
+```java
+// Новая сигнатура — id цепи передаётся в BE:
+void addConnectionTo(BlockPos target, ResourceLocation chainItemId);
 
-`getChainsFromInventory` уже матчит по `chain.getItem()` — никаких изменений. Игрок потратит именно ту цепь, которой подключал.
+// Чтение для рендера / дропа:
+Item getChainItemForConnection(BlockPos localTarget);
+ResourceLocation getChainTextureForConnection(BlockPos localTarget);
+```
 
-### Когда удаляется chain type
+Снаружи `addConnectionTo` зовётся из `ChainConveyorConnectionPacket.applySettings`
+на `connect=true`: после успешного `addConnectionTo` на обеих сторонах пишем
+`chain.getItem().builtInRegistryHolder().key().location()` в `connectionChains`
+на обеих BE (с относительными смещениями — `localTargetForSource = targetPos - be.pos`,
+`localSourceForTarget = be.pos - targetPos`). На `connect=false` refund через
+`getChainsFromInventory` подменяется на lookup типа из BE и
+`placeItemBackInInventory` правильного предмета — игрок получает обратно ровно
+ту же цепь, которую потратил.
 
-Две ситуации, обе покрыты:
+### Frogport-интеграция
 
-1. **Sneak+wrench disconnect** (`ChainConveyorBlock.onSneakWrenched`): `@Overwrite` подменяет refund-цикл. Возврат default-поведения через `IWrenchable.super.onSneakWrenched(state, context)` — это работает, потому что mixin декларирует `implements IWrenchable` (все методы IWrenchable — `default`, абстрактных нет). BE-lookup инлайнится (`getBlockEntity(...) instanceof ChainConveyorBlockEntity ccbe`) вместо `IBE.withBlockEntityDo` — у `IBE<T>` два абстрактных метода (`getBlockEntityClass`, `getBlockEntityType`), которые мы не хотим шэдоуить.
-2. **Полное разрушение `chain_conveyor`** (`ChainConveyorBlockEntity.destroy` → `chainDestroyed` для каждого подключения): `@Inject method="chainDestroyed" at=HEAD cancellable=true` подменяет обе `Items.CHAIN` ссылки (scatter через `forPointsAlongChains` + fallback через `Block.popResource`) на drop типа из `aeronautics$chainTypes`. Эффект-сигнал отправляется через `@Shadow`-поле `chainDestroyedEffectToSend` (package-private на target — доступ через cast к mixin-типу).
+`PackagePortTarget` в Create фильтрует по типу `BlockEntity` — поэтому
+`create:chain_conveyor` и наш — две независимые сети. Чтобы фрогпорт мог
+стрелять пакетами **в обе** сети, регистрируем собственный target:
 
-### Что НЕ делается
+- `chain/ChainConveyorFrogportTarget.java` — подкласс
+  `com.simibubi.create.content.logistics.packagePort.PackagePortTarget`.
+  Логика тела скопирована из `PackagePortTarget.ChainConveyorFrogportTarget`
+  (`code_references/Create/.../packagePort/PackagePortTarget.java:69-203`):
+  CODEC, STREAM_CODEC, поля `chainPos`/`connection`/`flipped`,
+  методы `setup`/`getIcon`/`export`/`register`/`deregister`/
+  `getExactTargetLocation`/`canSupport`/`getType` + вложенный `Type`.
+  Замены: импорты `ChainConveyorBlockEntity`/`ChainConveyorPackage` → наши;
+  `getIcon()` возвращает `new ItemStack(ChainConveyorRegistration.CHAIN_CONVEYOR.get())`.
+- `chain/ChainConveyorPackagePortTargets.java` — аналог Create'
+  `AllPackagePortTargetTypes`. Использует
+  `DeferredRegister.create(CreateRegistries.PACKAGE_PORT_TARGET_TYPE,
+  "tfc_aeronautics")` (публичный API Create, см.
+  `code_references/Create/.../api/registry/CreateRegistries.java:36`),
+  регистрирует entry `tfc_aeronautics:chain_conveyor` под
+  `ChainConveyorFrogportTarget.Type::new`. Вызов
+  `register(IEventBus)` из `ChainConveyorRegistration.register()`.
 
-- **Рецепт** — `chain_conveyor` крафтится из `large_cogwheel + andesite_casing`, цепь в рецепте не используется. Прецедент `data/create/recipe/crafting/kinetics/encased_chain_drive.json` уже использует `c:chains` для смежного блока — см. раздел 19.
-- **Новый тег** — `c:chains` уже публикуется TFC и содержит все 9 цепей. Свой `tfc_aeronautics:chains` дублировал бы 9 записей и требовал ручного апдейта при добавлении нового металла в TFC.
-- **Конфиг** — поведение включено по умолчанию. Toggle не нужен.
-- **`chainCost`** — distance-based стоимость (`max(round(d / 2.5), 1)`) не меняется. Тип металла в cost не учитывается.
-- **Ponder-сцены** — стандартные сцены Create работают как есть; тип цепи — чисто визуальная и балансовая деталь.
+`ChainConveyorBlockEntity.tick()` уже обходит `connections` и стреляет в
+`FrogportBlockEntity` (`ppbe.startAnimation(box.item, false)`) — это логика
+скопирована verbatim, и наша BE импортирует
+`com.simibubi.create.content.logistics.packagePort.frogport.FrogportBlockEntity`,
+поэтому работает без правок.
 
-### Файлы
+### Скрытие оригинала
 
-| Путь | Действие | Назначение |
-|------|----------|------------|
-| `src/main/java/ru/tfc_aeronautics/chain/ChainConveyorCompat.java` | создать | `CHAINS_TAG`, `VANILLA_CHAIN_TEXTURE`, `isAeronauticsChain`, `chainTextureFor`, `resolveChainItem` (fallback на vanilla) |
-| `src/main/java/ru/tfc_aeronautics/mixin/chain/ChainConveyorCompatHandlerMixin.java` | создать | `@Overwrite ChainConveyorConnectionHandler.isChain` |
-| `src/main/java/ru/tfc_aeronautics/mixin/chain/ChainConveyorCompatBlockMixin.java` | создать | `@Redirect` в `useItemOn`; `@Overwrite onSneakWrenched` (BE-lookup инлайном, `IWrenchable.super` через `implements IWrenchable`) |
-| `src/main/java/ru/tfc_aeronautics/mixin/chain/ChainConveyorCompatBlockEntityMixin.java` | создать | NBT `aeronautics_chain_types` (`@Inject` TAIL в `write`/`read`); очистка в `removeConnectionTo`; `@Inject HEAD cancellable` в `chainDestroyed` |
-| `src/main/java/ru/tfc_aeronautics/mixin/chain/ChainConveyorCompatConnectionPacketMixin.java` | создать | `@Overwrite applySettings` для connect (запись типа на обе BE) и disconnect (refund по типу) |
-| `src/client/java/ru/aeronautics/client/mixin/chain/ChainConveyorCompatRendererMixin.java` | создать | `@Overwrite renderChains` + `renderChain` с per-segment текстурой |
-| `src/main/resources/tfc_aeronautics.mixins.json` | edit | Зарегистрировать 4 server-side mixin-класса под `package: "ru.tfc_aeronautics.mixin"` (резёрвит только поддерево mixin, не `TFCAeronautics`) |
-| `src/main/resources/tfc_aeronautics.client.mixins.json` | edit | Зарегистрировать renderer mixin под `package: "ru.aeronautics.client.mixin"` |
+- **Recipe:** `create:crafting/kinetics/chain_conveyor` → `BANNED_RECIPES` в
+  `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`.
+- **Creative tab:** `src/client/java/ru/aeronautics/client/ChainConveyorCreativeTabFilter.java`
+  подписан на `BuildCreativeModeTabContentsEvent` и удаляет
+  `create:chain_conveyor` из `create:base`. ResourceKey —
+  `ResourceKey.create(Registries.CREATIVE_MODE_TAB,
+  ResourceLocation.fromNamespaceAndPath("create", "base"))`.
 
-### Совместимость
+### Рецепт
+
+Новый файл `src/main/resources/data/tfc_aeronautics/recipe/crafting/kinetics/chain_conveyor.json`
+— shaped crafting по образцу Create, выход ×2:
+
+```json
+{ "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": { "A": { "item": "create:large_cogwheel" },
+            "C": { "item": "create:andesite_casing" } },
+  "pattern": [ " C ", "CAC", " C " ],
+  "result": { "count": 2, "id": "tfc_aeronautics:chain_conveyor" } }
+```
+
+Под нашим неймспейсом (`tfc_aeronautics/recipe/...`), **не** под `create/...` —
+recipe-id должен отличаться от забаненного `create:crafting/kinetics/chain_conveyor`.
+Прецедент `data/create/recipe/crafting/kinetics/encased_chain_drive.json` (см.
+раздел 19) переопределяет рецепт под исходным id; здесь не переопределение, а
+**новый** рецепт.
+
+В паре — advancement:
+`src/main/resources/data/tfc_aeronautics/advancement/recipes/misc/crafting/kinetics/chain_conveyor.json`.
+
+### Ограничения (явно)
+
+- **Авто-миграция** `create:chain_conveyor` → `tfc_aeronautics:chain_conveyor`
+  в существующих мирах **не делается**. Старые блоки остаются как есть, образуют
+  отдельную сеть (разные `BlockEntityType`).
+- **Две независимые сети:** `create:chain_conveyor` и наш — два отдельных
+  контура. Frogport умеет стрелять в обе (две независимые target-записи), но
+  пакеты не «протекают» между сетями.
+- **Display Link / Smart Observer** адреса нашего конвейера — **не
+  поддерживаются** (out of scope; требует копирования
+  `PackageAddressDisplaySource` + `SmartObserverBlockEntity` или mixin).
+- **Ponder-сцены** под наш блок — out of scope (стандартные сцены Create для
+  `create:chain_conveyor` работают как есть; тип цепи — чисто визуальная
+  деталь).
+- **Звуки, специфичные для металла цепи** — out of scope (для всех цепей
+  используется vanilla-звук `Blocks.CHAIN.defaultBlockState().getSoundType()`).
+- **Display Link / Smart Observer** — out of scope.
+- **Цепи модов вне TFC** — работают через тег `c:chains`, никакого
+  спец-обработчика.
+- **chainCost** — distance-based стоимость (`max(round(d / 2.5), 1)`) не
+  меняется; тип металла в cost не учитывается.
+
+### Файловое дерево
+
+#### Java (21 файл)
+
+**Общие (16 классов из Create + 3 инфраструктурных + 2 frogport = 21):**
+
+| Путь | Назначение |
+|---|---|
+| `src/main/java/ru/tfc_aeronautics/chain/Registration.java` | `DeferredRegister`-ы `BLOCKS`/`ITEMS`/`BLOCK_ENTITY_TYPES`. `CHAINS_CONVEYOR`, `CHAIN_CONVEYOR_ITEM`, `CHAIN_CONVEYOR_BE`. `register(IEventBus)` дополнительно вызывает `ChainConveyorPackagePortTargets.register(bus)`. |
+| `src/main/java/ru/tfc_aeronautics/chain/Packets.java` | Регистрация 5 payload-ов через `CatnipServices.NETWORK` (catnip-platform — публичный API из Create-инфраструктуры). |
+| `src/main/java/ru/tfc_aeronautics/chain/Block.java` | Копия `ChainConveyorBlock`; `Items.CHAIN` → тег `c:chains`; refund в `onSneakWrenched` через BE-lookup; ссылки на `AllBlocks.CHAIN_CONVEYOR`/`AllBlockEntityTypes.CHAIN_CONVEYOR` → наши. |
+| `src/main/java/ru/tfc_aeronautics/chain/BlockEntity.java` | Per-connection `connectionChains`, write/read/writeSafe под ключом `ConnectionChains`, lazy-fallback на vanilla chain, хелперы `getChainItemForConnection`/`getChainTextureForConnection`. |
+| `src/main/java/ru/tfc_aeronautics/chain/ConnectionHandler.java` | `instanceof ChainConveyorBlock`/`ChainConveyorBlockEntity` → наши; `isChain` → тег `c:chains`. |
+| `src/main/java/ru/tfc_aeronautics/chain/ConnectionPacket.java` | Наш packet id; refund через per-connection type; пишет `chain.getItem().builtInRegistryHolder().key().location()` в обе BE на `connect=true`. |
+| `src/main/java/ru/tfc_aeronautics/chain/InteractionHandler.java` | Только замена `instanceof` и перенос `loadedChains` статика. |
+| `src/main/java/ru/tfc_aeronautics/chain/ChainPackageInteractionPacket.java` | Наш packet id; тип BE → наш. |
+| `src/main/java/ru/tfc_aeronautics/chain/ServerboundRidingPacket.java` | Только packet id. |
+| `src/main/java/ru/tfc_aeronautics/chain/ClientboundRidingPacket.java` | Только packet id. |
+| `src/main/java/ru/tfc_aeronautics/chain/ServerChainConveyorHandler.java` | Замена ссылок на наши packet-классы. |
+| `src/main/java/ru/tfc_aeronautics/chain/Shape.java` | Копия без правок. |
+| `src/main/java/ru/tfc_aeronautics/chain/RoutingTable.java` | Копия без правок. |
+| `src/main/java/ru/tfc_aeronautics/chain/Package.java` | Внутренняя ссылка на BE тип → наш. |
+| `src/main/java/ru/tfc_aeronautics/chain/FrogportTarget.java` | Подкласс `PackagePortTarget`; см. §Frogport-интеграция. |
+| `src/main/java/ru/tfc_aeronautics/chain/PackagePortTargets.java` | `DeferredRegister` в `CreateRegistries.PACKAGE_PORT_TARGET_TYPE` под id `tfc_aeronautics:chain_conveyor`. |
+
+**Клиентские (5 файлов):**
+
+| Путь | Назначение |
+|---|---|
+| `src/client/java/ru/aeronautics/client/chain/Renderer.java` | `RenderTypes.chain(CHAIN_LOCATION)` → `RenderTypes.chain(be.getChainTextureForConnection(localPos))`. `renderChain` принимает дополнительный параметр `ResourceLocation chainTex`. |
+| `src/client/java/ru/aeronautics/client/chain/Visual.java` | Только `instanceof`. |
+| `src/client/java/ru/aeronautics/client/chain/RidingHandler.java` | Только `instanceof`. |
+| `src/client/java/ru/aeronautics/client/chain/PackageInteractionHandler.java` | Только `instanceof`. |
+| `src/client/java/ru/aeronautics/client/chain/ClientSetup.java` | `RegisterRenderersEvent` для BER. |
+
+**Creative-tab фильтр (1 файл):**
+
+| Путь | Назначение |
+|---|---|
+| `src/client/java/ru/aeronautics/client/ChainConveyorCreativeTabFilter.java` | Подписчик `BuildCreativeModeTabContentsEvent` для скрытия `create:chain_conveyor` из `create:base`. |
+
+#### Ассеты (9 файлов)
+
+| Путь | Назначение |
+|---|---|
+| `src/main/resources/data/tfc_aeronautics/recipe/crafting/kinetics/chain_conveyor.json` | Новый recipe (см. §Рецепт). |
+| `src/main/resources/data/tfc_aeronautics/advancement/recipes/misc/crafting/kinetics/chain_conveyor.json` | Recipe-unlock advancement. |
+| `src/main/resources/assets/tfc_aeronautics/blockstates/chain_conveyor.json` | `{ "variants": { "": { "model": "tfc_aeronautics:block/chain_conveyor/block" } } }`. |
+| `src/main/resources/assets/tfc_aeronautics/models/item/chain_conveyor.json` | `{ "parent": "tfc_aeronautics:block/chain_conveyor/item" }`. |
+| `src/main/resources/assets/tfc_aeronautics/models/block/chain_conveyor/block.json` | `{ "parent": "create:block/chain_conveyor/block" }`. |
+| `src/main/resources/assets/tfc_aeronautics/models/block/chain_conveyor/item.json` | `{ "parent": "create:block/chain_conveyor/item" }`. |
+| `src/main/resources/assets/tfc_aeronautics/models/block/chain_conveyor/guard.json` | `{ "parent": "create:block/chain_conveyor/guard" }`. |
+| `src/main/resources/assets/tfc_aeronautics/models/block/chain_conveyor/shaft.json` | `{ "parent": "create:block/chain_conveyor/shaft" }`. |
+| `src/main/resources/assets/tfc_aeronautics/models/block/chain_conveyor/wheel.json` | `{ "parent": "create:block/chain_conveyor/wheel" }`. |
+| `src/main/resources/data/tfc_aeronautics/loot_table/blocks/chain_conveyor.json` | Self-drop loot table. |
+| `src/main/resources/assets/tfc_aeronautics/lang/en_us.json` | `"block.tfc_aeronautics.chain_conveyor": "Chain Conveyor"` + ключи ошибок подключения. |
+| `src/main/resources/assets/tfc_aeronautics/lang/ru_ru.json` | Те же ключи по-русски. |
+
+> Модель `chain.json` в Create отсутствует — поэтому в нашем дереве её нет.
+> Текстуры не копируем — подтягиваются через `parent`-ссылку на
+> `create:block/chain_conveyor/...`.
+
+### Существующие файлы — что меняется
+
+| Файл | Изменение |
+|---|---|
+| `src/main/java/ru/tfc_aeronautics/TFCAeronautics.java` | Добавить `ChainConveyorRegistration.register(modEventBus);` рядом с другими `.register(...)`. |
+| `src/main/java/ru/tfc_aeronautics/CreativeTabs.java` | `output.accept(ChainConveyorRegistration.CHAIN_CONVEYOR_ITEM.get());` в `displayItems`. |
+| `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java` | Добавить `ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/chain_conveyor")` в `BANNED_RECIPES`. |
+
+### Совместимость и edge-cases
 
 - **TFC не загружен** — `c:chains` содержит только `minecraft:chain` (TFC — единственный источник тега). Поведение совпадает с vanilla.
-- **Create не загружен** — ни один миксин не активируется, мод бездействует.
-- **Цепь удалена из реестра другим модом** — `resolveChainItem` падает на `Items.CHAIN`, текстура — vanilla, NPE нет.
-- **Legacy-чанк без `aeronautics_chain_types` NBT** — карта пустая; рендер/дроп идут через fallback на vanilla chain.
+- **Create не загружен** — мод бездействует, никакие регистрации не активируются.
+- **Цепь удалена из реестра другим модом** — `getChainItemForConnection` падает на `Items.CHAIN.getKey()` через fallback; текстура — vanilla; NPE нет.
+- **Legacy-чанк без `ConnectionChains` NBT** — `connectionChains` пустая; lazy-fallback на vanilla chain в каждом хелпере.
+- **TFC цепь без `Blocks.CHAIN`-эквивалента** — `Blocks.CHAIN.defaultBlockState().getSoundType()` всё равно используется для звука/частиц (частицы декоративные).
+- **Контрапция (SContraption)** — `transform(...)` обязан перенести `connectionChains` вместе с `connections`. Без этого тип цепи теряется при перемещении конструкции.
+- **Old-world с `create:chain_conveyor`** — остаётся как есть, не соединяется с нашим (разные `BlockEntityType`). Сети независимы.
+
+### Верификация (статическая)
+
+Рантайм-проверка запрещена `CLAUDE.md`; только статически:
+
+```bash
+# Должно быть пусто (все Items.CHAIN и Blocks.CHAIN заменены на per-connection lookup):
+grep -rn "Items\.CHAIN\|Blocks\.CHAIN" src/main/java/ru/tfc_aeronautics/chain/ src/client/java/ru/aeronautics/client/chain/
+
+# Должно быть пусто (не импортим Create'овские chain-conveyor классы):
+grep -rn "import com\.simibubi\.create\.content\.kinetics\.chainConveyor" src/main/java/ru/tfc_aeronautics/chain/ src/client/java/ru/aeronautics/client/chain/
+
+# Должно быть пусто (статик CHAIN_LOCATION больше не используется):
+grep -rn "CHAIN_LOCATION" src/main/java/ru/tfc_aeronautics/chain/ src/client/java/ru/aeronautics/client/chain/
+
+# Должно быть пусто (не импортим чужой ChainConveyorBlockEntity):
+grep -rn "com\.simibubi\.create\.content\.kinetics\.chainConveyor\.ChainConveyorBlockEntity" src/main/java/ru/tfc_aeronautics/chain/ src/client/java/ru/aeronautics/client/chain/
+
+./gradlew compileJava        # main sources
+./gradlew compileClientJava  # клиент-рендер
+./gradlew build              # полная сборка + datagen + jar
+```
 
 ### Smoke-проверка в игре
 
-- [ ] Подключить два `chain_conveyor` ванильной цепью — связь работает.
+Без рантайма — передать пользователю для прогона в Prism-лаунчере:
+
+- [ ] Подключить два `chain_conveyor` (наших) ванильной цепью — связь работает.
 - [ ] Подключить `tfc:metal/chain/wrought_iron` — работает.
 - [ ] Подключить `tfc:metal/chain/steel` — работает (любой из 9 TFC-металлов).
 - [ ] Sneak+wrench disconnect — возврат той же цепи, которой подключал.
 - [ ] Уничтожить `chain_conveyor` — drop той же цепи по каждому подключению.
 - [ ] Multi-segment BE: одно подключение бронзой, другое сталью — разные текстуры на сегментах, drop правильного типа.
+- [ ] Frogport в нашу сеть — принимает и стреляет пакеты в обе стороны.
+- [ ] Frogport из `create:chain_conveyor` в наш — НЕ работает (разные сети); наоборот — тоже не работает.
+- [ ] В creative-табе `create:base` нет иконки `create:chain_conveyor`.
+- [ ] Recipe `create:crafting/kinetics/chain_conveyor` отсутствует в recipe manager.
 - [ ] Перезайти в мир / перезагрузить чанк — типы цепей сохраняются, рендер совпадает.
 - [ ] Save → load — типы цепей сохраняются через серверный restart.
 
