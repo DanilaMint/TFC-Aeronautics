@@ -49,6 +49,10 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
     Альтернативный craft-путь перекрашивания, без ручного верстака; особенно
     удобно для массовой раскраски в рамках Create-конвейера.
     `deploying_envelope_white.json` удалён: vanilla-белого красителя нет.
+- [x] `data/create/recipe/crafting/kinetics/rope_pulley.json`
+  - оригинал Create (1×3: casing+`#minecraft:wool`+`#c:plates/iron`) → TFC-style 3×3 `RCR`/`RRR`/`RSR`
+  - `C` = `create:andesite_casing` (верх-середина), `S` = `tfc:metal/sheet/wrought_iron` (низ-середина), `R` = `tfc:rope` (7× остальные)
+  - мотивация: `tfc:rope` — естественный заменитель шерсти в TFC; wrought iron sheet — кованая железная плита вместо Create-only iron plate. Rope подчёркивает «грузовую» суть кинематического блока
 
 ## TODO (новые добавлять сюда)
 
