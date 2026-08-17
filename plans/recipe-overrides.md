@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 5/? ✓ (overrides + 31 envelope)
+**Прогресс:** 6/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -30,6 +30,10 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `minecraft:dried_kelp` → `tfc:cloths`
 - [x] `data/create/recipe/crafting/logistics/andesite_tunnel.json`
   - `minecraft:dried_kelp` → `tfc:cloths`
+- [x] `data/create/recipe/crafting/kinetics/water_wheel.json`
+  - pattern Create `["SSS","SCS","SSS"]` (8× `#minecraft:planks` + 1× `create:shaft`) → TFC-style `["LPL","PAP","LPL"]` (4× `#tfc:lumber` + 4× `#minecraft:planks` + 1× `create:shaft`): lumber по углам, planks на боках, вал в центре
+  - ключ `A` = `create:shaft` (центр; в оригинале это был ключ `C` — заменили только букву, предмет тот же)
+  - `minecraft:planks` после TFC содержит только TFC-плахи (20 пород), так что «любая доска» в TFC-сборке == TFC-доска. Тег `tfc:lumber` уже есть в датапаке TFC, shadow не нужен
 - [x] **Aeronautics envelopes** (31 файл в `data/aeronautics/recipe/...`):
   - `white_envelope.json` — shaped: 5× `#tfc:cloths` (helmet-curl: `CCC` / `C C`)
     + `tfc:rope` в нижней середке (` R `) → 8 `aeronautics:white_envelope`.
