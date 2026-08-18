@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 12/? ✓ (overrides + 31 envelope)
+**Прогресс:** 13/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -84,6 +84,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: оба ингредиента — прямые item-id
   - recipe-id остаётся `create:crafting/kinetics/gearshift`, advancement Create засчитывается без правок
   - **проверено**: `./gradlew compileJava` UP-TO-DATE, JSON валиден (`python3 -c 'json.load(...)'` OK), сборка `./build.sh install` прошла, JAR установился в `~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/tfc-aeronautics-dev/minecraft/mods/tfc_aeronautics-0.5.0.jar`
+- [x] `data/simulated/recipe/directional_gearshift.json`
+  - оригинал Simulated shapeless `create:andesite_casing` + `create:cogwheel` + `minecraft:redstone_torch` + `create:shaft` → 1 `simulated:directional_gearshift`
+  - новый shapeless: `create:clutch` + `create:gearshift` + tag `c:dusts/redstone` → 2 `simulated:directional_gearshift`
+  - мотивация: directional_gearshift — это «улучшенная» связка clutch + gearshift. Собирать её из тех же clutch + gearshift + redstone интуитивнее, чем из 4 разнородных компонент (включая редстоун-факел). `clutch` уже содержит andesite_casing + cogwheel; `gearshift` — clutch + cogwheel; вместе они покрывают andesite_casing + cogwheel из исходного рецепта, а редстоун-источник остаётся обязательным «электрическим» ингредиентом. Выход ×2 — два directional_gearshift за раз, потому что clutch и gearshift сами по себе дорогие механические блоки, а directional_gearshift — это их сборка
+  - структурно — простой sub-recipe override (как `gearshift.json`, `super_glue.json`, `encased_chain_drive.json`): формат остался shapeless, поменялись ингредиенты и выход
+  - `show_notification: true` (по умолчанию)
+  - шейдинг-тегов не требуется: `create:clutch` и `create:gearshift` — прямые item-id; `c:dusts/redstone` уже определён в рантайме (используется самим Create в 20+ рецептах включая clutch и gearshift)
+  - recipe-id остаётся `simulated:directional_gearshift`, advancement `data/simulated/advancement/recipes/misc/directional_gearshift.json` ссылается на этот же recipe-id — засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -c 'import json; json.load(...)'` OK), `./gradlew compileJava` UP-TO-DATE
 - [x] `data/tfc_aeronautics/recipe/kinetics/clutch.json`
   - оригинал Create shapeless `create:andesite_casing` + `create:shaft` + tag `c:dusts/redstone` → 1 `create:clutch`
   - новый shaped 3×3 `LCL`/`MSR`/`LCL`: 4× `#tfc:lumber` (углы) + 2× `create:andesite_casing` + 1× `tfc:brass_mechanisms` (центр) + 1× `create:shaft` + 1× tag `c:dusts/redstone` → 2 `create:clutch`
