@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 6/? ✓ (overrides + 31 envelope)
+**Прогресс:** 7/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -53,6 +53,13 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - оригинал Create (1×3: casing+`#minecraft:wool`+`#c:plates/iron`) → TFC-style 3×3 `RCR`/`RRR`/`RSR`
   - `C` = `create:andesite_casing` (верх-середина), `S` = `tfc:metal/sheet/wrought_iron` (низ-середина), `R` = `tfc:rope` (7× остальные)
   - мотивация: `tfc:rope` — естественный заменитель шерсти в TFC; wrought iron sheet — кованая железная плита вместо Create-only iron plate. Rope подчёркивает «грузовую» суть кинематического блока
+- [x] `data/create/recipe/crafting/kinetics/whisk.json`
+  - оригинал Create: shaped `[" C ","SCS","SSS"]` с `create:andesite_alloy` + `#c:plates/iron` → 1 `create:whisk`
+  - TFC-style ромб `[" R ","R R"," R "]`: 4× `tfc:metal/rod/wrought_iron` (стержни по четырём сторонам, углы и центр пусты) → 1 `create:whisk`
+  - мотивация: венчик — кованый ручной инструмент; стержни кованого железа естественно ложатся в TFC-металлургический путь (anvil + hammer), а андезитовый сплав и Create iron plates недоступны
+  - `show_notification: false` (structural reshape, как у `rope_pulley.json`)
+  - шейдинг-тегов не требуется: `tfc:metal/rod/wrought_iron` — прямой item-id (single item), shadow-тег не нужен
+  - recipe-id остаётся `create:crafting/kinetics/whisk`, поэтому advancement `data/create/advancement/recipes/misc/crafting/kinetics/whisk.json` зачтётся без правок (см. §19 DOCS.md про recipe-id в namespace источника)
 
 ## TODO (новые добавлять сюда)
 

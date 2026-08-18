@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "R": {
+      "item": "tfc:metal/rod/wrought_iron"
+    }
+  },
+  "pattern": [
+    " R ",
+    "R R",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:whisk"
+  }
+}
