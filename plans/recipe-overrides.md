@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 11/? ✓ (overrides + 31 envelope)
+**Прогресс:** 12/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -84,6 +84,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: оба ингредиента — прямые item-id
   - recipe-id остаётся `create:crafting/kinetics/gearshift`, advancement Create засчитывается без правок
   - **проверено**: `./gradlew compileJava` UP-TO-DATE, JSON валиден (`python3 -c 'json.load(...)'` OK), сборка `./build.sh install` прошла, JAR установился в `~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/tfc-aeronautics-dev/minecraft/mods/tfc_aeronautics-0.5.0.jar`
+- [x] `data/tfc_aeronautics/recipe/kinetics/clutch.json`
+  - оригинал Create shapeless `create:andesite_casing` + `create:shaft` + tag `c:dusts/redstone` → 1 `create:clutch`
+  - новый shaped 3×3 `LCL`/`MSR`/`LCL`: 4× `#tfc:lumber` (углы) + 2× `create:andesite_casing` + 1× `tfc:brass_mechanisms` (центр) + 1× `create:shaft` + 1× tag `c:dusts/redstone` → 2 `create:clutch`
+  - мотивация: оригинал слишком дёшев (3 ингредиента, count 1) и не использует TFC-материалы; TFC-латунный механизм в центре (выковывается через TFC anvil из `c:ingots/brass`) + доски по углам + редстоун дают механически осмысленный craft в TFC-контексте. Выход ×2 компенсирует добавление `brass_mechanisms` (3-шаговый anvil-recipe)
+  - структурно — **TFC-style reshape** (shapeless → shaped), как `whisk.json` / `rope_pulley.json` / `propeller.json`. Ветка 2 скилла `recipe-override` (recipe-id в `tfc_aeronautics`, оригинал запрещён через `BANNED_RECIPES`)
+  - `show_notification: false` (structural reshape)
+  - шейдинг-тегов не требуется: `tfc:lumber` определён в датапаке TFC (20 пород), `c:dusts/redstone` — общий common-тег
+  - оригинал `create:crafting/kinetics/clutch` (recipe-id из пути `data/create/recipe/crafting/kinetics/clutch.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
 
 ## TODO (новые добавлять сюда)
 
