@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 10/? ✓ (overrides + 31 envelope)
+**Прогресс:** 11/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -75,6 +75,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `tfc:lens` и `tfc:metal/sheet/gold` — прямые item-id, `c:strings` определён в датапаке TFC и в этой сборке содержит `tfc:wool_yarn` (ванильная `minecraft:string` в тег **не** входит — это поведение совпадает с оригинальным Create-рецептом)
   - recipe-id остаётся `create:crafting/kinetics/goggles`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/goggles.json` засчитывается без правок
   - **внимание к паттерну**: пустой слот — пробел (`" "`), не `.`. В Minecraft 1.21.1 `ShapedRecipePattern` принимает пустым только пробел; любой другой символ вне `key` валит JSON с `JsonSyntaxException: Pattern references symbol '.' but it's not defined in the key`. Прочие override'ы в проекте (`whisk.json`, `propeller.json`) используют пробелы
+- [x] `data/create/recipe/crafting/kinetics/gearshift.json`
+  - оригинал Create shapeless `andesite_casing` + `cogwheel` + tag `c:dusts/redstone` → 1 `create:gearshift`
+  - новый shapeless: `create:clutch` + `create:cogwheel` → 1 `create:gearshift`
+  - мотивация: `clutch` уже сам по себе содержит `andesite_casing` + `cogwheel`, поэтому это shortcut — игроку не нужно собирать andesite_casing и не нужен redstone. TFC-контекст: andesite_casing в TFC-мире требует andesite alloy (металл), а clutch — уже готовый механический блок, естественнее положить его
+  - структурно — простой sub-recipe override (как `super_glue.json`, `encased_chain_drive.json`), не TFC-style reshape: формат остался shapeless, поменялись только ингредиенты
+  - `show_notification: true` (по умолчанию; ничего особенного в получении нет)
+  - шейдинг-тегов не требуется: оба ингредиента — прямые item-id
+  - recipe-id остаётся `create:crafting/kinetics/gearshift`, advancement Create засчитывается без правок
+  - **проверено**: `./gradlew compileJava` UP-TO-DATE, JSON валиден (`python3 -c 'json.load(...)'` OK), сборка `./build.sh install` прошла, JAR установился в `~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/tfc-aeronautics-dev/minecraft/mods/tfc_aeronautics-0.5.0.jar`
 
 ## TODO (новые добавлять сюда)
 
