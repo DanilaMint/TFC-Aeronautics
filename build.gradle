@@ -46,39 +46,8 @@ neoForge {
         minecraftVersion = project.parchment_minecraft_version
     }
 
-    runs {
-        configureEach {
-            logLevel = org.slf4j.event.Level.DEBUG
-            systemProperty 'forge.logging.markers', 'REGISTRIES'
-        }
-
-        client {
-            client()
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        }
-
-        server {
-            server()
-            programArgument '--nogui'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        }
-
-        gameTestServer {
-            type = "gameTestServer"
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        }
-
-        data {
-            data()
-            programArgument '--mod'
-            programArgument mod_id
-            programArgument '--all'
-            programArgument '--output'
-            programArgument file('src/generated/resources/').absolutePath
-            programArgument '--existing'
-            programArgument file('src/main/resources/').absolutePath
-        }
-    }
+    // runClient/runServer/runData/runGameTestServer require a full modpack and
+    // are intentionally omitted. Use `build` + PrismLauncher for runtime testing.
 
     mods {
         "${mod_id}" {
