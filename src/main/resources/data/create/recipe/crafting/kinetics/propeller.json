@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "S": {
+      "item": "tfc_aeronautics:metal/tight_sheet/wrought_iron"
+    },
+    "R": {
+      "item": "tfc:metal/rod/wrought_iron"
+    }
+  },
+  "pattern": [
+    "S S",
+    " R ",
+    "S S"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:propeller"
+  }
+}

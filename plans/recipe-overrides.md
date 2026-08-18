@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 7/? ✓ (overrides + 31 envelope)
+**Прогресс:** 10/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -60,6 +60,21 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (structural reshape, как у `rope_pulley.json`)
   - шейдинг-тегов не требуется: `tfc:metal/rod/wrought_iron` — прямой item-id (single item), shadow-тег не нужен
   - recipe-id остаётся `create:crafting/kinetics/whisk`, поэтому advancement `data/create/advancement/recipes/misc/crafting/kinetics/whisk.json` зачтётся без правок (см. §19 DOCS.md про recipe-id в namespace источника)
+- [x] `data/create/recipe/crafting/kinetics/propeller.json`
+  - оригинал Create shaped `[" S ","SCS"," S "]` с `create:andesite_alloy` + `#c:plates/iron` — невозможен в TFC (andesite_alloy нет, `c:plates/iron` пуст)
+  - TFC-style `["S S"," R ","S S"]`: 4× `tfc_aeronautics:metal/tight_sheet/wrought_iron` (углы) + 1× `tfc:metal/rod/wrought_iron` (центр) → 1 `create:propeller`. Мотивация: пропеллер — кованое механическое изделие; тонкий лист и стержень кованого железа — естественный результат TFC-кузнечного пути. `show_notification: false` (structural reshape). Шейдинг-тегов не требуется. recipe-id остаётся `create:crafting/kinetics/propeller`, advancement Create засчитывается без правок
+- [x] `data/tfc_aeronautics/recipe/crafting/kinetics/steel_propeller.json`
+  - параллельный вариант под сталь: те же 4× `tfc_aeronautics:metal/tight_sheet/steel` (углы) + 1× `tfc:metal/rod/steel` (центр) → 1 `create:propeller`
+  - recipe-id `tfc_aeronautics:crafting/kinetics/steel_propeller` — даёт игроку выбор металла (wrought_iron через override, сталь через этот рецепт)
+  - не требует `BANNED_RECIPES`: исходный Create-рецепт уже замещён первым override'ом
+- [x] `data/create/recipe/crafting/kinetics/goggles.json`
+  - оригинал Create shaped `[" S ","GPG"]` с `c:glass_blocks` + `c:plates/gold` + 1× `c:strings` → 1 `create:goggles`
+  - TFC-style шлем 3×3 `["SSS","S S","LPL"]`: 5× `c:strings` (контур шлема: 3 в ободе купола сверху + 2 по бокам, центр пуст — отверстие под линзы) + 2× `tfc:lens` (глаза) + 1× `tfc:metal/sheet/gold` (переносица) → 1 `create:goggles`
+  - мотивация: очки — стекольно-металлический предмет в TFC-мире; `tfc:lens` идёт через TFC glassworking (`data/tfc/recipe/glassworking/lens.json`), `tfc:metal/sheet/gold` — через anvil (`data/tfc/recipe/anvil/metal/sheet/gold.json`). Нитки формируют шлемный каркас с открытым лицом, под которое уходят линзы и золотой мост
+  - `show_notification: false` (structural reshape, как у `whisk.json` / `rope_pulley.json` / `propeller.json`)
+  - шейдинг-тегов не требуется: `tfc:lens` и `tfc:metal/sheet/gold` — прямые item-id, `c:strings` определён в датапаке TFC и в этой сборке содержит `tfc:wool_yarn` (ванильная `minecraft:string` в тег **не** входит — это поведение совпадает с оригинальным Create-рецептом)
+  - recipe-id остаётся `create:crafting/kinetics/goggles`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/goggles.json` засчитывается без правок
+  - **внимание к паттерну**: пустой слот — пробел (`" "`), не `.`. В Minecraft 1.21.1 `ShapedRecipePattern` принимает пустым только пробел; любой другой символ вне `key` валит JSON с `JsonSyntaxException: Pattern references symbol '.' but it's not defined in the key`. Прочие override'ы в проекте (`whisk.json`, `propeller.json`) используют пробелы
 
 ## TODO (новые добавлять сюда)
 

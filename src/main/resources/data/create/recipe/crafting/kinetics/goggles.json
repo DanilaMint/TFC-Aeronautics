@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "S": {
+      "tag": "c:strings"
+    },
+    "L": {
+      "item": "tfc:lens"
+    },
+    "P": {
+      "item": "tfc:metal/sheet/gold"
+    }
+  },
+  "pattern": [
+    "SSS",
+    "S S",
+    "LPL"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:goggles"
+  }
+}
