@@ -33,7 +33,9 @@ public final class RecipeRemoval
      * (horizontal and vertical patterns — same output item, different
      * layouts). The replacement path is
      * {@code tfc_aeronautics:anvil/fluid_pipe}; the vanilla must not be
-     * reachable via crafting grid / JEI.
+     * reachable via crafting grid / JEI. The wooden bracket is replaced by
+     * twenty per-wood crafting recipes under
+     * {@code tfc_aeronautics:crafting/wood/bracket/&lt;wood&gt;}.
      *
      * <p><b>Note:</b> recipe IDs in vanilla are derived from the JSON file
      * path under {@code recipe/}, not from the item id. So a recipe at
@@ -47,7 +49,8 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/encased_chain_drive_from_zinc"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/chain_conveyor"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/clutch"),
-        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/metal_bracket")
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/metal_bracket"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/wooden_bracket")
     );
 
     private RecipeRemoval() {}

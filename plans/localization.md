@@ -1,6 +1,6 @@
 # Localization
 
-**Прогресс:** 28/37 ⏳
+**Прогресс:** 32/37 ⏳
 
 ## en_us
 - [x] `itemGroup.tfc_aeronautics` — "TFC Aeronautics"
@@ -21,6 +21,7 @@
 - [x] `tfc.recipe.barrel.tfc_aeronautics.barrel.impregnated_burlap_cloth`
 - [x] 9× config: `tfc_aeronautics.config.resinDropChance` + 8× `tfc_aeronautics.config.shaftDamage*`
 - [x] 2× death-attack: `death.attack.tfc_aeronautics.shaft` + `.player` — см. Shaft Damage
+- [x] 40× `<block|item>.tfc_aeronautics.wood.bracket.<wood>` для 20 пород (`Acacia Bracket` / `Oak Bracket` / ...)
 
 ## ru_ru
 - [x] `itemGroup.tfc_aeronautics`
@@ -34,6 +35,7 @@
 - [x] `tfc.recipe.barrel.tfc_aeronautics.barrel.impregnated_burlap_cloth`
 - [x] 8× `tfc_aeronautics.config.shaftDamage*`
 - [x] 2× `death.attack.tfc_aeronautics.shaft` + `.player`
+- [x] 40× `<block|item>.tfc_aeronautics.wood.bracket.<wood>` — перевод с TFC-овского словаря пород: `Дубовый кронштейн`, `Берёзовый кронштейн`, `Гренадиловый кронштейн` (blackwood), `Сейбовый кронштейн` (kapok), `Дугласовый кронштейн` (douglas_fir), `Белокедровый кронштейн` (white_cedar), и т.д. по 20 породам
 - [ ] 8× `item.tfc_aeronautics.powder.{copper,tin,zinc,bismuth,cast_iron,gold,silver,nickel}`
 - [ ] `item.tfc_aeronautics.resin_clump`
 - [ ] `item.tfc_aeronautics.saw_blade`

@@ -25,5 +25,6 @@
 - [Shaft Damage](plans/shaft-damage.md) — 6/7 ⏳
 - [Worldgen](plans/worldgen.md) — 46/46 ✓
 - [Ponder](plans/ponder.md) — 7/9 ⏳
-- [Localization](plans/localization.md) — 28/37 ⏳
+- [Localization](plans/localization.md) — 32/37 ⏳
 - [Chain Conveyor (TFC-aware)](plans/chain-conveyor.md) — ✓
+- [Wooden Brackets (per-wood)](plans/wooden-bracket.md) — ✓ (Java + datagen + recipes + ban + docs реализованы, runData подвис → datagen-выход сгенерирован Python-скриптом `generate/generate_wooden_bracket_assets.py`; текстуры — `generate/generate_wooden_bracket_textures.py` с verify-скриптом `generate/verify_wooden_bracket_textures.py`)

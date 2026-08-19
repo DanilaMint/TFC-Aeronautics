@@ -1,0 +1,7 @@
+{
+  "parent": "create:block/bracket/item",
+  "textures": {
+    "bracket": "tfc_aeronautics:block/wood/bracket/bracket_acacia",
+    "plate": "tfc_aeronautics:block/wood/bracket/bracket_plate_acacia"
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "variants": {
+    "axis_along_first=false,facing=down,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/ground_rosewood",
+      "x": 180
+    },
+    "axis_along_first=false,facing=down,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/ground_rosewood",
+      "x": 180
+    },
+    "axis_along_first=false,facing=down,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/ground_rosewood",
+      "x": 180
+    },
+    "axis_along_first=false,facing=east,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/wall_rosewood"
+    },
+    "axis_along_first=false,facing=east,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/wall_rosewood"
+    },
+    "axis_along_first=false,facing=east,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/wall_rosewood"
+    },
+    "axis_along_first=false,facing=north,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/wall_rosewood",
+      "x": 90,
+      "y": 270
+    },
+    "axis_along_first=false,facing=north,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/wall_rosewood",
+      "x": 90,
+      "y": 270
+    },
+    "axis_along_first=false,facing=north,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/wall_rosewood",
+      "x": 90,
+      "y": 270
+    },
+    "axis_along_first=false,facing=south,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/wall_rosewood",
+      "x": 90,
+      "y": 90
+    },
+    "axis_along_first=false,facing=south,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/wall_rosewood",
+      "x": 90,
+      "y": 90
+    },
+    "axis_along_first=false,facing=south,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/wall_rosewood",
+      "x": 90,
+      "y": 90
+    },
+    "axis_along_first=false,facing=up,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/ground_rosewood"
+    },
+    "axis_along_first=false,facing=up,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/ground_rosewood"
+    },
+    "axis_along_first=false,facing=up,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/ground_rosewood"
+    },
+    "axis_along_first=false,facing=west,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/wall_rosewood",
+      "y": 180
+    },
+    "axis_along_first=false,facing=west,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/wall_rosewood",
+      "y": 180
+    },
+    "axis_along_first=false,facing=west,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/wall_rosewood",
+      "y": 180
+    },
+    "axis_along_first=true,facing=down,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/ground_rosewood",
+      "x": 180,
+      "y": 90
+    },
+    "axis_along_first=true,facing=down,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/ground_rosewood",
+      "x": 180,
+      "y": 90
+    },
+    "axis_along_first=true,facing=down,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/ground_rosewood",
+      "x": 180,
+      "y": 90
+    },
+    "axis_along_first=true,facing=east,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/wall_rosewood",
+      "x": 90
+    },
+    "axis_along_first=true,facing=east,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/wall_rosewood",
+      "x": 90
+    },
+    "axis_along_first=true,facing=east,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/wall_rosewood",
+      "x": 90
+    },
+    "axis_along_first=true,facing=north,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/wall_rosewood",
+      "y": 270
+    },
+    "axis_along_first=true,facing=north,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/wall_rosewood",
+      "y": 270
+    },
+    "axis_along_first=true,facing=north,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/wall_rosewood",
+      "y": 270
+    },
+    "axis_along_first=true,facing=south,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/wall_rosewood",
+      "y": 90
+    },
+    "axis_along_first=true,facing=south,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/wall_rosewood",
+      "y": 90
+    },
+    "axis_along_first=true,facing=south,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/wall_rosewood",
+      "y": 90
+    },
+    "axis_along_first=true,facing=up,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/ground_rosewood",
+      "y": 90
+    },
+    "axis_along_first=true,facing=up,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/ground_rosewood",
+      "y": 90
+    },
+    "axis_along_first=true,facing=up,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/ground_rosewood",
+      "y": 90
+    },
+    "axis_along_first=true,facing=west,type=cog": {
+      "model": "tfc_aeronautics:block/wood/bracket/cog/wall_rosewood",
+      "x": 90,
+      "y": 180
+    },
+    "axis_along_first=true,facing=west,type=pipe": {
+      "model": "tfc_aeronautics:block/wood/bracket/pipe/wall_rosewood",
+      "x": 90,
+      "y": 180
+    },
+    "axis_along_first=true,facing=west,type=shaft": {
+      "model": "tfc_aeronautics:block/wood/bracket/shaft/wall_rosewood",
+      "x": 90,
+      "y": 180
+    }
+  }
+}

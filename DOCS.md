@@ -29,6 +29,7 @@
 19. [Простые замены рецептов (Recipe overrides)](#19-простые-замены-рецептов-recipe-overrides)
 20. [Замена slimeball на `tfc:glue`](#20-замена-slimeball-на-tfcglue)
 21. [Наковальни для остальных металлов (Tier-1 Anvils)](#21-наковальни-для-остальных-металлов-tier-1-anvils)
+22. [Деревянные кронштейны по породе (TFC Wooden Brackets)](#22-деревянные-кронштейны-по-породе-tfc-wooden-brackets)
 
 ---
 
@@ -2292,3 +2293,100 @@ grep -rn "com\.simibubi\.create\.content\.kinetics\.chainConveyor\.ChainConveyor
 - [ ] Save → load — типы цепей сохраняются через серверный restart.
 
 
+
+## 22. Деревянные кронштейны по породе (TFC Wooden Brackets)
+
+Create регистрирует единственный `create:wooden_bracket` — vanilla-style, один предмет и один блок. В мире TFC это означало бы, что любой кронштейн выглядит одинаково, независимо от того, из какого дерева стол или обшивка дома. Подсистема заменяет это на 20 per-wood вариантов, привязанных к TFC-овскому списку пород: `tfc_aeronautics:wood/bracket/<wood>` для каждого `<wood>` из 20.
+
+Поведение ПКМ по shaft/cog/pipe полностью наследуется от Create-овских `BracketBlock` / `BracketBlockItem` — никакой своей логики не пишем, нужен только тон.
+
+### Регистрация блоков и предметов
+
+Точка входа: `ru.tfc_aeronautics.bracket.WoodenBracketRegistration`. На статической инициализации по списку WOODS цикл делает:
+
+- `BLOCKS.register("wood/bracket/" + wood, () -> new WoodenBracket(...))` — подкласс `BracketBlock` без переопределений (всё уже объявлено в родителе: `AXIS_ALONG_FIRST_COORDINATE`, `TYPE`).
+- `ITEMS.register("wood/bracket/" + wood, () -> new WoodenBracketItem(block, new Item.Properties()))` — подкласс `BracketBlockItem`, тоже без логики, нужен только для типа.
+
+Публичные `BRACKETS` / `BRACKET_ITEMS` (`Map<String, DeferredHolder<...>>`) — для креатив-таба и будущих рецептов.
+
+Свойства: `BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(0.5F, 0.5F).noOcclusion().sound(SoundType.WOOD)` — дерево-материал, без occlusion (полупрозрачный для рендера).
+
+`WoodenBracketRegistration.register(modEventBus)` подключается в `TFCAeronautics#TFCAeronautics` после `ChainConveyorRegistration`. `CreativeTabs.MAIN.displayItems` добавляет все 20 предметов через `BRACKETS.keySet().forEach(wood -> output.accept(BRACKET_ITEMS.get(wood).get()))`.
+
+### Геометрия и текстурирование
+
+- Геометрия — `create:block/bracket/{cog|pipe|shaft}/{ground|wall}` (Blockbench в коде Create), 6 базовых моделей родителей, которые `WoodenBracketBlockStateProvider` ребиндит по текстурам. На каждый wood получается 6 per-wood моделей (×20 = 120), каждая — `withExistingParent("wood/bracket/<type>/<ground|wall>_<wood>", "create:block/bracket/<type>/<ground|wall>").texture("bracket", tfc_aeronautics:block/wood/bracket/bracket_<wood>).texture("plate", tfc_aeronautics:block/wood/bracket/bracket_plate_<wood>)`.
+- Blockstate: 36 вариантов на wood (= 2 `axis_along_first` × 6 `facing` × 3 `type`: cog/pipe/shaft). Rotation-таблица взята один-в-один из Create-овского `wooden_bracket.json` (per-type поворот не меняется) — реализована в `WoodenBracketBlockStateProvider.rotation(facing, alongFirst)`.
+- Item-модель: `withExistingParent("wood/bracket/<wood>", "create:block/bracket/item").texture("bracket", ...).texture("plate", ...)` — родительская Blockbench-геометрия та же, что у Create.
+
+### Текстуры
+
+40 PNG (20 × 2: `bracket_<wood>.png` + `bracket_plate_<wood>.png`) генерируются скриптом `generate/generate_wooden_bracket_textures.py` на основе двух Create-овских эталонов (`bracket_wooden.png`, `bracket_plate_wooden.png`). Алгоритм:
+
+1. Берётся медиана RGB центральной 50% TFC-овской планки (`assets/tfc/textures/block/wood/planks/<wood>.png`) — это целевой wood-тон.
+2. Каждый пиксель Create-эталона обесцвечивается до ЧБ по luminance-формуле с premultiply-alpha: `gray = round((0.299·R + 0.587·G + 0.114·B) · α/255)`. Затем `gray` рескейлится пропорционально так, чтобы самый яркий непрозрачный пиксель стал ровно `#FFFFFF` (`scale = 255 / max_gray`). Тёмное зерно остаётся тёмным, но динамический диапазон растягивается до полного.
+3. Финальный цвет: `R = round(gray' / 255 · wood_r)` (то же для G, B), α — как у Create. То есть самый яркий пиксель читается как **полный** wood-тон породы, а не его тёмная доля.
+4. Пишется под `src/generated/resources/assets/tfc_aeronautics/textures/block/wood/bracket/` — datagen видит их как обычные ассеты мода.
+
+Скрипт идемпотентен: перезапуск переписывает 40 PNG одними и теми же значениями.
+
+### Рецепты крафта
+
+20 per-wood рецептов в `data/tfc_aeronautics/recipe/crafting/wood/bracket/<wood>.json`:
+
+```json
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": { "P": { "item": "tfc:wood/lumber/<wood>" } },
+  "pattern": [ "PPP", "P P" ],
+  "result": { "count": 1, "id": "tfc_aeronautics:wood/bracket/<wood>" }
+}
+```
+
+Шаблон шлема: 5 lumber в форме перевёрнутой U. Генерируются скриптом `generate/generate_wooden_bracket_recipes.py`.
+
+Per-wood item-id выбран потому, что TFC не даёт per-wood tag для lumber — общий `tfc:lumber` сломал бы per-wood идентичность результата (через крафт из ольхи получался бы «дубовый» кронштейн).
+
+### Бан vanilla рецепта
+
+`create:crafting/kinetics/wooden_bracket` добавляется 7-м аргументом в `RecipeRemoval.BANNED_RECIPES` (`ImmutableSet.of(...)`). Миксин `RecipeManagerMixin` стрипает его из `byName` / `byType` после каждого reload, поэтому в JEI он не виден, а в верстаке — крафт-чек даёт «no recipe». Замена через per-wood crafting-рецепты выше.
+
+### Что НЕ делается
+
+- Нет осмысленного аналога для `tfc:metal/chain/<металл>` — кронштейны декоративно-функциональные, не металлические; эту нишу закрывает Create-овский `metal_bracket`, который тоже запрещён через `RecipeRemoval.BANNED_RECIPES` и не покрывается per-wood версиями.
+- Текстуры — статические, не генерируются в момент сборки как часть `runData`. Скрипт `generate/generate_wooden_bracket_textures.py` нужно прогнать вручную до `runData` (или до игры), иначе datagen упадёт на missing textures.
+- Lang-строки для предметов и блоков не добавлены — TODO, появится в подсистеме Localization.
+
+### Верификация (статическая)
+
+```bash
+./gradlew compileJava                                          # main sources
+python3 generate/generate_wooden_bracket_textures.py           # 40 PNG под src/generated
+python3 generate/verify_wooden_bracket_textures.py             # spot-check: 40 OK rows (brightest pixel = wood median)
+./gradlew runData                                              # 20 blockstate + 120 model + 20 item под src/generated
+# Альтернатива runData: Python-эмиттер даёт тот же набор 160 JSON, но без JVM-стартапа.
+python3 generate/generate_wooden_bracket_assets.py             # 20 blockstate + 120 model + 20 item под src/generated
+python3 generate/generate_wooden_bracket_recipes.py            # 20 recipe JSON под src/main/resources
+
+# Должно быть 0 (никаких упоминаний wooden_bracket без per-wood шага):
+grep -rn "WoodType\|woodType" src/main/java/ru/tfc_aeronautics/bracket/
+
+# После runData в src/generated должны появиться (per-wood × штук):
+ls src/generated/resources/assets/tfc_aeronautics/blockstates/wood/bracket/   # 20 .json
+ls src/generated/resources/assets/tfc_aeronautics/models/block/wood/bracket/  # 120 .json
+ls src/generated/resources/assets/tfc_aeronautics/models/item/wood/bracket/   # 20 .json
+```
+
+### Smoke-проверка в игре
+
+Без рантайма — передать пользователю для прогона в Prism-лаунчере:
+
+- [ ] `/give @s tfc_aeronautics:wood/bracket/oak` появляется в инвентаре и в creative-табе мода.
+- [ ] ПКМ по `create:shaft` разными кронштейнами — ставятся, цвет соответствует породе.
+- [ ] ПКМ по `create:large_cogwheel` и `create:fluid_pipe` — тоже работает, переключается в нужный `type` (cog / pipe / shaft) автоматически.
+- [ ] Крафт: 5 oak-lumber в шлем-форме `["PPP", "P P"]` → 1 `tfc_aeronautics:wood/bracket/oak`. Тот же рецепт для каждой породы, ингредиент — соответствующий lumber.
+- [ ] Крафт: 5 `tfc:wood/planks/oak` в той же форме → рецепт НЕ срабатывает (lumber ≠ planks).
+- [ ] JEI: 20 per-wood рецептов видны. Create-овский `create:wooden_bracket` рецепт не виден.
+- [ ] В creative-табе — все 20 предметов рядом, в алфавитном порядке.

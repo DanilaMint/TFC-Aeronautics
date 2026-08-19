@@ -46,7 +46,7 @@ neoForge {
         minecraftVersion = project.parchment_minecraft_version
     }
 
-    // runClient/runServer/runData/runGameTestServer require a full modpack and
+    // runClient/runServer/runGameTestServer require a full modpack and
     // are intentionally omitted. Use `build` + PrismLauncher for runtime testing.
 
     mods {

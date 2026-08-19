@@ -10,6 +10,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import ru.tfc_aeronautics.anvil.AnvilRegistration;
+import ru.tfc_aeronautics.bracket.WoodenBracketRegistration;
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.chain.ChainConveyorRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
@@ -46,6 +47,7 @@ public final class CreativeTabs
                 output.accept(BurlapRegistration.IMPREGNATED_BURLAP_CLOTH.get());
                 output.accept(FluidItems.ROSIN_BUCKET.get());
                 output.accept(ChainConveyorRegistration.CHAIN_CONVEYOR_ITEM.get());
+                WoodenBracketRegistration.BRACKETS.keySet().forEach(wood -> output.accept(WoodenBracketRegistration.BRACKET_ITEMS.get(wood).get()));
             })
             .build());
 
