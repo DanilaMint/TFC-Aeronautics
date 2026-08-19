@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 14/? ✓ (overrides + 31 envelope)
+**Прогресс:** 15/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -109,6 +109,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (consistent with 8 existing overrides: encased_chain_drive, wrench, belt_connector, whisk, propeller, rope_pulley, mechanical_saw, goggles)
   - шейдинг-тегов не требуется: `#tfc:lumber` уже в датапаке TFC (20 пород) и использован в 3 других наших override-рецептах (`clutch.json`, `water_wheel.json`, `white_sail.json`); `tfc_aeronautics:composite` — прямой item-id из `composite/CompositeRegistration.java`
   - recipe-id остаётся `create:crafting/kinetics/hand_crank`, advancement Create засчитывается без правок
+- [x] `data/create/recipe/crafting/kinetics/chute.json`
+  - оригинал Create shaped 3×1 `A/I/A` с `#c:plates/iron` (A) + `#c:ingots/iron` (I) → 4 `create:chute`
+  - TFC-style shaped 3×1 `A/I/A`: 2× `tfc_aeronautics:metal/tight_sheet/wrought_iron` (A) + 1× `tfc:metal/ingot/wrought_iron` (I) → 4 `create:chute`
+  - мотивация: `c:plates/iron` и `c:ingots/iron` в TFC-сборке пусты (per TFC convention — металл приходит через `c:plates/<metal>` / `c:ingots/<metal>`); tight_sheet — наш аналог plate для wrought iron, ingot — TFC слиток. Pattern и аутпут неизменны — простой sub-recipe override (как `rope_pulley.json` / `propeller.json`), не TFC-style reshape
+  - ветка 1 скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (consistent с 10 существующими overrides)
+  - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/wrought_iron` и `tfc:metal/ingot/wrought_iron` — прямые item-id (TFC ingot item, уникальный tight_sheet из `metal/TightSheet.java`)
+  - recipe-id остаётся `create:crafting/kinetics/chute`, advancement Create засчитывается без правок
+  - параллельно добавлены `data/tfc_aeronautics/recipe/heating/chute.json` (chute → 75 мБ `tfc:metal/cast_iron` @ 1535°C) и `data/tfc_aeronautics/tfc/item_heat/chute.json` (`heat_capacity: 7.2`) — см. `plans/chute.md`
 
 ## TODO (новые добавлять сюда)
 
