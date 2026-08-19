@@ -29,14 +29,8 @@ from pathlib import Path
 
 from PIL import Image
 
-WOODS = [
-    "acacia", "ash", "aspen", "birch", "blackwood", "chestnut",
-    "douglas_fir", "hickory", "kapok", "mangrove", "maple", "oak",
-    "palm", "pine", "rosewood", "sequoia", "spruce", "sycamore",
-    "white_cedar", "willow",
-]
+from _common import WOODS, REPO
 
-REPO = Path(__file__).resolve().parent.parent
 CREATE_TEX = REPO / "code_references" / "Create" / "src" / "main" / "resources" / "assets" / "create" / "textures" / "block"
 TFC_PLANKS = REPO / "code_references" / "TerraFirmaCraft" / "src" / "main" / "resources" / "assets" / "tfc" / "textures" / "block" / "wood" / "planks"
 OUT_DIR = REPO / "src" / "generated" / "resources" / "assets" / "tfc_aeronautics" / "textures" / "block" / "wood" / "bracket"
@@ -103,7 +97,7 @@ def tint(texture_path: Path, wood_rgb: tuple[int, int, int]) -> Image.Image:
     return out
 
 
-def main() -> None:
+def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     sources = {
         "bracket": CREATE_TEX / "bracket_wooden.png",
@@ -113,6 +107,7 @@ def main() -> None:
     if missing:
         raise SystemExit(f"Missing Create reference textures: {missing}")
 
+    written = 0
     for wood in WOODS:
         plank = TFC_PLANKS / f"{wood}.png"
         if not plank.exists():
@@ -122,10 +117,11 @@ def main() -> None:
         for prefix, src in sources.items():
             tinted = tint(src, wood_rgb)
             tinted.save(OUT_DIR / f"{prefix}_{wood}.png")
+            written += 1
 
-    written = sorted(p.name for p in OUT_DIR.iterdir())
-    print(f"Wrote {len(written)} PNGs to {OUT_DIR.relative_to(REPO)}")
+    print(f"wrote {written} PNGs to {OUT_DIR.relative_to(REPO)}")
+    return written
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

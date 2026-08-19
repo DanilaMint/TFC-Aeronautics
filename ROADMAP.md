@@ -27,4 +27,4 @@
 - [Ponder](plans/ponder.md) — 7/9 ⏳
 - [Localization](plans/localization.md) — 32/37 ⏳
 - [Chain Conveyor (TFC-aware)](plans/chain-conveyor.md) — ✓
-- [Wooden Brackets (per-wood)](plans/wooden-bracket.md) — ✓ (Java + datagen + recipes + ban + docs реализованы, runData подвис → datagen-выход сгенерирован Python-скриптом `generate/generate_wooden_bracket_assets.py`; текстуры — `generate/generate_wooden_bracket_textures.py` с verify-скриптом `generate/verify_wooden_bracket_textures.py`)
+- [Wooden Brackets (per-wood)](plans/wooden-bracket.md) — ✓ (Python-генерация под `generate/`: assets через `generate_wooden_bracket_assets.py`, recipes через `generate_wooden_bracket_recipes.py`, текстуры — `generate_wooden_bracket_textures.py` с verify `generate/verify_wooden_bracket_textures.py`; milling+quern рецепты — `generate_milling_recipes.py` + `generate_quern_food_recipes.py`; Java-классы datagen удалены; `src/generated/resources/` гитигнорится и перегенерируется перед `build`)

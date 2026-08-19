@@ -24,14 +24,8 @@ from pathlib import Path
 
 from PIL import Image
 
-WOODS = [
-    "acacia", "ash", "aspen", "birch", "blackwood", "chestnut",
-    "douglas_fir", "hickory", "kapok", "mangrove", "maple", "oak",
-    "palm", "pine", "rosewood", "sequoia", "spruce", "sycamore",
-    "white_cedar", "willow",
-]
+from _common import WOODS, REPO
 
-REPO = Path(__file__).resolve().parent.parent
 CREATE_TEX = REPO / "code_references" / "Create" / "src" / "main" / "resources" / "assets" / "create" / "textures" / "block"
 TFC_PLANKS = REPO / "code_references" / "TerraFirmaCraft" / "src" / "main" / "resources" / "assets" / "tfc" / "textures" / "block" / "wood" / "planks"
 OUT_DIR = REPO / "src" / "generated" / "resources" / "assets" / "tfc_aeronautics" / "textures" / "block" / "wood" / "bracket"

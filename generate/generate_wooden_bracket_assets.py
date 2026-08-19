@@ -25,22 +25,14 @@ The template is rewritten per-wood with two string substitutions:
   _wooden                       ->  _<wood>
 """
 import json
-import shutil
 from pathlib import Path
 
-WOODS = [
-    "acacia", "ash", "aspen", "birch", "blackwood", "chestnut",
-    "douglas_fir", "hickory", "kapok", "mangrove", "maple", "oak",
-    "palm", "pine", "rosewood", "sequoia", "spruce", "sycamore",
-    "white_cedar", "willow",
-]
+from _common import WOODS, REPO, GEN, write_json
 
 TYPES = ["cog", "pipe", "shaft"]
 POSITIONS = ["ground", "wall"]
 
-REPO = Path(__file__).resolve().parent.parent
 TEMPLATE = REPO / "code_references" / "Create" / "src" / "generated" / "resources" / "assets" / "create" / "blockstates" / "wooden_bracket.json"
-GEN = REPO / "src" / "generated" / "resources" / "assets" / "tfc_aeronautics"
 
 
 def render_blockstate(template_text: str, wood: str) -> str:
@@ -60,10 +52,7 @@ def write_block_model(wood: str, type_: str, pos: str) -> Path:
             "plate":   f"tfc_aeronautics:block/wood/bracket/bracket_plate_{wood}",
         },
     }
-    path = GEN / "models" / "block" / "wood" / "bracket" / type_ / f"{pos}_{wood}.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(body, indent=2) + "\n")
-    return path
+    return write_json(f"assets/tfc_aeronautics/models/block/wood/bracket/{type_}/{pos}_{wood}.json", body)
 
 
 def write_item_model(wood: str) -> Path:
@@ -74,20 +63,17 @@ def write_item_model(wood: str) -> Path:
             "plate":   f"tfc_aeronautics:block/wood/bracket/bracket_plate_{wood}",
         },
     }
-    path = GEN / "models" / "item" / "wood" / "bracket" / f"{wood}.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(body, indent=2) + "\n")
-    return path
+    return write_json(f"assets/tfc_aeronautics/models/item/wood/bracket/{wood}.json", body)
 
 
 def write_blockstate(wood: str, rendered: str) -> Path:
-    path = GEN / "blockstates" / "wood" / "bracket" / f"{wood}.json"
+    path = GEN / "assets" / "tfc_aeronautics" / "blockstates" / "wood" / "bracket" / f"{wood}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(rendered)
     return path
 
 
-def main() -> None:
+def main() -> int:
     if not TEMPLATE.exists():
         raise SystemExit(f"Missing template: {TEMPLATE}")
 
@@ -108,9 +94,11 @@ def main() -> None:
         write_item_model(wood)
         im_count += 1
 
-    print(f"Wrote {bs_count} blockstates, {bm_count} block models, {im_count} item models under")
-    print(f"  {GEN.relative_to(REPO)}")
+    total = bs_count + bm_count + im_count
+    print(f"wrote {bs_count} blockstates, {bm_count} block models, {im_count} item models "
+          f"({total} total) under {GEN.relative_to(REPO)}")
+    return total
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

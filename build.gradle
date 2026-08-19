@@ -101,6 +101,53 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 sourceSets.main.resources.srcDir generateModMetadata
 neoForge.ideSyncTask generateModMetadata
 
+// Run Python datagen scripts before resources are processed. The scripts
+// populate src/generated/resources/ (gitignored) with all asset + data
+// output. Replaces the legacy Java GatherDataEvent providers entirely.
+def generateResources = tasks.register('generateResources', Exec) {
+    group = 'build'
+    description = 'Run Python datagen scripts to populate src/generated/resources/'
+
+    inputs.dir('generate')
+        .withPropertyName('generateScripts')
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.dir('src/generated/resources')
+        .withPropertyName('generatedResources')
+
+    doFirst {
+        // Discover a working Python 3 interpreter (python3 first, then python).
+        // The user can override via `pythonBin` in gradle.properties.
+        def chosen = null
+        for (name in ['python3', 'python']) {
+            try {
+                def result = exec {
+                    commandLine name, '-c', 'import sys'
+                    ignoreExitValue = true
+                }
+                if (result.exitValue == 0) {
+                    chosen = name
+                    break
+                }
+            } catch (Exception ignored) {}
+        }
+        def override = project.findProperty('pythonBin')
+        if (override != null) chosen = override
+        if (chosen == null) {
+            throw new GradleException(
+                'Neither python3 nor python is on PATH. Install Python 3 to run generateResources, ' +
+                'or set `pythonBin=/path/to/python` in gradle.properties.')
+        }
+        commandLine chosen, 'generate/generate.py'
+        logger.lifecycle("generateResources: using ${chosen}")
+    }
+
+    workingDir = projectDir
+}
+
+tasks.named('processResources').configure {
+    dependsOn generateResources
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
