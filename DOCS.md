@@ -30,6 +30,7 @@
 20. [Замена slimeball на `tfc:glue`](#20-замена-slimeball-на-tfcglue)
 21. [Наковальни для остальных металлов (Tier-1 Anvils)](#21-наковальни-для-остальных-металлов-tier-1-anvils)
 22. [Деревянные кронштейны по породе (TFC Wooden Brackets)](#22-деревянные-кронштейны-по-породе-tfc-wooden-brackets)
+23. [Depot: крафт молотком по андезитовому корпусу (Hammer-craft Depot)](#23-depot-крафт-молотком-по-андезитовому-корпусу-hammer-craft-depot)
 
 ---
 
@@ -2390,3 +2391,18 @@ ls src/generated/resources/assets/tfc_aeronautics/models/item/wood/bracket/   # 
 - [ ] Крафт: 5 `tfc:wood/planks/oak` в той же форме → рецепт НЕ срабатывает (lumber ≠ planks).
 - [ ] JEI: 20 per-wood рецептов видны. Create-овский `create:wooden_bracket` рецепт не виден.
 - [ ] В creative-табе — все 20 предметов рядом, в алфавитном порядке.
+
+## 23. Depot: крафт молотком по андезитовому корпусу (Hammer-craft Depot)
+
+**Mechanic:** кликнуть любым молотком (`c:tools/hammer`) по верхней грани блока `create:andesite_casing` (андезитовый корпус, при условии, что блок над ним — воздух), чтобы превратить его в `create:depot`.
+
+**Аналогия:** копия TFC-механики создания каменной наковальни — `code_references/TerraFirmaCraft/.../blocks/rock/RockConvertableToAnvilBlock.java` (per-block override `useItemOn`). У нас `андезитовый корпус` — не наш блок, поэтому та же логика перенесена в event-listener.
+
+**Реализация:** `src/main/java/ru/tfc_aeronautics/depot/DepotCraftHandler.java`.
+- common bus `@EventBusSubscriber(modid = TFCAeronautics.MOD_ID)`
+- слушает `PlayerInteractEvent.RightClickBlock`
+- проверяет `event.getHitVec().getDirection() == Direction.UP`, `level.getBlockState(pos.above()).isAir()`, `state.getBlock() == AllBlocks.ANDESITE_CASING.get()`, `held.is(HAMMERS)` (TagKey `c:tools/hammer`)
+- на сервере: `level.setBlockAndUpdate(pos, AllBlocks.DEPOT.get().defaultBlockState())`
+- на обеих сторонах: `event.setCanceled(true)` + `setCancellationResult(InteractionResult.CONSUME)` — стандартное использование блока не срабатывает (андезитовый корпус не открывает GUI/не ставится).
+
+**Запрет оригинала:** `create:crafting/kinetics/depot` (recipe-id из `data/create/recipe/crafting/kinetics/depot.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`.
