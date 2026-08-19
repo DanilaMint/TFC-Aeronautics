@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "tag": "tfc:lumber"
+    },
+    "A": {
+      "item": "tfc_aeronautics:composite"
+    }
+  },
+  "pattern": [
+    "CCC",
+    "  A"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:hand_crank"
+  },
+  "show_notification": false
+}

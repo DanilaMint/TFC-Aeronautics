@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 13/? ✓ (overrides + 31 envelope)
+**Прогресс:** 14/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -101,6 +101,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (structural reshape)
   - шейдинг-тегов не требуется: `tfc:lumber` определён в датапаке TFC (20 пород), `c:dusts/redstone` — общий common-тег
   - оригинал `create:crafting/kinetics/clutch` (recipe-id из пути `data/create/recipe/crafting/kinetics/clutch.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
+- [x] `data/create/recipe/crafting/kinetics/hand_crank.json`
+  - оригинал Create shaped `["CCC", "  A"]` с 3× `#minecraft:planks` + 1× `create:andesite_alloy` → 1 `create:hand_crank`
+  - новый: те же `["CCC", "  A"]`, ключи `C = #tfc:lumber` + `A = tfc_aeronautics:composite` → 1 `create:hand_crank`
+  - мотивация: `minecraft:planks` в TFC-сборке — это TFC-плахи (blocks). Игроку нужны lumber — обработанные доски как items. `tfc_aeronautics:composite` (Industrial Composite / Промышленный композит) — наш аналог `create:andesite_alloy`, производится через barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`. Pattern и аутпут неизменны — простой sub-recipe override (как `super_glue.json` / `gearshift.json`), не TFC-style reshape
+  - ветка 1 скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (consistent with 8 existing overrides: encased_chain_drive, wrench, belt_connector, whisk, propeller, rope_pulley, mechanical_saw, goggles)
+  - шейдинг-тегов не требуется: `#tfc:lumber` уже в датапаке TFC (20 пород) и использован в 3 других наших override-рецептах (`clutch.json`, `water_wheel.json`, `white_sail.json`); `tfc_aeronautics:composite` — прямой item-id из `composite/CompositeRegistration.java`
+  - recipe-id остаётся `create:crafting/kinetics/hand_crank`, advancement Create засчитывается без правок
 
 ## TODO (новые добавлять сюда)
 
