@@ -1,0 +1,16 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {
+    "tag": "c:ingots/wrought_iron"
+  },
+  "result": {
+    "count": 4,
+    "id": "create:metal_bracket"
+  },
+  "rules": [
+    "bend_last",
+    "bend_second_last"
+  ],
+  "apply_bonus": false,
+  "tier": 3
+}

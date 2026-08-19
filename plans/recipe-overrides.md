@@ -118,6 +118,17 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/wrought_iron` и `tfc:metal/ingot/wrought_iron` — прямые item-id (TFC ingot item, уникальный tight_sheet из `metal/TightSheet.java`)
   - recipe-id остаётся `create:crafting/kinetics/chute`, advancement Create засчитывается без правок
   - параллельно добавлены `data/tfc_aeronautics/recipe/heating/chute.json` (chute → 75 мБ `tfc:metal/cast_iron` @ 1535°C) и `data/tfc_aeronautics/tfc/item_heat/chute.json` (`heat_capacity: 7.2`) — см. `plans/chute.md`
+- [x] `data/tfc_aeronautics/recipe/anvil/bracket_{wrought_iron,steel,cast_iron}.json` (3 файла)
+  - оригинал Create crafting_shaped `["SSS","PCP"]`: 3× `#c:nuggets/iron` (S) + 2× `#c:ingots/iron` (P) + 1× `create:andesite_alloy` (C) → 4 `create:metal_bracket`. В TFC-сборке фактически мёртв: `c:ingots/iron` / `c:nuggets/iron` пусты (per TFC convention — металл через per-metal subtag), `andesite_alloy` — Create-only
+  - новые: 3 файла anvil-рецептов (один per-металл — TFC-наковальня не принимает несколько тегов в одном ингедиенте). Шаблон: `tfc:anvil` + tag `c:ingots/<metal>` + `rules: ["bend_last","bend_second_last"]` (2 сгиба, уникальный bend-паттерн — отличается от hit-паттерна в `tight_sheet_*`) + `apply_bonus: false` (аналогично `tight_sheet_*`, без бонусного выхода за мастерство). Per-металл `count`: `wrought_iron` → 4, `steel` → 8 (steel даёт больше как лучший металл), `cast_iron` → 2 (минимальный выход для «грязного» tier-0 пути)
+  - **tier per-металл**: `wrought_iron` → 3, `steel` → 4 (совпадает с `tight_sheet_wrought_iron.json` / `tight_sheet_steel.json`); `cast_iron` → 0 (по запросу пользователя — соответствует TFC vanilla cast iron recipes, которые не указывают tier; `default = 0` в `AnvilRecipe.java:71`, означает «любая наковальня»)
+  - мотивация: скоба — кованая листовая заготовка, естественно идёт через TFC-наковальню. Per-metal tag вместо `c:ingots` umbrella (как в `tight_sheet_*`): исключает скобы из латуни/бронзы/меди, держит баланс металлов. Прогрессия count (2 → 4 → 8) повторяет «качество металла = выход»: cast_iron на любой наковальне даёт минимум, steel на 4-tier даёт максимум. Bend-паттерн (не hit) делает рецепт визуально отличимым в JEI от прочих anvil-операций в моде
+  - структурно — **TFC-style reshape** (shaped → tfc:anvil), ветка 2 скилла `recipe-override` (recipe-id в `tfc_aeronautics`, оригинал запрещён через `BANNED_RECIPES`)
+  - `show_notification: false` (по умолчанию для anvil-рецептов — UI TFC-наковальни сам показывает результат)
+  - шейдинг-тегов не требуется: `c:ingots/wrought_iron`, `c:ingots/steel`, `c:ingots/cast_iron` — per-metal subtag'и, уже определённые в датапаке TFC
+  - recipe-id'ы **новые** (`tfc_aeronautics:anvil/bracket_wrought_iron` / `.../bracket_steel` / `.../bracket_cast_iron`), не override существующих — JEI/advancement привязывать не нужно
+  - оригинал `create:crafting/kinetics/metal_bracket` (recipe-id из пути `data/create/recipe/crafting/kinetics/metal_bracket.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
+  - **проверено**: JSON валиден (`python3 -c 'json.load(...)'` OK × 3), `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## TODO (новые добавлять сюда)
 
