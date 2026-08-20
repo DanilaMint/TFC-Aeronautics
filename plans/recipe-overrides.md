@@ -135,6 +135,13 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - **ветка 1** скилла `recipe-override`: recipe-id `create:crafting/kinetics/fluid_valve` сохранён, advancement Create засчитывается без правок; `BANNED_RECIPES` не трогаем
   - `show_notification: false` (structural reshape)
   - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id
+- [x] `data/create/recipe/crafting/kinetics/steam_whistle.json`
+  - оригинал Create shaped `["P", "C"]` с `#c:plates/gold` (P) + `#c:ingots/copper` (C) → 1 `create:steam_whistle`
+  - новый: тот же pattern, ключи `P = #c:sheets/gold` + `C = #c:ingots/copper` → 1 `create:steam_whistle`
+  - мотивация: `c:plates/gold` в TFC-сборке содержит только `create:golden_sheet` (Create-only золотой лист, требует mechanical press); `c:sheets/gold` — common-тег золотых листов, в котором TFC регистрирует `tfc:metal/sheet/gold` (получается через TFC anvil из `c:double_ingots/gold`, см. `data/tfc/recipe/anvil/metal/sheet/gold.json`). Замена сохраняет семантику «любой золотой лист», но привязывает свисток к TFC-металлургическому пути — игрок больше не обязан делать Create-press для золотой пластины
+  - **ветка 1** скилла `recipe-override`: recipe-id `create:crafting/kinetics/steam_whistle` сохранён, advancement Create засчитывается без правок; `BANNED_RECIPES` не трогаем
+  - `show_notification: false` (конвенция проекта, как `wrench.json`)
+  - шейдинг-тегов не требуется: `c:sheets/gold` — common-тег, в TFC-сборке содержит `tfc:metal/sheet/gold` (`code_references/TerraFirmaCraft/src/generated/resources/data/c/tags/item/sheets/gold.json`)
 
 ## TODO (новые добавлять сюда)
 
