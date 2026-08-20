@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "S": { "item": "tfc_aeronautics:metal/tight_sheet/wrought_iron" },
+    "P": { "item": "create:fluid_pipe" }
+  },
+  "pattern": [
+    " S ",
+    "PPP",
+    "   "
+  ],
+  "result": {
+    "count": 3,
+    "id": "create:fluid_valve"
+  }
+}

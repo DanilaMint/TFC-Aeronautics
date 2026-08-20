@@ -129,6 +129,12 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id'ы **новые** (`tfc_aeronautics:anvil/bracket_wrought_iron` / `.../bracket_steel` / `.../bracket_cast_iron`), не override существующих — JEI/advancement привязывать не нужно
   - оригинал `create:crafting/kinetics/metal_bracket` (recipe-id из пути `data/create/recipe/crafting/kinetics/metal_bracket.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
   - **проверено**: JSON валиден (`python3 -c 'json.load(...)'` OK × 3), `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/create/recipe/crafting/kinetics/fluid_valve.json`
+  - Create shapeless `c:plates/iron` (пуст в TFC) + `create:fluid_pipe` → 1 → shaped `[" S ","PPP","   "]`: 1× `tfc_aeronautics:metal/tight_sheet/wrought_iron` (верх-середина) + 3× `create:fluid_pipe` (средний ряд) → 3 `create:fluid_valve`
+  - выход ×3: логика «1 труба-сегмент = 1 клапан», один лист сверху — общая перемычка-коромысло для трёх
+  - **ветка 1** скилла `recipe-override`: recipe-id `create:crafting/kinetics/fluid_valve` сохранён, advancement Create засчитывается без правок; `BANNED_RECIPES` не трогаем
+  - `show_notification: false` (structural reshape)
+  - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id
 
 ## TODO (новые добавлять сюда)
 
