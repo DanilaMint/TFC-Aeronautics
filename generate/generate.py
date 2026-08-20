@@ -17,6 +17,7 @@ import sys
 import time
 
 from generate_milling_recipes import main as gen_milling
+from generate_mixing_recipes import main as gen_mixing
 from generate_quern_food_recipes import main as gen_quern
 from generate_wooden_bracket_assets import main as gen_assets
 from generate_wooden_bracket_recipes import main as gen_recipes
@@ -31,6 +32,7 @@ LEAVES: list[tuple[str, callable]] = [
     ("brackets-recipes",  gen_recipes),
     ("brackets-textures", gen_textures),
     ("milling",           gen_milling),
+    ("mixing",            gen_mixing),
     ("quern",             gen_quern),
 ]
 
@@ -44,7 +46,8 @@ GROUPS: dict[str, list[tuple[str, callable]]] = {
     "brackets-recipes": [LEAVES[1]],
     "brackets-textures": [LEAVES[2]],
     "milling":           [LEAVES[3]],
-    "quern":             [LEAVES[4]],
+    "mixing":            [LEAVES[4]],
+    "quern":             [LEAVES[5]],
 }
 
 

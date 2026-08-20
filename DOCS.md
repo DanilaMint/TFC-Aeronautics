@@ -31,6 +31,7 @@
 21. [Наковальни для остальных металлов (Tier-1 Anvils)](#21-наковальни-для-остальных-металлов-tier-1-anvils)
 22. [Деревянные кронштейны по породе (TFC Wooden Brackets)](#22-деревянные-кронштейны-по-породе-tfc-wooden-brackets)
 23. [Depot: крафт молотком по андезитовому корпусу (Hammer-craft Depot)](#23-depot-крафт-молотком-по-андезитовому-корпусу-hammer-craft-depot)
+24. [TFC FOOD processing в Create-машинах](#24-tfc-food-processing-в-create-машинах)
 
 ---
 
@@ -1599,6 +1600,112 @@ HeatDealer.REGISTRY.register(MyRegistration.MY_BURNER.get(),
 Одна строка в `HeatDealerRegistration#registerHeatDealers` — и блок сразу
 работает и с басином, и с паровым котлом, и со всеми будущими потребителями.
 Именно так будет подключён `tfc_aeronautics:spirit_burner`.
+
+---
+
+## 24. TFC FOOD processing в Create-машинах
+
+TFC сам по себе не предлагает механической автоматизации пищевого
+производства — `tfc:barrel_sealed` годится для заквасок и длительной
+выдержки, `tfc:pot` — для варки, наковальня — для формовки, — но для
+промежуточных шагов (помол, замес, просушка, прессование сыра)
+автоматизации нет. Этот раздел фиксирует проброс TFC FOOD шагов в
+Create-машины с полной синхронизацией пищевых данных TFC (`tfc:food`
+компонент: rot timer, `creationDate`, traits).
+
+Трекер и мета-план — `plans/tfc-food-create-integration.md`.
+
+### Общий принцип синхронизации rot timer
+
+Для каждого шага:
+
+1. TFC-рецепт (`tfc:advanced_shapeless_crafting`, `tfc:quern`, ...) уже
+   синхронизирует food data — это baseline.
+2. Create-аналог (`create:milling`, `create:mixing`, ...) — более
+   быстрый, автоматизированный путь.
+3. Если Create-путь не даёт тот же набор `ItemStackModifier`-ов
+   (`tfc:copy_food`, `tfc:copy_oldest_food`), подключаем миксин:
+   - `HEAD` ловит input **до** in-place `shrink(1)` через `.copy()`
+     (см. [[feedback_mixin_itemstack_copy]]);
+   - `TAIL` применяет `FoodCapability.updateFoodFromPrevious(input, output)`,
+     или маршрутизирует через `ItemStackProvider.getSingleStack(input)`
+     (когда нужны произвольные modifiers).
+
+Формула `Cf = (1 - p) * T + p * Ci` с `p = newDecay / oldDecay`
+сохраняет долю испорченности между input и output. `creationDate`
+пересчитывается так, чтобы rot timer у муки из мельницы совпадал с
+rot timer у муки из жернова, помолотого из того же зерна.
+
+### Milling (grain → flour) — Create millstone
+
+См. [раздел 2.3](#tfc_aeronauticsquern_milling--поддержка-tfc-модификаторов-в-мельнице)
+(`tfc_aeronautics:quern_milling`): кастомный `RecipeType` extends
+`MillingRecipe`, плюс `MillstoneBlockEntityMixin` для маршрутизации
+через `ItemStackProvider.getSingleStack(capturedInput)`. Decay-таймер
+муки из мельницы идентичен муке из жернова.
+
+### Mixing (flour → dough) — Create basin + mixer
+
+TFC'шное тесто (`tfc:food/{grain}_dough`) — базовый пищевой ингредиент,
+который обычно получают через crafting grid + water bucket
+(`tfc:advanced_shapeless_crafting`, `tfc:copy_oldest_food`). Альтернатива
+— Create basin + mechanical mixer, с такой же синхронизацией rot timer.
+
+Датаген: `generate/generate_mixing_recipes.py` → 6 JSON
+`src/generated/resources/data/tfc_aeronautics/recipe/mixing/
+{grain}_dough.json` (по одному на каждое зерно: wheat, barley, maize,
+oat, rye, rice).
+
+JSON-форма (пример для wheat, `wheat_dough.json`):
+
+```json
+{
+  "type": "create:mixing",
+  "ingredients": [
+    { "item": "tfc:food/wheat_flour" },
+    { "type": "neoforge:single", "amount": 100, "fluid": "minecraft:water" }
+  ],
+  "results": [{ "count": 1, "id": "tfc:food/wheat_dough" }]
+}
+```
+
+Синхронизация rot timer: миксин
+`src/main/java/ru/tfc_aeronautics/mixin/BasinMixingFoodDataMixin.java`
+на `BasinOperatingBlockEntity.applyBasinRecipe`:
+
+- `HEAD` обходит basin input inventory, ищет TFC flour
+  (`tfc:food/*_flour` предикат по item-id) и сохраняет **копию**
+  в `aeronautics$capturedFlour`. `.copy()` обязательно — иначе
+  последующий in-place `shrink(1)` обнулит count у нашего снимка,
+  и `ItemStack.copy()` внутри `updateFoodFromPrevious` отдаст
+  `EMPTY` без FOOD-компонента → `tfc:copy_food` тихо срабатывает
+  вхолостую. Та же ловушка, что и в `MillstoneBlockEntityMixin` (см.
+  [раздел 2.3](#tfc_aeronauticsquern_milling--поддержка-tfc-модификаторов-в-мельнице)).
+- `TAIL` обходит basin output inventory, и для каждого результата
+  из `TFC_DOUGHS` set (явное перечисление шести TFC dough'ов:
+  `tfc:food/{barley,maize,oat,rye,rice,wheat}_dough`) вызывает
+  `FoodCapability.updateFoodFromPrevious(captured, output)`.
+  Если у output нет `TFCComponents.FOOD` (например, recipe-result
+  закешировался и `ItemStackHooks.onModifyItemStackComponents` не
+  отработал) — прикрепляем свежий `FoodComponent` через
+  `FoodCapability.getDefinition` + `new FoodComponent(def)`.
+
+### Future
+
+- **Dough → bread** — TFC выпекает хлеб в `tfc:pot` / `tfc:firepit`
+  (нужна жарка). Create basin не подходит. Кандидаты: кастомная
+  машина, либо адаптация `tfc:pot` под basin + heat через
+  `tfc_aeronautics:heat_dealers` ([раздел 16](#16-нагревательные-элементы-heat-dealers)).
+- **Sourdough starter** — TFC `tfc:barrel_sealed` 12-часовой рецепт.
+  Возможен аналог через mixer spin-time или адаптация recipe type
+  под sealed-семантику.
+- **Dough → pasta** — TFC pasta shaping. Create `mechanical_press`
+  через `tfc_aeronautics:stamping_press` ([раздел 3](#3-штамп-пресс-stamping-press))
+  — кандидат.
+- **Drying / smoking** — TFC drying мяса/рыбы/фруктов в pit/solar
+  dryer. Автоматизация firepit/cooler.
+- **Cheese pressing** — TFC cheese curds → cheese wheel через press.
+  Аналог — `tfc_aeronautics:stamping_press` с другим фильтром.
 
 ---
 

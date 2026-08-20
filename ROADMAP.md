@@ -28,3 +28,4 @@
 - [Localization](plans/localization.md) — 32/37 ⏳
 - [Chain Conveyor (TFC-aware)](plans/chain-conveyor.md) — ✓
 - [Wooden Brackets (per-wood)](plans/wooden-bracket.md) — ✓ (Python-генерация под `generate/`: assets через `generate_wooden_bracket_assets.py`, recipes через `generate_wooden_bracket_recipes.py`, текстуры — `generate_wooden_bracket_textures.py` с verify `generate/verify_wooden_bracket_textures.py`; milling+quern рецепты — `generate_milling_recipes.py` + `generate_quern_food_recipes.py`; Java-классы datagen удалены; `src/generated/resources/` гитигнорится и перегенерируется перед `build`)
+- [TFC FOOD + Create integration](plans/tfc-food-create-integration.md) — milling ✓, mixing ✓ (6 grain × `create:mixing` через `generate_mixing_recipes.py` + `BasinMixingFoodDataMixin` для rot timer sync)
