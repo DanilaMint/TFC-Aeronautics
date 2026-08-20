@@ -142,6 +142,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - **ветка 1** скилла `recipe-override`: recipe-id `create:crafting/kinetics/steam_whistle` сохранён, advancement Create засчитывается без правок; `BANNED_RECIPES` не трогаем
   - `show_notification: false` (конвенция проекта, как `wrench.json`)
   - шейдинг-тегов не требуется: `c:sheets/gold` — common-тег, в TFC-сборке содержит `tfc:metal/sheet/gold` (`code_references/TerraFirmaCraft/src/generated/resources/data/c/tags/item/sheets/gold.json`)
+- [x] `data/tfc_aeronautics/recipe/anvil/copper_valve_handle.json`
+  - оригинал Create crafting_shaped `["CCC", " S "]` с `#c:plates/copper` (C) + `create:andesite_alloy` (S) → 1 `create:copper_valve_handle`. В TFC-сборке фактически мёртв: `c:plates/copper` пуст (per TFC convention — металл идёт через per-metal subtag'и и `tfc:metal/sheet/*`, см. `steam_whistle.json` для той же логики), `andesite_alloy` — Create-only сплав, требующий mechanical press
+  - новый: TFC anvil tier 1, `ingredient: { item: "tfc:metal/rod/copper" }` → 1 `create:copper_valve_handle`. Rules `["bend_last", "draw_not_last", "upset_not_last"]` — последний удар всегда `BEND` (финальный изгиб ручки), среди двух предыдущих должны быть и `DRAW` (вытяжка), и `UPSET` (утолщение) — порядок этих двух свободный. Три разные операции (не «просто три удара»), с гибкостью в первой части последовательности. `apply_bonus: false` (стандарт для немодификаторных anvil-рецептов)
+  - **tier**: `1` (copper tier; см. `tmp_docs/tfc_smithing_research.md` строки 643–651)
+  - мотивация: ручка клапана семантически — кованое изделие из прутка: вытянуть (DRAW), осадить конец (UPSET), согнуть (BEND). По аналогии с `whisk.json` / `propeller.json` (тоже `tfc:metal/rod/wrought_iron`), но для медной ручки — TFC-наковальня естественный путь, и copper — tier-1 металл, доступный рано. Work-offsets операций (BEND=+7, DRAW=−15, UPSET=+13) дают осмысленный кузнечный мини-челлендж вместо тривиальной серии однотипных ударов
+  - структурно — **TFC-style reshape** (shaped → tfc:anvil), ветка 2 скилла `recipe-override` (recipe-id в `tfc_aeronautics`, оригинал запрещён через `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется: `tfc:metal/rod/copper` — прямой item-id (single item), shadow-тег не нужен (см. `plans/recipe-overrides.md` — `whisk.json` для той же конвенции)
+  - recipe-id **новый** (`tfc_aeronautics:anvil/copper_valve_handle`), не override существующего — JEI/advancement привязывать не нужно
+  - оригинал `create:crafting/kinetics/copper_valve_handle` (recipe-id из пути `data/create/recipe/crafting/kinetics/copper_valve_handle.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
+  - подробный план: [`plans/copper-valve-handle.md`](copper-valve-handle.md)
 
 ## TODO (новые добавлять сюда)
 
