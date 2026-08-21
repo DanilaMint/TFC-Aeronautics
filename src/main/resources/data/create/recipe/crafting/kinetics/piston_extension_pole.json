@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": {
+      "tag": "tfc:lumber"
+    },
+    "A": {
+      "item": "tfc_aeronautics:composite"
+    }
+  },
+  "pattern": [
+    "P",
+    "A",
+    "P"
+  ],
+  "result": {
+    "count": 2,
+    "id": "create:piston_extension_pole"
+  },
+  "show_notification": false
+}

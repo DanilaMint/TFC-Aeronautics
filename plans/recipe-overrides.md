@@ -19,6 +19,10 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
 
 ## Готово
 
+- [x] `data/create/recipe/crafting/kinetics/piston_extension_pole.json`
+  - `minecraft:planks` → `tfc:lumber`
+  - `create:andesite_alloy` → `tfc_aeronautics:composite`
+  - выход 8 → 2
 - [x] `data/create/recipe/crafting/kinetics/fluid_tank.json`
   - `c:plates/copper` → `tfc_aeronautics:metal/tight_sheet/copper`
   - `c:barrels/wooden` → `tfc:barrels`
