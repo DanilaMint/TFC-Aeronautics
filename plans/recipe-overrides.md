@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 15/? ✓ (overrides + 31 envelope)
+**Прогресс:** 16/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -156,6 +156,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id **новый** (`tfc_aeronautics:anvil/copper_valve_handle`), не override существующего — JEI/advancement привязывать не нужно
   - оригинал `create:crafting/kinetics/copper_valve_handle` (recipe-id из пути `data/create/recipe/crafting/kinetics/copper_valve_handle.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
   - подробный план: [`plans/copper-valve-handle.md`](copper-valve-handle.md)
+- [x] `data/create/recipe/crafting/kinetics/linear_chassis_from_conversion.json`
+  - оригинал Create shaped `[" P ","LLL"," P "]`: 2× `create:andesite_alloy` (P) + 3× `#minecraft:logs` (L) → 3 `create:linear_chassis`
+  - новый: тот же pattern, ключ `P = tfc_aeronautics:composite` → 3 `create:linear_chassis`
+  - мотивация: `create:andesite_alloy` в TFC-сборке недоступен (Create-only сплав, циклическая зависимость от mechanical mixer, который сам требует andesite_alloy). `tfc_aeronautics:composite` (Industrial Composite) — наш аналог, TFC barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`. Тот же свап, что в `hand_crank.json` / `piston_extension_pole.json` (другие overrides с `andesite_alloy` → `composite`)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл по тому же пути, что оригинал, затеняет Create'овский рецепт автоматически (конвенция: см. `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для всех sub-recipe overrides)
+  - шейдинг-тегов не требуется: `#minecraft:logs` уже в датапаке, `tfc_aeronautics:composite` — прямой item-id из `composite/CompositeRegistration.java:28`
+  - recipe-id остаётся `create:crafting/kinetics/linear_chassis_from_conversion`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/linear_chassis_from_conversion.json` засчитывается без правок
 
 ## TODO (новые добавлять сюда)
 
