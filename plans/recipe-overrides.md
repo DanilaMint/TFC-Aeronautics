@@ -164,6 +164,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция проекта для всех sub-recipe overrides)
   - шейдинг-тегов не требуется: `#minecraft:logs` уже в датапаке, `tfc_aeronautics:composite` — прямой item-id из `composite/CompositeRegistration.java:28`
   - recipe-id остаётся `create:crafting/kinetics/linear_chassis`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/linear_chassis.json` засчитывается без правок
+- [x] `data/create/recipe/crafting/kinetics/radial_chassis.json`
+  - оригинал Create shaped `[" L ","PLP"," L "]`: 1× `create:andesite_alloy` (P) + 4× `#minecraft:logs` (L) → 3 `create:radial_chassis`
+  - новый: тот же pattern, ключ `P = tfc_aeronautics:composite` → 3 `create:radial_chassis`
+  - мотивация: `create:andesite_alloy` в TFC-сборке недоступен (Create-only сплав, циклически зависит от andesite_alloy через mixer); `tfc_aeronautics:composite` (Industrial Composite) — наш аналог, TFC barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`. Тот же свап, что в `hand_crank.json` / `piston_extension_pole.json` / `linear_chassis.json` (другие overrides с `andesite_alloy` → `composite`)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл по тому же пути, что оригинал, затеняет Create'овский рецепт автоматически (конвенция: см. `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для всех sub-recipe overrides)
+  - шейдинг-тегов не требуется: `#minecraft:logs` уже в датапаке, `tfc_aeronautics:composite` — прямой item-id из `composite/CompositeRegistration.java:28`
+  - recipe-id остаётся `create:crafting/kinetics/radial_chassis`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/radial_chassis.json` засчитывается без правок
 
 ## TODO (новые добавлять сюда)
 
