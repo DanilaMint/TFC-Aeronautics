@@ -172,6 +172,17 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция проекта для всех sub-recipe overrides)
   - шейдинг-тегов не требуется: `#minecraft:logs` уже в датапаке, `tfc_aeronautics:composite` — прямой item-id из `composite/CompositeRegistration.java:28`
   - recipe-id остаётся `create:crafting/kinetics/radial_chassis`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/radial_chassis.json` засчитывается без правок
+- [x] `data/create/recipe/crafting/kinetics/mechanical_piston.json`
+  - оригинал Create shaped 3×1 `["B","C","I"]`: 1× `#minecraft:wooden_slabs` (B) + 1× `create:andesite_casing` (C) + 1× `create:piston_extension_pole` (I) → 1 `create:mechanical_piston`
+  - TFC-style shaped 3×3 `[" P ","MCS"," E "]`: 1× `#minecraft:wooden_slabs` (P, верх-середина) + 1× `tfc:brass_mechanisms` (M, средний ряд левый) + 1× `create:andesite_casing` (C, центр) + 1× `create:shaft` (S, средний ряд правый) + 1× `create:piston_extension_pole` (E, низ-середина) → 1 `create:mechanical_piston`
+  - мотивация: оригинал — 3 разнородных компонента в столбик без внутренней структуры; TFC-style 3×3 «бутерброд» отражает устройство пистона: casing + shaft в центре образуют кинематическое ядро, `tfc:brass_mechanisms` слева (точный латунный интерфейс — прецедент `clutch.json`, в нём `brass_mechanisms` тоже в центральной роли), `piston_extension_pole` снизу (к нему крепится шток), деревянный полублок сверху (декоративная «опора»). TFC-контекст: латунный механизм — 3-шаговый anvil-recipe (sheet → bending → mechanisms), естественно лежит в TFC-металлургическом пути, а не «три предмета в столбик»
+  - структурно — **TFC-style reshape** (shaped 3×1 → shaped 3×3) в namespace `create` (без `BANNED_RECIPES`, по образцу `rope_pulley.json` / `goggles.json`). **Ветка 1** скилла `recipe-override`
+  - `show_notification: false` (structural reshape, конвенция проекта для всех override-рецептов — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: `#minecraft:wooden_slabs` TFC re-defines под 20 TFC plank slabs (см. `code_references/TerraFirmaCraft/src/generated/resources/data/minecraft/tags/item/wooden_slabs.json`), `tfc:brass_mechanisms` — прямой item-id (уже использован в `clutch.json:8` в той же роли)
+  - recipe-id остаётся `create:crafting/kinetics/mechanical_piston`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/mechanical_piston.json` засчитывается без правок
+  - **внимание к паттерну**: пустой слот — пробел `" "`, не `.` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException`, если Pattern ссылается на символ вне `key`; конвенция та же, что в `goggles.json` / `whisk.json` / `propeller.json` / `hand_crank.json`)
+  - sticky_mechanical_piston — отдельный рецепт (`data/create/recipe/crafting/kinetics/sticky_mechanical_piston.json`: `S` + `create:mechanical_piston` → 1), конверсия в runtime через `c:slimeballs` (уже расширен `tfc:glue` по DOCS.md §20), этот override на sticky-путь не влияет
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` UP-TO-DATE
 
 ## TODO (новые добавлять сюда)
 
