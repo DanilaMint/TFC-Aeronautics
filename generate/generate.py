@@ -16,6 +16,7 @@ import argparse
 import sys
 import time
 
+from generate_bucket_textures import main as gen_buckets
 from generate_milling_recipes import main as gen_milling
 from generate_mixing_recipes import main as gen_mixing
 from generate_quern_food_recipes import main as gen_quern
@@ -31,6 +32,7 @@ LEAVES: list[tuple[str, callable]] = [
     ("brackets-assets",   gen_assets),
     ("brackets-recipes",  gen_recipes),
     ("brackets-textures", gen_textures),
+    ("buckets",           gen_buckets),
     ("milling",           gen_milling),
     ("mixing",            gen_mixing),
     ("quern",             gen_quern),
@@ -45,9 +47,10 @@ GROUPS: dict[str, list[tuple[str, callable]]] = {
     "brackets-assets":   [LEAVES[0]],
     "brackets-recipes": [LEAVES[1]],
     "brackets-textures": [LEAVES[2]],
-    "milling":           [LEAVES[3]],
-    "mixing":            [LEAVES[4]],
-    "quern":             [LEAVES[5]],
+    "buckets":           [LEAVES[3]],
+    "milling":           [LEAVES[4]],
+    "mixing":            [LEAVES[5]],
+    "quern":             [LEAVES[6]],
 }
 
 
