@@ -20,7 +20,9 @@ import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.MetalPowder;
 import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.resin.ResinRegistration;
+import ru.tfc_aeronautics.saw.SawBladeRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
+import ru.tfc_aeronautics.wrench.WrenchHeadRegistration;
 
 /**
  * Single creative tab for the mod, exposing every item/block this mod adds.
@@ -47,6 +49,8 @@ public final class CreativeTabs
                 output.accept(BurlapRegistration.IMPREGNATED_BURLAP_CLOTH.get());
                 output.accept(FluidItems.ROSIN_BUCKET.get());
                 output.accept(ChainConveyorRegistration.CHAIN_CONVEYOR_ITEM.get());
+                output.accept(SawBladeRegistration.SAW_BLADE.get());
+                output.accept(WrenchHeadRegistration.WRENCH_HEAD.get());
                 WoodenBracketRegistration.BRACKETS.keySet().forEach(wood -> output.accept(WoodenBracketRegistration.BRACKET_ITEMS.get(wood).get()));
             })
             .build());
