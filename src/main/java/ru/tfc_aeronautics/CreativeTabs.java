@@ -9,7 +9,10 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import ru.tfc_aeronautics.anvil.AnvilRegistration;
+import ru.tfc_aeronautics.bracket.WoodenBracketRegistration;
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
+import ru.tfc_aeronautics.chain.ChainConveyorRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.fluid.FluidItems;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
@@ -17,7 +20,9 @@ import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.MetalPowder;
 import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.resin.ResinRegistration;
+import ru.tfc_aeronautics.saw.SawBladeRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
+import ru.tfc_aeronautics.wrench.WrenchHeadRegistration;
 
 /**
  * Single creative tab for the mod, exposing every item/block this mod adds.
@@ -39,9 +44,14 @@ public final class CreativeTabs
                 TightSheetRegistration.TIGHT_SHEETS.values().forEach(s -> output.accept(s.get()));
                 output.accept(HeaterRegistration.HEATER_ITEM.get());
                 output.accept(StampingPressRegistration.STAMPING_PRESS_ITEM.get());
+                AnvilRegistration.ANVIL_ITEMS.values().forEach(i -> output.accept(i.get()));
                 output.accept(ResinRegistration.RESIN_CLUMP.get());
                 output.accept(BurlapRegistration.IMPREGNATED_BURLAP_CLOTH.get());
                 output.accept(FluidItems.ROSIN_BUCKET.get());
+                output.accept(ChainConveyorRegistration.CHAIN_CONVEYOR_ITEM.get());
+                output.accept(SawBladeRegistration.SAW_BLADE.get());
+                output.accept(WrenchHeadRegistration.WRENCH_HEAD.get());
+                WoodenBracketRegistration.BRACKETS.keySet().forEach(wood -> output.accept(WoodenBracketRegistration.BRACKET_ITEMS.get(wood).get()));
             })
             .build());
 

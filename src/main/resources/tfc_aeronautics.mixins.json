@@ -4,7 +4,10 @@
   "package": "ru.tfc_aeronautics.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "MillstoneBlockEntityMixin"
+    "BasinBlockEntityMixin",
+    "BasinMixingFoodDataMixin",
+    "MillstoneBlockEntityMixin",
+    "RecipeManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

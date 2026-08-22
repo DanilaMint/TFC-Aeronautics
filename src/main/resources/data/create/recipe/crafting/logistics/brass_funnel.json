@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "tfc:metal/ingot/brass"
+    },
+    "E": {
+      "item": "create:electron_tube"
+    },
+    "K": {
+      "tag": "tfc:cloths"
+    }
+  },
+  "pattern": [
+    "E",
+    "A",
+    "K"
+  ],
+  "result": {
+    "count": 2,
+    "id": "create:brass_funnel"
+  }
+}

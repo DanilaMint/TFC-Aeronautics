@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "A": {
+      "item": "tfc_aeronautics:metal/tight_sheet/wrought_iron"
+    },
+    "I": {
+      "item": "tfc:metal/ingot/wrought_iron"
+    }
+  },
+  "pattern": [
+    "A",
+    "I",
+    "A"
+  ],
+  "result": {
+    "count": 4,
+    "id": "create:chute"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "tfc:block/anvil",
+  "textures": {
+    "all": "tfc:block/metal/smooth/bismuth",
+    "particle": "tfc:block/metal/smooth/bismuth"
+  }
+}

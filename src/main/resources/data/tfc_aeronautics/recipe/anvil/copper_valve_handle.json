@@ -1,0 +1,17 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {
+    "item": "tfc:metal/rod/copper"
+  },
+  "result": {
+    "count": 1,
+    "id": "create:copper_valve_handle"
+  },
+  "rules": [
+    "bend_last",
+    "draw_not_last",
+    "upset_not_last"
+  ],
+  "apply_bonus": false,
+  "tier": 1
+}

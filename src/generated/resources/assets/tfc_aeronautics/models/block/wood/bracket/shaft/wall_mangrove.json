@@ -1,0 +1,7 @@
+{
+  "parent": "create:block/bracket/shaft/wall",
+  "textures": {
+    "bracket": "tfc_aeronautics:block/wood/bracket/bracket_mangrove",
+    "plate": "tfc_aeronautics:block/wood/bracket/bracket_plate_mangrove"
+  }
+}

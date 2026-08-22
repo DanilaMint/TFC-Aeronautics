@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "create:chain_conveyor" }
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc_aeronautics:chain_conveyor"
+  }
+}

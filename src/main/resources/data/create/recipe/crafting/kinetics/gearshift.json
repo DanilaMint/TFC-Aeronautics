@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "create:clutch" },
+    { "item": "create:cogwheel" }
+  ],
+  "result": { "count": 1, "id": "create:gearshift" }
+}
