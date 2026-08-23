@@ -1,6 +1,7 @@
 package ru.tfc_aeronautics.stamping_press;
 
 import com.simibubi.create.AllShapes;
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
 import com.simibubi.create.content.processing.basin.BasinBlock;
 import com.simibubi.create.foundation.block.IBE;
@@ -26,7 +27,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * {@code create:mechanical_press} so the press looks and connects to
  * kinetic networks identically.
  */
-public class StampingPressBlock extends HorizontalKineticBlock implements IBE<StampingPressBlockEntity> {
+public class StampingPressBlock extends HorizontalKineticBlock implements IBE<StampingPressBlockEntity>, IWrenchable {
 
     public StampingPressBlock(Properties properties) {
         super(properties);
@@ -62,6 +63,15 @@ public class StampingPressBlock extends HorizontalKineticBlock implements IBE<St
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
         return face.getAxis() == state.getValue(HORIZONTAL_FACING).getAxis();
+    }
+
+    @Override
+    public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
+        if (!originalState.hasProperty(HORIZONTAL_FACING))
+            return originalState;
+        return originalState.setValue(
+            HORIZONTAL_FACING,
+            originalState.getValue(HORIZONTAL_FACING).getClockWise());
     }
 
     @Override
