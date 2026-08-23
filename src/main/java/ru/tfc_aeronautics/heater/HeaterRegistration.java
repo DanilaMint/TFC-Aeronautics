@@ -42,7 +42,8 @@ public final class HeaterRegistration {
                 .mapColor(MapColor.STONE)
                 .strength(2.0F, 6.0F)
                 .sound(SoundType.STONE)
-                .pushReaction(PushReaction.BLOCK)));
+                .pushReaction(PushReaction.BLOCK)
+                .noOcclusion()));
 
     public static final DeferredHolder<Item, BlockItem> HEATER_ITEM =
         ITEMS.register("heater", () -> new BlockItem(HEATER.get(), new Item.Properties()));
