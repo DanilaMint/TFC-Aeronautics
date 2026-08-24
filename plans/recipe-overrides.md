@@ -221,6 +221,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id остаётся `create:crafting/kinetics/nozzle`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/nozzle.json` (если есть) ссылается на тот же id — засчитывается без правок
   - **внимание к узору**: сплошной паттерн `CCC/CCC/SSS` без пустых слотов — валидации 1.21.1 `ShapedRecipePattern` на `' '`-символ не требуется; все 9 клеток заняты ключами
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/create/recipe/mechanical_crafting/crushing_wheel.json`
+  - оригинал Create mechanical_crafting 5×5 `[" AAA ","AAPAA","APSPA","AAPAA"," AAA "]`: 8× `create:andesite_alloy` (A) + 1× `#minecraft:planks` (P, центр) + 16× tag `c:stones` (S) → 2 `create:crushing_wheel`
+  - TFC-style 5×5 `[" SSS ","SAPAS","SPsPS","SAPAS"," SSS "]`: 12× tag `c:stones` (S, обод) + 8× `tfc_aeronautics:composite` (A, спицы) + 4× `#minecraft:planks` (P, диагональные прокладки) + 1× `create:shaft` (s, центр — кинематическое ядро колеса). Аутпут `create:crushing_wheel` × 2 не изменился
+  - мотивация: `create:andesite_alloy` в TFC-сборке недоступен (Create-only сплав, циклически требует mechanical mixer); `tfc_aeronautics:composite` (Industrial Composite) — наш аналог, TFC barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`. Тот же свап, что у `hand_crank.json` / `piston_extension_pole.json` / `linear_chassis.json` / `radial_chassis.json`. Структурно — **TFC-style reshape** (другой паттерн 5×5): оригинальный Create делает плотный диск без явного кинематического ядра; наш override явно выносит `create:shaft` в центр как ось колеса, а доски (`#minecraft:planks`) — в диагональные прокладки между камнем и композитом. Семантика: crushing wheel — это колесо с валом, а не «просто 25 блоков в форме круга»
+  - ветка 1 скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл по тому же пути, что оригинал, затеняет Create'овский рецепт автоматически (конвенция: см. `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для всех override-рецептов — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: `#minecraft:planks` уже в датапаке (20 TFC-плах после TFC-override), `c:stones` — common-тег, `create:shaft` и `tfc_aeronautics:composite` — прямые item-id (composite из `composite/CompositeRegistration.java`)
+  - recipe-id остаётся `create:mechanical_crafting/crushing_wheel`, advancement Create `data/create/advancement/recipes/misc/mechanical_crafting/crushing_wheel.json` (если есть) ссылается на тот же id — засчитывается без правок
+  - **внимание к ключам**: в JSON присутствуют оба ключа `S` (заглавная, tag `c:stones`) и `s` (строчная, item `create:shaft`) — различаются регистром. mechanical_crafting парсер принимает такие пары (JSON-ключи регистрозависимы); pattern использует обе формы
+  - **внимание к pattern'у**: пустые слоты — пробелы `" "`, не `.` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException`, если Pattern ссылается на символ вне `key`; конвенция та же, что в `goggles.json` / `whisk.json` / `propeller.json` / `hand_crank.json` / `mechanical_piston.json`)
 
 ## TODO (новые добавлять сюда)
 

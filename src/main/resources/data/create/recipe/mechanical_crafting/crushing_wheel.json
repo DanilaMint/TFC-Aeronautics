@@ -11,14 +11,17 @@
     },
     "S": {
       "tag": "c:stones"
+    },
+    "s": {
+      "item": "create:shaft"
     }
   },
   "pattern": [
-    " AAA ",
-    "AAPAA",
-    "APSPA",
-    "AAPAA",
-    " AAA "
+    " SSS ",
+    "SAPAS",
+    "SPsPS",
+    "SAPAS",
+    " SSS "
   ],
   "result": {
     "count": 2,
