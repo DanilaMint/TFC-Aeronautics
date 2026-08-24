@@ -193,6 +193,24 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id'ы **новые** (`tfc_aeronautics:crafting/kinetics/mechanical_plough/wrought_iron` и `.../steel`), не override существующего. Advancement Create `data/create/advancement/recipes/misc/crafting/kinetics/mechanical_plough.json` ссылается на старый `create:crafting/kinetics/mechanical_plough` — обычный trade-off ветки 2 (см. `clutch.json` / `copper_valve_handle.json` для той же конструкции)
   - оригинал `create:crafting/kinetics/mechanical_plough` (recipe-id из пути `data/create/recipe/crafting/kinetics/mechanical_plough.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK × 2), `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/create/recipe/crafting/kinetics/item_vault.json`
+  - оригинал Create shaped 3×1 `B/C/B` с `#c:plates/iron` (B) + `#c:barrels/wooden` (C) → 1 `create:item_vault`
+  - новый: тот же pattern, ключи `B = tfc:metal/sheet/wrought_iron` + `C = #c:chests/wooden` → 1 `create:item_vault`
+  - мотивация: `#c:plates/iron` в TFC-сборке пуст, `#c:barrels/wooden` содержит только ванильную `minecraft:barrel` — а по запросу пользователя нужен именно «любой сундук из TFC». `#c:chests/wooden` — готовый common-тег с 20 TFC chest + 20 TFC trapped chest; shadow не требуется
+  - структурно — простой sub-recipe override (как `rope_pulley.json` / `propeller.json`): pattern и аутпут неизменны, поменялись только ингредиенты
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`): файл по тому же пути, что оригинал, затеняет Create'овский рецепт автоматически (конвенция: см. `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для всех override-рецептов — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: `tfc:metal/sheet/wrought_iron` — прямой item-id (TFC sheet), `#c:chests/wooden` — common-тег (включает 40 TFC chest/trapped_chest)
+  - recipe-id остаётся `create:crafting/kinetics/item_vault`, advancement Create засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
+- [x] `data/tfc_aeronautics/recipe/crafting/kinetics/item_vault_steel_tight.json`
+  - параллельный вариант под сталь: те же 3×1 `B/C/B`, ключи `B = tfc_aeronautics:metal/tight_sheet/steel` + `C = #c:chests/wooden` → 1 `create:item_vault`
+  - мотивация: дать игроку выбор металла — wrought iron через override в `create`, сталь через этот рецепт в `tfc_aeronautics` (по запросу пользователя — наш namespace). tight_sheet/steel производится через TFC-наковальню или pressing (`data/tfc_aeronautics/recipe/pressing/tight_sheet_steel.json`)
+  - структурно — sub-recipe override, файл в `tfc_aeronautics` (recipe-id **новый**). Ветка 2 по форме (recipe-id не из namespace источника), но без `BANNED_RECIPES` — банить нечего: новый recipe-id не пересекается ни с одним существующим, а оригинал уже перебит первым файлом
+  - `show_notification: false` (конвенция)
+  - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/steel` — прямой item-id из `metal/TightSheet.java:33`, `#c:chests/wooden` — common-тег
+  - recipe-id `tfc_aeronautics:crafting/kinetics/item_vault_steel_tight` **не** из Create-овского namespace, поэтому advancement Create `data/create/advancement/recipes/misc/crafting/kinetics/item_vault.json` (привязан к `create:crafting/kinetics/item_vault`) по этому пути **не** засчитывается — компромисс Datapack: один item, два recipe-id, advancement привязан к одному. Игрок получает предмет в обоих случаях, но ачивка — только за wrought iron вариант
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
 
 ## TODO (новые добавлять сюда)
 
