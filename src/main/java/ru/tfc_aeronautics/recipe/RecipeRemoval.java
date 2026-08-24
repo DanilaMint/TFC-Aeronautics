@@ -52,7 +52,8 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/metal_bracket"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/wooden_bracket"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/depot"),
-        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/copper_valve_handle")
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/copper_valve_handle"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/mechanical_plough")
     );
 
     private RecipeRemoval() {}

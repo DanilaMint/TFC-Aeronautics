@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "show_notification": false,
+  "ingredients": [
+    {
+      "item": "create:andesite_casing"
+    },
+    {
+      "item": "tfc:metal/hoe_head/wrought_iron"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:mechanical_plough"
+  }
+}

@@ -183,6 +183,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - **внимание к паттерну**: пустой слот — пробел `" "`, не `.` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException`, если Pattern ссылается на символ вне `key`; конвенция та же, что в `goggles.json` / `whisk.json` / `propeller.json` / `hand_crank.json`)
   - sticky_mechanical_piston — отдельный рецепт (`data/create/recipe/crafting/kinetics/sticky_mechanical_piston.json`: `S` + `create:mechanical_piston` → 1), конверсия в runtime через `c:slimeballs` (уже расширен `tfc:glue` по DOCS.md §20), этот override на sticky-путь не влияет
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` UP-TO-DATE
+- [x] `data/tfc_aeronautics/recipe/crafting/kinetics/mechanical_plough/{wrought_iron,steel}.json` (2 файла)
+  - оригинал Create crafting_shaped `["III","AAA"," C "]`: 3× `c:plates/iron` (I) + 3× `create:andesite_alloy` (A) + 1× `create:andesite_casing` (C) → 1 `create:mechanical_plough`. В TFC-сборке мёртв: `c:plates/iron` пуст по TFC-конвенции (металл приходит через `c:plates/<metal>`), `andesite_alloy` — Create-only сплав
+  - новые: 2 параллельных shapeless — 1× `create:andesite_casing` + 1× `tfc:metal/hoe_head/wrought_iron` (вариант A) или 1× `tfc:metal/hoe_head/steel` (вариант B) → 1 `create:mechanical_plough`
+  - мотивация: плуг — сельхоз-инструмент; головка мотыги в качестве режущего элемента семантически точна (нижняя лопасть плуга = подрезающий нож, как у мотыги, но крупнее), andesite_casing — рама и крепление кинематики. Wrought iron и steel — два TFC-тира, оба дают рабочий плуг; bronze/copper намеренно не включены (по запросу пользователя «железо или сталь»)
+  - структурно — **TFC-style reshape** (shaped → shapeless), ветка 2 скилла `recipe-override` (recipe-id в `tfc_aeronautics`, оригинал запрещён через `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция проекта для всех override-рецептов — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: `create:andesite_casing`, `tfc:metal/hoe_head/wrought_iron` и `tfc:metal/hoe_head/steel` — прямые item-id (TFC metal heads — single items, регистрируются в `code_references/TerraFirmaCraft/src/main/resources/assets/tfc/models/item/metal/hoe_head/...`)
+  - recipe-id'ы **новые** (`tfc_aeronautics:crafting/kinetics/mechanical_plough/wrought_iron` и `.../steel`), не override существующего. Advancement Create `data/create/advancement/recipes/misc/crafting/kinetics/mechanical_plough.json` ссылается на старый `create:crafting/kinetics/mechanical_plough` — обычный trade-off ветки 2 (см. `clutch.json` / `copper_valve_handle.json` для той же конструкции)
+  - оригинал `create:crafting/kinetics/mechanical_plough` (recipe-id из пути `data/create/recipe/crafting/kinetics/mechanical_plough.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK × 2), `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## TODO (новые добавлять сюда)
 
