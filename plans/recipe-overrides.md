@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 16/? ✓ (overrides + 31 envelope)
+**Прогресс:** 17/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -211,6 +211,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/steel` — прямой item-id из `metal/TightSheet.java:33`, `#c:chests/wooden` — common-тег
   - recipe-id `tfc_aeronautics:crafting/kinetics/item_vault_steel_tight` **не** из Create-овского namespace, поэтому advancement Create `data/create/advancement/recipes/misc/crafting/kinetics/item_vault.json` (привязан к `create:crafting/kinetics/item_vault`) по этому пути **не** засчитывается — компромисс Datapack: один item, два recipe-id, advancement привязан к одному. Игрок получает предмет в обоих случаях, но ачивка — только за wrought iron вариант
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
+- [x] `data/create/recipe/crafting/kinetics/nozzle.json`
+  - оригинал Create shaped `[" S "," C ","SSS"]` с `create:andesite_alloy` + `#minecraft:wool` → 1 `create:nozzle`
+  - TFC-style shaped 3×3 `["CCC","CCC","SSS"]`: 6× `#tfc:cloths` (2 верхних ряда) + 3× `tfc:metal/sheet/wrought_iron` (нижний ряд) → 3 `create:nozzle`
+  - мотивация: `#minecraft:wool` в TFC-сборке пуст, `create:andesite_alloy` — Create-only сплав (циклически требует mechanical mixer); `tfc:cloths` (наш shadow-тег `burlap/wool/silk` в `src/main/resources/data/tfc/tags/item/cloths.json`) — естественный TFC-аналог шерсти как «фильтрующего слоя» в пневматике; `tfc:metal/sheet/wrought_iron` — кованый железный каркас (производится через TFC anvil из `c:double_ingots/wrought_iron`). Выход ×3 — компенсация за более дорогие ингредиенты (ткань реже ванильной шерсти, sheet — 3-шаговый anvil-recipe)
+  - структурно — TFC-style reshape (другой паттерн и выход) в namespace `create` (без `BANNED_RECIPES`), по образцу `rope_pulley.json` / `steam_whistle.json` / `chute.json`
+  - `show_notification: false` (конвенция проекта, memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: `#tfc:cloths` уже зашаден под `src/main/resources/data/tfc/tags/item/cloths.json` (burlap/wool/silk), `tfc:metal/sheet/wrought_iron` — прямой item-id (уже использован в `rope_pulley.json` / `chute.json` / `item_vault.json`)
+  - recipe-id остаётся `create:crafting/kinetics/nozzle`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/nozzle.json` (если есть) ссылается на тот же id — засчитывается без правок
+  - **внимание к узору**: сплошной паттерн `CCC/CCC/SSS` без пустых слотов — валидации 1.21.1 `ShapedRecipePattern` на `' '`-символ не требуется; все 9 клеток заняты ключами
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## TODO (новые добавлять сюда)
 

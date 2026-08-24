@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "show_notification": false,
+  "category": "misc",
+  "key": {
+    "C": {
+      "tag": "tfc:cloths"
+    },
+    "S": {
+      "item": "tfc:metal/sheet/wrought_iron"
+    }
+  },
+  "pattern": [
+    "CCC",
+    "CCC",
+    "SSS"
+  ],
+  "result": {
+    "count": 3,
+    "id": "create:nozzle"
+  }
+}
