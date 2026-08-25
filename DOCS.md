@@ -2054,8 +2054,8 @@ TFC регистрирует наковальню только для метал
 
 Крафт из слитков (3×3 с пустым центром, 8 слитков на наковальню):
 
-- `data/tfc_aeronautics/recipe/crafting/metal/anvil/<металл>.json` (×19) — shaped `minecraft:crafting_shaped`, паттерн `###` / ` # ` / `###`, ключ `#` → `c:ingots/<металл>`, результат — блок наковальни, count 1.
-- Зеркалит форму рецепта TFC для собственных наковален (`data/tfc/recipe/crafting/metal/anvil/<металл>.json` — те же 3×3, та же полая середина), но использует одинарные слитки (`c:ingots/<металл>`) вместо двойных (`c:double_ingots/<металл>`). Суммарный расход металла тот же (8 слитков = 4 двойных слитка), но без обязательного промежуточного шага «слить двойной слиток».
+- `data/tfc_aeronautics/recipe/crafting/metal/anvil/<металл>.json` (×19) — shaped `minecraft:crafting_shaped`, паттерн `###` / ` # ` / `###`, ключ `#` → `c:double_ingots/<металл>` для 10 металлов с покрытием (bismuth, brass, cast_iron, gold, nickel, rose_gold, silver, sterling_silver, tin, zinc) или `c:ingots/<металл>` для 9 без покрытия (pig_iron, weak_*, high_carbon_*, unknown). Результат — блок наковальни, count 1.
+- Зеркалит форму TFC-овского рецепта для собственных наковален (`data/tfc/recipe/crafting/metal/anvil/<металл>.json` — те же 3×3 с полой серединой), но для 10 покрытых металлов — `c:double_ingots/<металл>` (8 двойных слитков, паттерн тот же), для 9 непокрытых — `c:ingots/<металл>` (8 одинарных). Для непокрытых добавлены `tfc:heating` рецепты на 700 mB жидкого металла (см. ниже).
 
 ### Модель и текстура
 
@@ -2086,7 +2086,7 @@ TFC регистрирует наковальню только для метал
 - **Не использовать tier=0.** TFC-овский `AnvilBlockEntityRenderer` рисует предметы выше на `tier == 0` (мёртвая ветка `0.875f` vs `0.6875f`), и в vanilla TFC tier=0 для `AnvilBlockEntity` не используется — он зарезервирован для rock anvil, который использует другой BE.
 - **Не модифицировать TFC-овские наковальни.** 9 «настоящих» TFC-наковален (`copper, wrought_iron, bronze, bismuth_bronze, black_bronze, steel, black_steel, blue_steel, red_steel`) живут как жили, фильтрация через `Metal.BlockType.ANVIL.has(metal)` их не затрагивает.
 - **Не подменять BE-тип на свой.** TFC-овская `AnvilContainer` меню-фабрика хардкодит `TFCBlockEntities.ANVIL.get()` при поиске BE, поэтому свой BE-тип (`tfc_aeronautics:anvil`) приводит к крашу при открытии меню (`NoSuchElementException`). Используем TFC-овский BE-тип и расширяем его `validBlocks` через рефлексию — единственный способ сохранить совместимость с TFC-меню.
-- **Не подменять `c:ingots` на `c:double_ingots`.** Суммарный расход металла одинаковый, но требовать предварительного слияния в двойной слиток — лишний шаг, который усложняет early-game прогрессию (tier-1 наковальни по дизайну дешёвые).
+- **Не добавлять `c:double_ingots/<металл>` tag-shadow и casting для 9 непокрытых.** Эти металлы (`pig_iron, weak_*, high_carbon_*, unknown`) не имеют подтега в TFC; tag-shadow потребует регистрации `metal/double_ingot/<металл>` + casting-рецептов — за рамками задачи. Anvil-крафт для них остаётся на `c:ingots/<металл>` (8 одинарных), а переплавка наковальни — сниженные 700 mB.
 
 ---
 

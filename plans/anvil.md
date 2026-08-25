@@ -28,8 +28,19 @@ tier-1 наковальня. Это «даунгрейд»-вариант с п�
 - Per-metal JSON-ассеты (blockstate × 4 facing, block model с parent
   `tfc:block/anvil`, item model) — все 57 файлов руками, в
   `src/main/resources/assets/tfc_aeronautics/`.
-- Per-metal shaped crafting recipe (3×3 полый, 8 слитков из тега
-  `c:ingots/<metal>`) в `src/main/resources/data/tfc_aeronautics/recipe/crafting/metal/anvil/`.
+- Per-metal shaped crafting recipe (3×3 полый, 8 слитков) в
+  `src/main/resources/data/tfc_aeronautics/recipe/crafting/metal/anvil/`:
+  - 10 металлов с покрытием `c:double_ingots/<metal>` (bismuth, brass,
+    cast_iron, gold, nickel, rose_gold, silver, sterling_silver, tin,
+    zinc) — тег `c:double_ingots/<metal>`.
+  - 9 металлов без покрытия (pig_iron, weak_steel, weak_blue_steel,
+    weak_red_steel, high_carbon_steel, high_carbon_black_steel,
+    high_carbon_blue_steel, high_carbon_red_steel, unknown) — тег
+    `c:ingots/<metal>`. Для них добавлены `tfc:heating` рецепты на 700
+    mB (см. ниже).
+- Per-metal `tfc:heating` рецепт для переплавки наковальни обратно в
+  жидкий металл: `src/main/resources/data/tfc_aeronautics/recipe/heating/metal/anvil/<metal>.json`.
+  10 покрытых — стандартные 1400 mB, 9 непокрытых — сниженные 700 mB.
 - Lang entries в `en_us.json` и `ru_ru.json`.
 - DOCS.md / ROADMAP.md / PROJECT_STRUCTURE.md синхронизированы.
 
@@ -76,10 +87,21 @@ tier-1 наковальня. Это «даунгрейд»-вариант с п�
   стоит рядом, что упрощает навигацию. Слеши в пути, точки в lang-ключе
   (`block.tfc_aeronautics.metal.anvil.<metal>`) — как у TFC.
 
-- **`c:ingots/<metal>` вместо `c:double_ingots/<metal>`**: TFC-овский
-  рецепт наковальни требует двойные слитки (4 = 8 одинарных). Мы
-  используем 8 одинарных напрямую — тот же суммарный расход металла, но
-  без обязательного шага слияния. Tier-1 наковальни по задумке дешёвые.
+- **Сплит крафта по покрытию `c:double_ingots/<metal>`**: для 10 металлов с
+  покрытием используем `c:double_ingots/<metal>` (8 двойных слитков —
+  зеркало TFC-овского рецепта, который требует 4 двойных слитка, у нас
+  по sum-of-matter получается 8 двойных = 16 одинарных). Для 9 металлов
+  без покрытия (pig_iron, weak_*, high_carbon_*, unknown) — 8 одинарных
+  из `c:ingots/<metal>`. Pattern `###` / ` # ` / `###` и count 8 одинаковы
+  для обеих групп.
+
+- **Heating для 9 непокрытых на 700 mB вместо 1400**: TFC-овский стандарт
+  переплавки наковальни — 1400 mB жидкого металла. Для 9 непокрытых
+  металлов (без `c:double_ingots/<metal>` и без реального пути получить
+  двойной слиток) снижаем до 700 mB, чтобы компенсировать отсутствие
+  промежуточного шага «слить двойной слиток». Для high_carbon_*
+  возвращаем базовую форму жидкости (high_carbon_steel →
+  `tfc:metal/pig_iron`, и т.д.), как в TFC-овском ingot-heating.
 
 - **Не пытаемся переопределить TFC-овский `Metal` enum** — он
   документирован как «Not extensible», и расширять его через API

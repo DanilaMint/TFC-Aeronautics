@@ -1,0 +1,11 @@
+{
+  "type": "tfc:heating",
+  "ingredient": {
+    "item": "tfc_aeronautics:metal/anvil/high_carbon_blue_steel"
+  },
+  "result_fluid": {
+    "amount": 700,
+    "id": "tfc:metal/weak_blue_steel"
+  },
+  "temperature": 1540.0
+}
