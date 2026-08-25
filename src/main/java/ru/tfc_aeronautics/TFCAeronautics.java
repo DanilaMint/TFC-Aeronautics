@@ -12,6 +12,7 @@ import ru.tfc_aeronautics.bracket.WoodenBracketRegistration;
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.chain.ChainConveyorRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
+import ru.tfc_aeronautics.drill_head.DrillHeadRegistration;
 import ru.tfc_aeronautics.fluid.FluidBlocks;
 import ru.tfc_aeronautics.fluid.FluidItems;
 import ru.tfc_aeronautics.fluid.Fluids;
@@ -47,6 +48,7 @@ public class TFCAeronautics {
         CompositeRegistration.register(modEventBus);
         TightSheetRegistration.register(modEventBus);
         SawBladeRegistration.register(modEventBus);
+        DrillHeadRegistration.register(modEventBus);
         WrenchHeadRegistration.register(modEventBus);
         FluidBlocks.register(modEventBus);
         FluidItems.register(modEventBus);

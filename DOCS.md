@@ -32,6 +32,7 @@
 22. [Деревянные кронштейны по породе (TFC Wooden Brackets)](#22-деревянные-кронштейны-по-породе-tfc-wooden-brackets)
 23. [Depot: крафт молотком по андезитовому корпусу (Hammer-craft Depot)](#23-depot-крафт-молотком-по-андезитовому-корпусу-hammer-craft-depot)
 24. [TFC FOOD processing в Create-машинах](#24-tfc-food-processing-в-create-машинах)
+25. [Сверло через TFC-сварку (Drill Head)](#25-сверло-через-tfc-сварку-drill-head)
 
 ---
 
@@ -2527,3 +2528,174 @@ ls src/generated/resources/assets/tfc_aeronautics/models/item/wood/bracket/   # 
 - на обеих сторонах: `event.setCanceled(true)` + `setCancellationResult(InteractionResult.CONSUME)` — стандартное использование блока не срабатывает (андезитовый корпус не открывает GUI/не ставится).
 
 **Запрет оригинала:** `create:crafting/kinetics/depot` (recipe-id из `data/create/recipe/crafting/kinetics/depot.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`.
+
+---
+
+## 25. Сверло через TFC-сварку (Drill Head)
+
+Механический бур Create — кинематически `drill_head + andesite_casing + shaft`.
+В ванильном рецепте `[" A ","AIA"," C "]` используются `#c:ingots/iron` и
+`create:andesite_alloy`, и в TFC-сборке оба недоступны (тег железа пуст по
+TFC-конвенции «металл через per-metal subtag», а андезитовый сплав —
+Create-only материал, циклически требующий `mechanical_mixer`, который
+сам собирается из андезитового сплава). Заменяем на двухступенчатую
+металлургическую цепочку:
+
+1. **Шаг 1** — сварить головку сверла на TFC-наковальне (любой из двух
+   рецептов ниже).
+2. **Шаг 2** — заверстать 3-символьный pattern `["D","C","S"]` на верстаке:
+   drill_head (верх) + andesite_casing (центр) + shaft (низ) → `create:mechanical_drill`.
+
+Подробный чек-лист задачи и заметки про 3D-модель — в
+[`plans/drill-head.md`](plans/drill-head.md).
+
+### Регистрация предмета
+
+Пакет `src/main/java/ru/tfc_aeronautics/drill_head/`. По образцу
+`SawBladeRegistration` — один `DeferredHolder<Item, Item>` `DRILL_HEAD`
+(`tfc_aeronautics:drill_head`) с vanilla `Item.Properties()`. Подключён
+в `TFCAeronautics` через `DrillHeadRegistration.register(modEventBus)`
+рядом с saw/wrench, добавлен в `CreativeTabs.MAIN.displayItems` рядом с
+ними же. Локализация — `item.tfc_aeronautics.drill_head` =
+«Drill Head» / «Сверло».
+
+### Модель
+
+Placeholder 16×16 `item/generated` поверх существующей текстуры
+`assets/tfc_aeronautics/textures/item/drill_head.png` (494 байта, leftover
+с прошлой попытки; пользователь предоставит настоящую 3D-модель позже).
+Прецедентов item-only 3D в моде нет (все «3D» — Block+BER); варианты
+для будущего моделирования (Block+BE / ISTER / multi-layer handheld) — в
+`plans/drill-head.md`.
+
+### Welding-рецепты
+
+Два рецепта в `data/tfc/recipe/welding/`, **первая запись в этой директории
+всего проекта** (ранее директория была пустой — в моде не было модовых
+предметов, производимых через TFC-сварку):
+
+```json
+// drill_head_cast_iron.json — tier 3, «дешёвая» ветка
+{
+  "type": "tfc:welding",
+  "first_input":  { "item": "tfc:metal/double_ingot/cast_iron" },
+  "second_input": { "item": "tfc:metal/sheet/wrought_iron" },
+  "result":       { "count": 1, "id": "tfc_aeronautics:drill_head" },
+  "tier": 3
+}
+```
+
+```json
+// drill_head_steel.json — tier 4, «продвинутая» ветка
+{
+  "type": "tfc:welding",
+  "first_input":  { "tag":  "c:ingots/steel" },
+  "second_input": { "item": "tfc_aeronautics:metal/tight_sheet/steel" },
+  "result":       { "count": 1, "id": "tfc_aeronautics:drill_head" },
+  "tier": 4
+}
+```
+
+`tfc:metal/double_ingot/cast_iron` сам является результатом TFC-сварки
+(`data/tfc/recipe/welding/metal/double_ingot/cast_iron.json`, tier −1) —
+то есть полный путь получения drill_head в cast-ветке:
+
+> cast_iron ingot × 2 → [tier −1] → cast_iron double ingot →
+> + wrought_iron sheet → [tier 3] → drill_head.
+
+Аналогично стальная ветка замыкается на `tight_sheet/steel`, который
+производится через TFC-наковальню из `c:double_ingots/steel` (tier 4,
+см. `data/tfc_aeronautics/recipe/anvil/tight_sheet_steel.json`) или
+через Create-пресс (`data/tfc_aeronautics/recipe/pressing/tight_sheet_steel.json`).
+Оба welding-рецепта доступны параллельно — игрок выбирает, исходя из
+текущей стадии прогресса.
+
+`bonus: copy_worst` здесь **намеренно не задан** — у готового drill_head
+нет ни heat-трека, ни «материала-изготовления», поэтому наследовать
+худшее из двух металлов TFC некуда. Если потом потребуется, чтобы
+готовая головка запоминала металл (для будущих механик — например,
+разная износостойкость cast vs steel), это добавляется через
+`bonus: copy_worst` + `data/tfc_aeronautics/tfc/item_heat/drill_head.json`
+по прецеденту `tfc:metal/shears/wrought_iron` welding-рецепта (см.
+`code_references/TerraFirmaCraft/src/generated/resources/data/tfc/recipe/welding/metal/shears/wrought_iron.json`).
+
+### Shadow crafting-рецепта
+
+Файл `data/create/recipe/crafting/kinetics/mechanical_drill.json` лежит
+под тем же путём, что ванильный Create-рецепт
+(`code_references/Create/src/generated/resources/data/create/recipe/crafting/kinetics/mechanical_drill.json`),
+поэтому datapack-merge автоматически заменяет его без правки
+`BANNED_RECIPES` (конвенция: `feedback_recipe_override_convention.md`,
+ветка 1 скилла `recipe-override`):
+
+```json
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "D": { "item": "tfc_aeronautics:drill_head" },
+    "C": { "item": "create:andesite_casing" },
+    "S": { "item": "create:shaft" }
+  },
+  "pattern": [ "D", "C", "S" ],
+  "result": { "count": 1, "id": "create:mechanical_drill" }
+}
+```
+
+Recipe-id остаётся `create:crafting/kinetics/mechanical_drill`, advancement
+Create (если он ссылается на этот id) засчитывается без правок.
+`show_notification: false` — структурный reshape (3×3 «крест» оригинала
+→ 3×1 «столбик»), конвенция для всех override-рецептов мода
+(`feedback_show_notification_false.md`).
+
+### Что НЕ сделано и почему
+
+* **`tfc/item_heat/drill_head.json`** отсутствует — намеренно: головка
+  сваривается из разных металлов и единого «материала» у неё нет. Если
+  позже появится механика износа/плавки — добавляется отдельный item_heat
+  или per-материал через bonus (см. выше).
+* **Реальная 3D-модель** — placeholder `item/generated`; пользователь
+  выберет вариант рендера, когда придёт арт (см. `plans/drill-head.md`
+  раздел «Моделирование 3D»).
+* **В JEI — два рецепта `create:mechanical_drill`** в двух разных
+  категориях (сварочный станок не имеет своего станка-рецепта, его
+  категория — `tfc:recipe/welding`). Это нормально: weld-рецепты и
+  crafting-table не конфликтуют по станку.
+
+### Верификация (статическая)
+
+```bash
+python3 -c "import json; [json.load(open(p)) for p in [
+    'src/main/resources/data/create/recipe/crafting/kinetics/mechanical_drill.json',
+    'src/main/resources/data/tfc/recipe/welding/drill_head_cast_iron.json',
+    'src/main/resources/data/tfc/recipe/welding/drill_head_steel.json',
+    'src/main/resources/assets/tfc_aeronautics/models/item/drill_head.json'
+]]"
+# all 4 JSON files valid
+
+./gradlew compileJava
+# BUILD SUCCESSFUL (recipes — JSON-only, Java не менялся)
+```
+
+### Smoke-проверка в игре
+
+Без рантайма — пользователь прогоняет в Prism-инстансе:
+
+- [ ] `/give @s tfc_aeronautics:drill_head` → предмет появляется в
+  инвентаре, имя «Drill Head» / «Сверло», отображается плоская
+  placeholder-текстура.
+- [ ] `data/tfc/recipe/welding/` содержит два файла `drill_head_*.json` —
+  новых welding-рецептов в датапаке не было раньше.
+- [ ] `JEI` → категория `TFC Welding` → две записи `drill_head`: tier 3
+  (cast_iron + wrought_iron) и tier 4 (steel + tight_sheet_steel).
+- [ ] Наковальня TFC **tier ≥ 3**, двойной слиток cast_iron + лист
+  wrought_iron → 1 `drill_head`. Хит-трек head'а в инвентаре пустой
+  (намеренно: bonus не задан).
+- [ ] Наковальня TFC **tier ≥ 4**, steel ingot + `tfc_aeronautics:metal/tight_sheet/steel`
+  → 1 `drill_head`.
+- [ ] Верстак: drill_head (верх) + andesite_casing (центр) + shaft
+  (низ) → 1 `create:mechanical_drill`. В JEI только один рецепт
+  получения бура (ванильный `[" A ","AIA"," C "]` заменён).
+- [ ] В creative-табе `TFC Aeronautics` присутствует `Drill Head` рядом
+  с `Saw Blade` и `Wrench Head`.

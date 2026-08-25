@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "D": { "item": "tfc_aeronautics:drill_head" },
+    "C": { "item": "create:andesite_casing" },
+    "S": { "item": "create:shaft" }
+  },
+  "pattern": [ "D", "C", "S" ],
+  "result": { "count": 1, "id": "create:mechanical_drill" }
+}

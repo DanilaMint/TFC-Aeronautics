@@ -248,6 +248,21 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id (`tfc_aeronautics:metal/tight_sheet/copper` из `metal/TightSheet.java:54`, `minecraft:redstone` ванильный)
   - recipe-id остаётся `create:crafting/materials/transmitter`. Advancement Create по transmitter (если есть — `code_references/Create/src/generated/resources/data/create/advancement/recipes/...`) ссылается на тот же id — засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
+- [x] `data/create/recipe/crafting/kinetics/mechanical_drill.json` + новый предмет `tfc_aeronautics:drill_head` + 2 welding-рецепта
+  - оригинал Create shaped `[" A ","AIA"," C "]`: 1× `create:andesite_alloy` (A) + 1× `#c:ingots/iron` (I) + 3× `create:andesite_casing` (C) → 1 `create:mechanical_drill`. В TFC-сборке фактически мёртв: `#c:ingots/iron` пуст (по TFC-конвенции — металл через per-metal subtag), `andesite_alloy` — Create-only сплав
+  - введена новая механика: предмет `tfc_aeronautics:drill_head` (сверло) производится через `tfc:welding`, потом собирается на верстаке с casing и shaft. Полная цепочка получения механического бура в TFC: получить `drill_head` (одним из двух путей ниже) → заверстать 3-символьный pattern `D/C/S` с `andesite_casing` и `shaft`
+  - новые файлы:
+    - `src/main/java/ru/tfc_aeronautics/drill_head/DrillHeadRegistration.java` — регистрация предмета по шаблону `SawBladeRegistration` (один `DeferredHolder`); подключён в `TFCAeronautics` рядом с saw/wrench, добавлен в creative tab рядом с ними же
+    - `src/main/resources/assets/tfc_aeronautics/models/item/drill_head.json` — placeholder 16×16 `item/generated` поверх существующей `textures/item/drill_head.png` (494 байта, лежала с прошлой попытки). Настоящая 3D-модель будет заменена позже пользователем
+    - lang: `item.tfc_aeronautics.drill_head` = "Drill Head" / "Сверло" в `en_us.json` / `ru_ru.json`
+    - `src/main/resources/data/create/recipe/crafting/kinetics/mechanical_drill.json` — **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`): shaped 3×1 `["D","C","S"]`, ключи `D = tfc_aeronautics:drill_head` + `C = create:andesite_casing` + `S = create:shaft` → 1 `create:mechanical_drill`. `show_notification: false` (structural reshape, конвенция)
+    - `src/main/resources/data/tfc/recipe/welding/drill_head_cast_iron.json` — `tfc:welding`: `tfc:metal/double_ingot/cast_iron` + `tfc:metal/sheet/wrought_iron` → 1 `tfc_aeronautics:drill_head`, tier 3
+    - `src/main/resources/data/tfc/recipe/welding/drill_head_steel.json` — `tfc:welding`: `#c:ingots/steel` + `tfc_aeronautics:metal/tight_sheet/steel` → 1 `tfc_aeronautics:drill_head`, tier 4
+  - мотивация: бур — кинематически `drill_head + casing + shaft`. В TFC-мире сверло — сварное изделие (cast_iron+wrought_iron — tier 3 — «дешёвая» ветка; steel+tight_sheet_steel — tier 4 — «продвинутая» ветка, где tight_sheet/steel производится через anvil или pressing `data/tfc_aeronautics/recipe/pressing/tight_sheet_steel.json`). Это первый случай модового предмета, производимого через `tfc:welding` в этом моде — ранее директория `data/tfc/recipe/welding/` была пуста
+  - структурно override-часть — **TFC-style reshape** (3×3 «крест» → 3×1 «столбик»), аналогично `rope_pulley.json` / `steam_whistle.json`. Без `BANNED_RECIPES` (recipe-id сохранён). Welding-рецепты — recipe-make territory (`tfc:welding` в namespace `tfc`), не требуют override-механики
+  - шейдинг-тегов не требуется: `tfc_aeronautics:drill_head`, `create:andesite_casing`, `create:shaft`, `tfc:metal/double_ingot/cast_iron`, `tfc:metal/sheet/wrought_iron`, `tfc_aeronautics:metal/tight_sheet/steel` — все прямые item-id; `#c:ingots/steel` — общий common-тег
+  - recipe-id `create:crafting/kinetics/mechanical_drill` остаётся, advancement Create (если есть) засчитывается без правок. Welding-рецепты получают новые recipe-id `tfc:welding/drill_head_cast_iron` и `tfc:welding/drill_head_steel` в namespace `tfc` — стандартный путь для кастомных welding-рецептов
+  - **проверено**: JSON валиден × 4 (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## TODO (новые добавлять сюда)
 
