@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 17/? ✓ (overrides + 31 envelope)
+**Прогресс:** 18/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -231,6 +231,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id остаётся `create:mechanical_crafting/crushing_wheel`, advancement Create `data/create/advancement/recipes/misc/mechanical_crafting/crushing_wheel.json` (если есть) ссылается на тот же id — засчитывается без правок
   - **внимание к ключам**: в JSON присутствуют оба ключа `S` (заглавная, tag `c:stones`) и `s` (строчная, item `create:shaft`) — различаются регистром. mechanical_crafting парсер принимает такие пары (JSON-ключи регистрозависимы); pattern использует обе формы
   - **внимание к pattern'у**: пустые слоты — пробелы `" "`, не `.` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException`, если Pattern ссылается на символ вне `key`; конвенция та же, что в `goggles.json` / `whisk.json` / `propeller.json` / `hand_crank.json` / `mechanical_piston.json`)
+- [x] `data/create/recipe/item_application/railway_casing.json`
+  - оригинал Create item_application: `create:brass_casing` + tag `c:plates/obsidian` → 1 `create:railway_casing`. В TFC-сборке `c:plates/obsidian` фактически сводится к `create:sturdy_sheet` (Create-only обсидиановый лист, требует mechanical press) — недостижимо в TFC
+  - новый: `create:brass_casing` + `tfc_aeronautics:metal/tight_sheet/steel` → 1 `create:railway_casing`. tight_sheet/steel — аэронавтический лист (100 мБ vs 200 мБ для обычного `tfc:metal/sheet/steel`), производится через TFC-наковальню или pressing (`data/tfc_aeronautics/recipe/pressing/tight_sheet_steel.json`)
+  - мотивация: railway_casing — каркас железнодорожного полотна Create; tight steel sheet семантически точен как «обшивка рельсов» и лежит в TFC-металлургическом пути (сталь — tier 4)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id
+  - recipe-id `create:item_application/railway_casing` сохраняется. Advancement `create:train_casing_00` — встроенный builtin-trigger в коде Create (см. `CreateAdvancements.java` в code_references), не recipe-based; override рецепта не сломает его (выдаётся за поднятие предмета, не за крафт)
 
 ## TODO (новые добавлять сюда)
 
