@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "tfc_aeronautics:metal/tight_sheet/copper" },
+    { "item": "minecraft:redstone" }
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:transmitter"
+  },
+  "show_notification": false
+}

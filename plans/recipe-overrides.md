@@ -239,6 +239,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция проекта)
   - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id
   - recipe-id `create:item_application/railway_casing` сохраняется. Advancement `create:train_casing_00` — встроенный builtin-trigger в коде Create (см. `CreateAdvancements.java` в code_references), не recipe-based; override рецепта не сломает его (выдаётся за поднятие предмета, не за крафт)
+- [x] `data/create/recipe/crafting/materials/transmitter.json`
+  - оригинал Create shaped 3×3 `[" N ","LLL"," R "]`: 3× `c:plates/copper` (L) + `minecraft:lightning_rod` (N) + tag `c:dusts/redstone` (R) → 1 `create:transmitter`
+  - новый: shapeless `tfc_aeronautics:metal/tight_sheet/copper` + `minecraft:redstone` → 1 `create:transmitter`
+  - мотивация: оригинал перегружен — `minecraft:lightning_rod` не имеет естественного TFC-аналога в базовом флоу (это сезонный предмет из trial chambers), `c:plates/copper` — Create-only plates (в TFC-сборке пуст). В TFC-сборке `tfc_aeronautics:metal/tight_sheet/copper` — естественный медный лист (получается из TFC anvil через `tfc:metal/sheet/copper` → pressing `data/tfc_aeronautics/recipe/pressing/tight_sheet_copper.json`), `minecraft:redstone` — стандартный ванильный пылевидный редстоун. Shapeless-формат: «медная обмотка + редстоун-источник» — два ингредиента без пространственного порядка, что семантически точно отражает устройство transmitter (плоская плата с двумя контактами)
+  - структурно — serializer сменился с `minecraft:crafting_shaped` на `minecraft:crafting_shapeless`, но станок остался тем же (верстак) — по скиллу `recipe-override` это всё та же **ветка 1** (recipe-id в namespace `create`, `BANNED_RECIPES` не трогаем; файл по тому же пути затеняет оригинал автоматически)
+  - `show_notification: false` (конвенция проекта для всех override-рецептов — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id (`tfc_aeronautics:metal/tight_sheet/copper` из `metal/TightSheet.java:54`, `minecraft:redstone` ванильный)
+  - recipe-id остаётся `create:crafting/materials/transmitter`. Advancement Create по transmitter (если есть — `code_references/Create/src/generated/resources/data/create/advancement/recipes/...`) ссылается на тот же id — засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
 
 ## TODO (новые добавлять сюда)
 
