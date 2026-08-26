@@ -1,0 +1,17 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {
+    "tag": "c:ingots/brass"
+  },
+  "result": {
+    "count": 1,
+    "id": "create:brass_hand"
+  },
+  "rules": [
+    "bend_last",
+    "draw_second_last",
+    "hit_third_last"
+  ],
+  "apply_bonus": true,
+  "tier": 2
+}

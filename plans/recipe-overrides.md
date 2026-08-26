@@ -289,6 +289,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - мотивация БАНа: rope_coupling — «узел на верёвке», естественно производится из самой верёвки (`tfc:rope`, получается из джута). В TFC-мире wool_yarn нить, а rope — готовое плетёное изделие; завязывание узла на rope — тематически точный путь
   - структурно — **recipe-override ветка 2 с BAN**: оригинальный recipe-id `simulated:rope_coupling` (из пути `data/simulated/recipe/rope_coupling.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`. Альтернативный путь получения — две новые shapeless-конвертации (см. `## Новые рецепты`)
   - **проверено**: JSON существующего recipe не редактировался (он в `code_references/`, не в нашем datapack); BAN работает через mixin в `RecipeManager`
+- [x] `data/tfc_aeronautics/recipe/anvil/brass_hand.json`
+  - оригинал Create shaped `[" A ","BBB"," B "]`: 1× `create:andesite_alloy` (A) + 3× tag `c:plates/brass` (B) → 1 `create:brass_hand`. В TFC-сборке мёртв: `andesite_alloy` — Create-only сплав, циклически требует mechanical mixer; `c:plates/brass` — общий тег латунных пластин
+  - новый: TFC-наковальня tier 2, `ingredient: { tag: "c:ingots/brass" }` → 1 `create:brass_hand`. Rules `["bend_last","draw_second_last","hit_third_last"]` + `apply_bonus: true` — семантическая последовательность HIT → DRAW → BEND (расплющить слиток → вытянуть «пальцы» → согнуть в форму хвата). Отличается от `wrench_head_brass.json` (3×HIT) и `copper_valve_handle.json` (DRAW → UPSET → BEND из прутка)
+  - мотивация: brass_hand — кованая латунная заготовка; слиток → кузнечная обработка (три удара) — естественный путь в TFC-металлургии. Латунь tier 2 = латунная наковальня (`tfc:metal/anvil/brass`), естественный ранне-средний этап прогрессии
+  - структурно — **TFC-style reshape** (shaped → tfc:anvil), **ветка 2** скилла `recipe-override` (recipe-id в `tfc_aeronautics`, оригинал запрещён через `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется: `c:ingots/brass` — common-тег (содержит `tfc:metal/ingot/brass` и `create:brass_ingot`)
+  - recipe-id **новый** (`tfc_aeronautics:anvil/brass_hand`), не override существующего — JEI/advancement привязывать не нужно
+  - оригинал `create:crafting/kinetics/brass_hand` (recipe-id из пути `data/create/recipe/crafting/kinetics/brass_hand.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
 
 ## Новые рецепты
 
