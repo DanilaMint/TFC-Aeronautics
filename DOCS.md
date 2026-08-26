@@ -33,6 +33,7 @@
 23. [Depot: крафт молотком по андезитовому корпусу (Hammer-craft Depot)](#23-depot-крафт-молотком-по-андезитовому-корпусу-hammer-craft-depot)
 24. [TFC FOOD processing в Create-машинах](#24-tfc-food-processing-в-create-машинах)
 25. [Сверло через TFC-сварку (Drill Head)](#25-сверло-через-tfc-сварку-drill-head)
+26. [Бесплатная конвертация `tfc:rope` ↔ `simulated:rope_coupling`](#26-бесплатная-конвертация-tfcrope--simulatedrope_coupling)
 
 ---
 
@@ -2699,3 +2700,139 @@ python3 -c "import json; [json.load(open(p)) for p in [
   получения бура (ванильный `[" A ","AIA"," C "]` заменён).
 - [ ] В creative-табе `TFC Aeronautics` присутствует `Drill Head` рядом
   с `Saw Blade` и `Wrench Head`.
+
+---
+
+## 26. Бесплатная конвертация `tfc:rope` ↔ `simulated:rope_coupling`
+
+В Simulated есть модовый предмет `simulated:rope_coupling` —
+«узел на верёвке», используется как компонент механического крафта
+(`simulated:plunger_launcher` через наш override в
+`src/main/resources/data/simulated/recipe/mechanical_crafting/plunger_launcher.json`).
+Апстрим-рецепт (`data/simulated/recipe/rope_coupling.json`,
+`minecraft:crafting_shaped` `[" S ","NSN"," S "]` с `c:nuggets/iron`
++ `c:strings`) в TFC-сборке фактически мёртв: `c:nuggets/iron` пуст
+по TFC-конвенции, `c:strings` содержит только `tfc:wool_yarn`.
+Железо + шерстяная нить для узла на верёвке — неестественный путь.
+
+### Что сделано
+
+| Изменение | Где |
+|---|---|
+| Оригинальный `simulated:rope_coupling` рецепт забанен | `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java` |
+| Новая shapeless-конвертация `tfc:rope` → `simulated:rope_coupling` | `src/main/resources/data/tfc_aeronautics/recipe/crafting/rope_to_rope_coupling.json` |
+| Новая shapeless-конвертация `simulated:rope_coupling` → `tfc:rope` | `src/main/resources/data/tfc_aeronautics/recipe/crafting/rope_coupling_to_rope.json` |
+
+### Мотивация
+
+`simulated:rope_coupling` — это «узел на верёвке», и в TFC-мире
+естественно завязывать узел на самой верёвке. `tfc:rope` производится
+из джута через `data/tfc/recipe/crafting/rope.json` (2× `tfc:jute_fiber`
+→ 2× `tfc:rope`), это базовый TFC-ресурс. Бесплатная конвертация
+позволяет игроку:
+
+- не тратить железные самородки (в TFC железо через per-metal subtag,
+  `c:nuggets/iron` пуст);
+- не спорить с тематикой (rope_yarn vs wool_yarn — обе «нити», но rope
+  семантически ближе к coupling);
+- использовать `rope_coupling` как переходный компонент: получил из
+  верёвки → поставил в механизм → размонтировал обратно в верёвку
+  через обратный рецепт.
+
+Обратная конвертация (`coupling → rope`) нужна не часто, но не должна
+терять материал при разборке. Это симметрично шейплесс-паре из
+recipe-make.
+
+### Как это устроено
+
+**БАН** оригинала. Один из вариантов recipe-override (ветка 2 — смена
+или удаление recipe через `BANNED_RECIPES`):
+
+```java
+// src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java
+ResourceLocation.fromNamespaceAndPath("simulated", "rope_coupling"),
+```
+
+Recipe-id формируется из пути JSON-файла под `recipe/` —
+`simulated:rope_coupling` (без поддиректорий). Это **recipe-id**, не
+item-id: `simulated:rope_coupling` совпадает с обоими, но
+`BANNED_RECIPES` тихо пропускает неверный формат, поэтому
+важно свериться с Javadoc над полем.
+
+**Новые shapeless-рецепты.** В namespace `tfc_aeronautics` (конвенция
+`recipe-make`):
+
+```json
+// rope_to_rope_coupling.json
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "tfc:rope" }
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:rope_coupling"
+  }
+}
+```
+
+Зеркальный файл `rope_coupling_to_rope.json` меняет местами
+`ingredients` и `result`. Оба используют дефолтный
+`show_notification: true` — это новые content-рецепты (не override'ы),
+игрок должен увидеть подсказку при первом крафте.
+
+### Что не делалось
+
+- **`simulated:rope_connector`** и **`simulated:rope_winch`** (другие
+  rope-предметы Simulated) — оставлены как есть. Они не запрашивались
+  для изменения и не конфликтуют с текущей задачей. Если потребуется —
+  это будут отдельные override'ы.
+- **advancement Simulated** `data/simulated/advancement/recipes/misc/rope_coupling.json`
+  остаётся привязан к старому recipe-id `simulated:rope_coupling`,
+  который теперь отсутствует. Это стандартный trade-off recipe-override
+  ветки 2: ачивка за получение предмета конкретным путём не засчитывается,
+  но предмет всё равно доступен через новый путь. Тот же компромисс уже
+  принят в `data/tfc_aeronautics/recipe/anvil/copper_valve_handle.json`
+  и других override'ах этой ветки.
+- **`src/generated/resources/`** не редактируется руками — это вывод
+  Python-скриптов под `generate/`, перегенерируется перед
+  `./gradlew build`.
+
+### Связанные override'ы (для полноты картины)
+
+- `src/main/resources/data/simulated/recipe/mechanical_crafting/plunger_launcher.json`
+  — потребляет `simulated:rope_coupling` как `R` в ключе. После нашего
+  БАНа + новых shapeless цепочка получения `plunger_launcher` в
+  TFC-сборке: rope (джут) → rope_coupling (shapeless, бесплатно) →
+  plunger_launcher (mechanical_crafting с 9 ингредиентами). Раньше на
+  первом шаге требовалось железо+нить, теперь — только rope.
+
+### Верификация (статическая)
+
+```bash
+python3 -c "import json; [json.load(open(p)) for p in [
+    'src/main/resources/data/tfc_aeronautics/recipe/crafting/rope_to_rope_coupling.json',
+    'src/main/resources/data/tfc_aeronautics/recipe/crafting/rope_coupling_to_rope.json'
+]]"
+# оба JSON валидны
+
+./gradlew compileJava
+# BUILD SUCCESSFUL (Java-изменение только в RecipeRemoval.java + новый BANNED_RECIPES entry)
+```
+
+### Smoke-проверка в игре
+
+Без рантайма — пользователь прогоняет в Prism-инстансе:
+
+- [ ] `/reload` → JEI: `simulated:rope_coupling` показывает **только**
+  один рецепт — наш shapeless с ингредиентом `tfc:rope`. Shaped-рецепта
+  `[" S ","NSN"," S "]` с железом/wool быть не должно.
+- [ ] Верстак: 1× `tfc:rope` → 1× `simulated:rope_coupling`.
+- [ ] Верстак: 1× `simulated:rope_coupling` → 1× `tfc:rope`.
+- [ ] `simulated:plunger_launcher` (mechanical crafting) всё ещё
+  крафтится — рецепт потребляет `simulated:rope_coupling`, который
+  доступен через rope-конвертацию.
+- [ ] В логе `logs/latest.log` нет
+  `Recipe ... `simulated:rope_coupling` was removed` / `missing recipe` —
+  наш БАН проходит тихо через `RecipeManagerMixin`.

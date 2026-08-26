@@ -263,6 +263,20 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `tfc_aeronautics:drill_head`, `create:andesite_casing`, `create:shaft`, `tfc:metal/double_ingot/cast_iron`, `tfc:metal/sheet/wrought_iron`, `tfc_aeronautics:metal/tight_sheet/steel` — все прямые item-id; `#c:ingots/steel` — общий common-тег
   - recipe-id `create:crafting/kinetics/mechanical_drill` остаётся, advancement Create (если есть) засчитывается без правок. Welding-рецепты получают новые recipe-id `tfc:welding/drill_head_cast_iron` и `tfc:welding/drill_head_steel` в namespace `tfc` — стандартный путь для кастомных welding-рецептов
   - **проверено**: JSON валиден × 4 (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/simulated/recipe/rope_coupling.json` (забанен в `RecipeRemoval.BANNED_RECIPES`; см. также `## Новые рецепты` — заменён на бесплатную shapeless-конвертацию `tfc:rope` ↔ `simulated:rope_coupling`)
+  - оригинал Simulated shaped `[" S ","NSN"," S "]` с `c:nuggets/iron` (N) + `c:strings` (S) → 1 `simulated:rope_coupling`. В TFC-сборке фактически мёртв: `c:nuggets/iron` пуст (по TFC-конвенции — металл через per-metal subtag), `c:strings` содержит только `tfc:wool_yarn` (ванильная `minecraft:string` не входит). Железо+нить для узла на верёвке — неестественный путь в TFC
+  - мотивация БАНа: rope_coupling — «узел на верёвке», естественно производится из самой верёвки (`tfc:rope`, получается из джута). В TFC-мире wool_yarn нить, а rope — готовое плетёное изделие; завязывание узла на rope — тематически точный путь
+  - структурно — **recipe-override ветка 2 с BAN**: оригинальный recipe-id `simulated:rope_coupling` (из пути `data/simulated/recipe/rope_coupling.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`. Альтернативный путь получения — две новые shapeless-конвертации (см. `## Новые рецепты`)
+  - **проверено**: JSON существующего recipe не редактировался (он в `code_references/`, не в нашем datapack); BAN работает через mixin в `RecipeManager`
+
+## Новые рецепты
+
+- [x] `data/tfc_aeronautics/recipe/crafting/rope_to_rope_coupling.json` — shapeless 1× `tfc:rope` → 1× `simulated:rope_coupling`. Бесплатная прямая конвертация: игрок с верёвкой получает coupling без затрат. Заменяет заблокированный shaped `simulated:rope_coupling` (см. `## Готово`)
+- [x] `data/tfc_aeronautics/recipe/crafting/rope_coupling_to_rope.json` — shapeless 1× `simulated:rope_coupling` → 1× `tfc:rope`. Обратная конвертация: позволяет размонтировать механизм (вернуть rope обратно, если coupling больше не нужен)
+  - оба рецепта в namespace `tfc_aeronautics` по конвенции recipe-make (см. `.claude/skills/recipe-make/`)
+  - `show_notification` не задан (дефолт `true`) — это новые content-рецепты, не override'ы существующих; игрок должен увидеть подсказку
+  - шейдинг-тегов не требуется: `tfc:rope` и `simulated:rope_coupling` — прямые item-id
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK × 2), `./gradlew compileJava` BUILD SUCCESSFUL (recipes — JSON-only, Java не менялся для новых файлов)
 
 ## TODO (новые добавлять сюда)
 
