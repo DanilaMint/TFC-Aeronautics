@@ -1,0 +1,17 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {
+    "tag": "c:ingots/cast_iron"
+  },
+  "result": {
+    "count": 1,
+    "id": "create:industrial_iron_block"
+  },
+  "rules": [
+    "hit_last",
+    "upset_second_last",
+    "hit_third_last"
+  ],
+  "apply_bonus": false,
+  "tier": 0
+}

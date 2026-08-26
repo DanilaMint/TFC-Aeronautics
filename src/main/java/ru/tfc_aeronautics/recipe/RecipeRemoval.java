@@ -47,6 +47,11 @@ public final class RecipeRemoval
      * path is now the free {@code tfc:rope} ↔ {@code simulated:rope_coupling}
      * conversion in {@code tfc_aeronautics:crafting/rope_to_rope_coupling}
      * (and the reverse in {@code .../rope_coupling_to_rope}).
+     *
+     * <p>{@code create:industrial_iron_block_from_ingots_iron_stonecutting}
+     * is stripped because its only path is now TFC-anvil recipes under
+     * {@code tfc_aeronautics:anvil/industrial_iron_block_cast_iron} and
+     * {@code tfc_aeronautics:anvil/industrial_iron_block_steel}.
      */
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
@@ -59,7 +64,8 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/depot"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/copper_valve_handle"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/mechanical_plough"),
-        ResourceLocation.fromNamespaceAndPath("simulated", "rope_coupling")
+        ResourceLocation.fromNamespaceAndPath("simulated", "rope_coupling"),
+        ResourceLocation.fromNamespaceAndPath("create", "industrial_iron_block_from_ingots_iron_stonecutting")
     );
 
     private RecipeRemoval() {}

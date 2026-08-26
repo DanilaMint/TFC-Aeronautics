@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 18/? ✓ (overrides + 31 envelope)
+**Прогресс:** 19/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -273,6 +273,18 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id `create:crafting/kinetics/mechanical_drill` остаётся, advancement Create (если есть) засчитывается без правок. Welding-рецепты получают новые recipe-id `tfc:welding/drill_head_cast_iron` и `tfc:welding/drill_head_steel` в namespace `tfc` — стандартный путь для кастомных welding-рецептов
   - **проверено**: JSON валиден × 4 (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 - [x] `data/simulated/recipe/rope_coupling.json` (забанен в `RecipeRemoval.BANNED_RECIPES`; см. также `## Новые рецепты` — заменён на бесплатную shapeless-конвертацию `tfc:rope` ↔ `simulated:rope_coupling`)
+- [x] `data/tfc_aeronautics/recipe/anvil/industrial_iron_block_{cast_iron,steel}.json` (2 файла)
+  - оригинал Create stonecutting `tag c:ingots/iron` → 2 `create:industrial_iron_block`. В TFC-сборке мёртв: `c:ingots/iron` пуст по TFC-конвенции (металл через per-metal subtag'и); сам по себе stonecutting — не ковка, мимо TFC-металлургического пути
+  - новые: 2 anvil-рецепта (per-металл — TFC-наковальня не принимает несколько тегов в одном ингедиенте). Шаблон: `tfc:anvil` + tag `c:ingots/<metal>` + `rules: ["hit_last", "upset_second_last", "hit_third_last"]` + `apply_bonus: false`. Per-металл `count`: `cast_iron` → 1 (минимум для tier-0 «грязного» пути), `steel` → 2 (стандартная ванильная пропорция 1 ingot → 2 blocks, сохранена через anvil)
+  - **tier per-металл**: `cast_iron` → 0 (прецедент `bracket_cast_iron.json`; чугун хрупкий, куётся только на rock anvil), `steel` → 4 (стандарт для стали)
+  - **rules**: оригинальная последовательность `hit → upset → hit` («сплющить → уплотнить → выровнять»). Тематика «прессование industrial iron»: плоский → плотный → гладкий. `upset` используется в моде только в `copper_valve_handle.json` (`upset_not_last`), поэтому этот рецепт визуально отличим в JEI от прочих anvil-операций
+  - мотивация: industrial iron block — сплошной брусок железа; ковка в TFC-мире — естественный путь получения. Cast iron — низкотехнологичный путь для ранней игры (tier 0 = rock anvil, без металлургии); сталь — высокотехнологичный (tier 4, требующий развитой металлургии). Выход cast_iron 1 блок за ингот вместо 2 у стали отражает «качество металла = выход» (та же логика, что у `bracket_*`)
+  - структурно — **TFC-style reshape** (stonecutting → tfc:anvil), ветка 2 скилла `recipe-override` (recipe-id в `tfc_aeronautics`, оригинал запрещён через `BANNED_RECIPES`)
+  - `show_notification` не задаётся (anvil-рецепты — специфический тип, без notion «разблокировки»)
+  - шейдинг-тегов не требуется: `c:ingots/cast_iron` и `c:ingots/steel` — per-metal subtag'и, уже определённые в датапаке TFC (прецедент `bracket_cast_iron.json` / `bracket_steel.json`)
+  - recipe-id'ы **новые** (`tfc_aeronautics:anvil/industrial_iron_block_cast_iron` и `.../industrial_iron_block_steel`), не override существующих — JEI/advancement привязывать не нужно
+  - оригинал `create:industrial_iron_block_from_ingots_iron_stonecutting` (recipe-id из пути `data/create/recipe/industrial_iron_block_from_ingots_iron_stonecutting.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK × 2), `./gradlew compileJava` BUILD SUCCESSFUL
   - оригинал Simulated shaped `[" S ","NSN"," S "]` с `c:nuggets/iron` (N) + `c:strings` (S) → 1 `simulated:rope_coupling`. В TFC-сборке фактически мёртв: `c:nuggets/iron` пуст (по TFC-конвенции — металл через per-metal subtag), `c:strings` содержит только `tfc:wool_yarn` (ванильная `minecraft:string` не входит). Железо+нить для узла на верёвке — неестественный путь в TFC
   - мотивация БАНа: rope_coupling — «узел на верёвке», естественно производится из самой верёвки (`tfc:rope`, получается из джута). В TFC-мире wool_yarn нить, а rope — готовое плетёное изделие; завязывание узла на rope — тематически точный путь
   - структурно — **recipe-override ветка 2 с BAN**: оригинальный recipe-id `simulated:rope_coupling` (из пути `data/simulated/recipe/rope_coupling.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`. Альтернативный путь получения — две новые shapeless-конвертации (см. `## Новые рецепты`)
