@@ -297,6 +297,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `c:ingots/brass` — common-тег (содержит `tfc:metal/ingot/brass` и `create:brass_ingot`)
   - recipe-id **новый** (`tfc_aeronautics:anvil/brass_hand`), не override существующего — JEI/advancement привязывать не нужно
   - оригинал `create:crafting/kinetics/brass_hand` (recipe-id из пути `data/create/recipe/crafting/kinetics/brass_hand.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
+- [x] `data/create/recipe/crafting/logistics/redstone_contact.json`
+  - оригинал Create shaped 3×3 `" S " / "CWC" / "CCC"`: 1× `#c:plates/iron` (S) + 1× tag `c:dusts/redstone` (W) + 7× `minecraft:cobblestone` (C) → 2 `create:redstone_contact`. В TFC-сборке `c:plates/iron` пуст — оригинал мёртв
+  - новый: TFC-style shaped 1×3 `["S","R","C"]`: 1× `tfc_aeronautics:metal/tight_sheet/wrought_iron` (S) + 1× tag `c:dusts/redstone` (R) + 1× tag `c:cobblestones` (C) → 2 `create:redstone_contact`
+  - мотивация: `c:plates/iron` в TFC-сборке пуст; `tfc_aeronautics:metal/tight_sheet/wrought_iron` — кованый железный лист (получается через TFC anvil `data/tfc_aeronautics/recipe/anvil/tight_sheet_wrought_iron.json` или pressing). Pattern сжат с 3×3 до 1×3 — redstone_contact это маленькая релейная плата, полоска «лист-контакт → редстоун → булыжник-подложка» семантически точнее, чем 9-блоковый «крест». Выход ×2 сохранён как в оригинале Create
+  - структурно — sub-recipe override с structural reshape (3×3 → 1×3), без `BANNED_RECIPES`. **Ветка 1** скилла `recipe-override` (recipe-id в namespace `create`)
+  - `show_notification` опущен (как у `andesite_funnel.json` — соседнего override в `crafting/logistics/`)
+  - шейдинг-тегов не требуется: `c:dusts/redstone` уже определён в рантайме (прецедент `clutch.json` / `directional_gearshift.json`), `c:cobblestones` — common-тег булыжника (используется самим Create в `sticker.json`)
+  - recipe-id `create:crafting/logistics/redstone_contact` сохраняется, advancement Create засчитывается без правок
 
 ## Новые рецепты
 
