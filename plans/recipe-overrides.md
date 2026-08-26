@@ -97,6 +97,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `create:clutch` и `create:gearshift` — прямые item-id; `c:dusts/redstone` уже определён в рантайме (используется самим Create в 20+ рецептах включая clutch и gearshift)
   - recipe-id остаётся `simulated:directional_gearshift`, advancement `data/simulated/advancement/recipes/misc/directional_gearshift.json` ссылается на этот же recipe-id — засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c 'import json; json.load(...)'` OK), `./gradlew compileJava` UP-TO-DATE
+- [x] `data/simulated/recipe/physics_assembler.json`
+  - оригинал Simulated shaped `["   ", " N ", "ARA"]` с `create:andesite_alloy` (A) + `minecraft:lever` (N) + `create:andesite_casing` (R) → 1 `simulated:physics_assembler`
+  - новый: тот же pattern, ключ `A = tfc_aeronautics:composite` → 1 `simulated:physics_assembler`
+  - мотивация: `create:andesite_alloy` в TFC-сборке недоступен (Create-only сплав, циклически требует mechanical mixer); `tfc_aeronautics:composite` (Industrial Composite) — наш аналог, TFC barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`. Тот же свап, что в `hand_crank.json` / `piston_extension_pole.json` / `linear_chassis.json` / `radial_chassis.json` / `crushing_wheel.json`
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Simulated-овский рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для всех sub-recipe overrides — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: `minecraft:lever`, `create:andesite_casing` и `tfc_aeronautics:composite` — прямые item-id
+  - recipe-id остаётся `simulated:physics_assembler`, advancement `data/simulated/advancement/recipes/misc/physics_assembler.json` (recipe-trigger + recipe reward) ссылается на тот же id — засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -c 'import json; json.load(...)'` OK), `./gradlew compileJava` UP-TO-DATE
 - [x] `data/tfc_aeronautics/recipe/kinetics/clutch.json`
   - оригинал Create shapeless `create:andesite_casing` + `create:shaft` + tag `c:dusts/redstone` → 1 `create:clutch`
   - новый shaped 3×3 `LCL`/`MSR`/`LCL`: 4× `#tfc:lumber` (углы) + 2× `create:andesite_casing` + 1× `tfc:brass_mechanisms` (центр) + 1× `create:shaft` + 1× tag `c:dusts/redstone` → 2 `create:clutch`
