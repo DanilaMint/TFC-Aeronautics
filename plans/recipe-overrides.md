@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 22/? ✓ (overrides + 31 envelope)
+**Прогресс:** 23/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -348,6 +348,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: тег `tfc_aeronautics:gem` создан в нашем namespace — `src/main/resources/data/tfc_aeronautics/tags/item/gem.json` (9 TFC gem item-id'ов)
   - recipe-id остаётся `simulated:optical_sensor`, advancement Simulated (если есть) ссылается на тот же id — засчитывается без правок
   - **проверено**: JSON валиден × 2 (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/simulated/recipe/laser_sensor.json`
+  - оригинал Simulated shaped 1×3 `["G","A","C"]` с `minecraft:tinted_glass` (G) + `#simulated:laser_point_lens` (A, сводится к `#c:gems/amethyst` — единственный item в теге) + `create:andesite_casing` (C) → 1 `simulated:laser_sensor`
+  - новый: тот же pattern, ключ `A = #tfc_aeronautics:gem` → 1 `simulated:laser_sensor`
+  - мотивация: `#simulated:laser_point_lens` сводится к `#c:gems/amethyst` — в TFC-сборке аметист труднодоступен (ванильные аметистовые блоки растут только в `amethyst_geode`, которых нет в TFC progression). Замена на `#tfc_aeronautics:gem` даёт 9 TFC-гемов, естественно лежащих в TFC-металлургическом пути (anvil). По образцу `optical_sensor.json` (тот же свап)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`); `show_notification: false` (конвенция)
+  - шейдинг-тегов не требуется: `#tfc_aeronautics:gem` уже создан в нашем namespace (см. `optical_sensor.json`)
+  - recipe-id `simulated:laser_sensor` сохраняется, advancement `data/simulated/advancement/recipes/misc/laser_sensor.json` (recipe-trigger + recipe reward ссылается на тот же id) засчитывается без правок
+  - `simulated:laser_pointer.json` и тег `simulated:laser_point_lens` не трогаем — пользователь спросил только про `laser_sensor`
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
 
 ## Новые рецепты
 
