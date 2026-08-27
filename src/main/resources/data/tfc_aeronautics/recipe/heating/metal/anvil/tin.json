@@ -1,0 +1,11 @@
+{
+  "type": "tfc:heating",
+  "ingredient": {
+    "item": "tfc_aeronautics:metal/anvil/tin"
+  },
+  "result_fluid": {
+    "amount": 1400,
+    "id": "tfc:metal/tin"
+  },
+  "temperature": 230.0
+}
