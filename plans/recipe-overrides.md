@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 23/? ✓ (overrides + 31 envelope)
+**Прогресс:** 24/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -355,8 +355,18 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`); `show_notification: false` (конвенция)
   - шейдинг-тегов не требуется: `#tfc_aeronautics:gem` уже создан в нашем namespace (см. `optical_sensor.json`)
   - recipe-id `simulated:laser_sensor` сохраняется, advancement `data/simulated/advancement/recipes/misc/laser_sensor.json` (recipe-trigger + recipe reward ссылается на тот же id) засчитывается без правок
-  - `simulated:laser_pointer.json` и тег `simulated:laser_point_lens` не трогаем — пользователь спросил только про `laser_sensor`
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
+- [x] `data/simulated/recipe/laser_pointer.json`
+  - оригинал Simulated shaped 1×3 `["A","T","C"]`: 1× `simulated:laser_point_lens` (A, тег → `#c:gems/amethyst` → `tfc:gem/amethyst` через TFC-шадow common-тега) + 1× `minecraft:redstone_torch` (T) + 1× `create:andesite_casing` (C) → 1 `simulated:laser_pointer`
+  - новый: тот же pattern, ключ `A = #tfc_aeronautics:gem` + `T = minecraft:redstone_torch` + `C = create:andesite_casing` → 1 `simulated:laser_pointer`
+  - мотивация: расширить пул линз с одного аметиста до всех 9 TFC-гемов (тег `tfc_aeronautics:gem` уже в нашем namespace, прецедент — `optical_sensor.json` / `laser_sensor.json` с той же подстановкой). Оригинальный рецепт не мёртв в TFC-сборке (аметист достижим через shadow `c:gems/amethyst`), override — улучшение доступности, а не фикс
+  - структурно — простой sub-recipe override: pattern и аутпут неизменны, поменялся только один ингредиент
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тегов не требуется: тег `tfc_aeronautics:gem` создан в нашем namespace (`src/main/resources/data/tfc_aeronautics/tags/item/gem.json`)
+  - recipe-id `simulated:laser_pointer` сохраняется, advancement `data/simulated/advancement/recipes/misc/laser_pointer.json` ссылается на тот же id — засчитывается без правок
+  - тег `simulated:laser_point_lens` не трогаем (может использоваться в других местах Simulated; удалять чужой namespace-тег не вправе)
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## Новые рецепты
 
