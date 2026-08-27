@@ -338,6 +338,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция override-рецептов)
   - шейдинг-тегов не требуется: все id — прямые item-id
   - recipe-id `simulated:sequenced_assembly/engine_assembly` сохраняется
+- [x] `data/simulated/recipe/optical_sensor.json`
+  - оригинал Simulated shaped 3×3 `[" A "," C "," B "]`: 1× `minecraft:amethyst_shard` (A, верх-середина) + 1× `create:electron_tube` (C, центр) + 1× `create:brass_casing` (B, низ-середина) → 1 `simulated:optical_sensor`
+  - новый: тот же pattern, ключ `A = #tfc_aeronautics:gem` + `C = create:electron_tube` + `B = create:brass_casing` → 1 `simulated:optical_sensor`
+  - мотивация: `minecraft:amethyst_shard` в TFC-мире труднодоступен (ванильные аметистовые блоки растут только в `amethyst_geode` биомах, которых нет в TFC progression). Замена на любой TFC-гем через наш umbrella-тег — у игрока появляется реальный craft-путь через TFC-металлургию (гемы из `Ore.Type.GEM` enum: amethyst/diamond/emerald/lapis_lazuli/opal/pyrite/ruby/sapphire/topaz)
+  - структурно — простой sub-recipe override (как `mechanical_crafter.json` / `steam_whistle.json`): pattern и аутпут неизменны, поменялся только один ингредиент
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тегов не требуется: тег `tfc_aeronautics:gem` создан в нашем namespace — `src/main/resources/data/tfc_aeronautics/tags/item/gem.json` (9 TFC gem item-id'ов)
+  - recipe-id остаётся `simulated:optical_sensor`, advancement Simulated (если есть) ссылается на тот же id — засчитывается без правок
+  - **проверено**: JSON валиден × 2 (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## Новые рецепты
 
