@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 19/? ✓ (overrides + 31 envelope)
+**Прогресс:** 20/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -305,6 +305,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification` опущен (как у `andesite_funnel.json` — соседнего override в `crafting/logistics/`)
   - шейдинг-тегов не требуется: `c:dusts/redstone` уже определён в рантайме (прецедент `clutch.json` / `directional_gearshift.json`), `c:cobblestones` — common-тег булыжника (используется самим Create в `sticker.json`)
   - recipe-id `create:crafting/logistics/redstone_contact` сохраняется, advancement Create засчитывается без правок
+- [x] `data/create/recipe/sequenced_assembly/precision_mechanism.json`
+  - оригинал Create `create:sequenced_assembly` (5 циклов): 1× `c:plates/gold` (вход) + 3 шага деплоера (cogwheel → large_cogwheel → `c:nuggets/iron`), 9 результатов в `results[]` с суммарными шансами 28 у побочек (iron_ingot, clock, gold_nugget, shaft, crushed_raw_gold, golden_sheet, andesite_alloy, cogwheel) против 120 у `create:precision_mechanism` (≈81% успеха)
+  - новый: тот же `create:sequenced_assembly` (3 цикла): 1× `tfc_aeronautics:metal/tight_sheet/steel` (вход) + 3 шага деплоера (cogwheel → large_cogwheel → `tfc:metal/chain/copper`), 1 результат в `results[]` (`create:precision_mechanism` без `chance` → дефолт 1.0 → **100% гарантия**)
+  - мотивация: `c:plates/gold` в TFC-сборке фактически мёртв (содержит только `create:golden_sheet` — Create-only лист, требует mechanical press); `tfc_aeronautics:metal/tight_sheet/steel` — аэронавтический стальной лист (100 мБ, tier 4 steel через TFC anvil или pressing), естественно ложится в TFC-металлургический путь. Iron nugget (`c:nuggets/iron` пуст в TFC) заменён на `tfc:metal/chain/copper` — медная цепь TFC, базовый TFC-металл. Сокращение 5 → 3 циклов убирает два лишних круга cogwheel/large_cogwheel, побочный дроп полностью убран (precision_mechanism = точный механизм, лишний мусор не нужен)
+  - структурно — sequenced_assembly override, без `BANNED_RECIPES`. **Ветка 1** скилла `recipe-override` (recipe-id в namespace `create`)
+  - `show_notification: false` (structural reshape — три параметра поменялись, молчаливое обновление как у других reshape-override'ов)
+  - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/steel` — наш прямой item-id (`src/main/java/ru/tfc_aeronautics/metal/TightSheet.java:35`), `tfc:metal/chain/copper` — TFC-форма `chain` для меди (literal item, не тег), `create:cogwheel` / `create:large_cogwheel` / `create:incomplete_precision_mechanism` — Create items
+  - recipe-id `create:sequenced_assembly/precision_mechanism` сохраняется
 
 ## Новые рецепты
 
