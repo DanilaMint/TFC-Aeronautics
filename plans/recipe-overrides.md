@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 20/? ✓ (overrides + 31 envelope)
+**Прогресс:** 21/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -313,6 +313,23 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (structural reshape — три параметра поменялись, молчаливое обновление как у других reshape-override'ов)
   - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/steel` — наш прямой item-id (`src/main/java/ru/tfc_aeronautics/metal/TightSheet.java:35`), `tfc:metal/chain/copper` — TFC-форма `chain` для меди (literal item, не тег), `create:cogwheel` / `create:large_cogwheel` / `create:incomplete_precision_mechanism` — Create items
   - recipe-id `create:sequenced_assembly/precision_mechanism` сохраняется
+- [x] `data/create/recipe/crafting/materials/electron_tube.json`
+  - оригинал Create: `minecraft:crafting_shaped` 2×1 (`["L","N"]` → `create:electron_tube`): `L = create:polished_rose_quartz`, `N = #c:plates/iron`
+  - новый: `minecraft:crafting_shaped` 3×3 (`[" B ", "NRN", " C "]` → 1× `create:electron_tube`): `B = #tfc:glass_bottles`, `N = tfc_aeronautics:powder/nickel`, `R = minecraft:redstone`, `C = tfc_aeronautics:metal/tight_sheet/copper`
+  - мотивация: `polished_rose_quartz` и `#c:plates/iron` в TFC-сборке фактически недоступны (rose_quartz — Create-only предмет из аметистовой руды; железные пластины уходят на TFC-наковальни и редки). Новый набор ложится в естественный TFC-прогресс: стеклянная бутылка (любая из 4-х по тегу TFC) + порошок никеля (аэронавтика) + редстоун + прокатная медная пластина (через `stamping_press`). Раскладка `[" B ", "NRN", " C "]`: B и C в среднем столбце, R в центре, никель по бокам от R
+  - структурно — shaped override, без `BANNED_RECIPES`. **Ветка 1** скилла `recipe-override` (recipe-id в namespace `create`)
+  - `show_notification: false` (конвенция override-рецептов)
+  - шейдинг-тегов не требуется: `#tfc:glass_bottles` уже есть в датапаке TFC (`code_references/TerraFirmaCraft/.../tags/item/glass_bottles.json` — silica/hematitic/olivine/volcanic)
+  - recipe-id `create:crafting/materials/electron_tube` сохраняется (тот же путь в namespace `create`)
+- [x] `data/create/recipe/crafting/kinetics/mechanical_crafter.json`
+  - оригинал Create shaped 1×3 `["B","C","R"]`: 1× `create:electron_tube` (B) + 1× `create:brass_casing` (C) + 1× `minecraft:crafting_table` (R) → 3 `create:mechanical_crafter`
+  - новый: тот же pattern, ключ `R = #tfc:workbenches` → 3 `create:mechanical_crafter`
+  - мотивация: `minecraft:crafting_table` в TFC-мире выпадает из стилистики; 20 TFC-вариантов верстака (`tfc:wood/workbench/<wood>`), объединённых в `tfc:workbenches`, естественно заменяют его. По запросу пользователя vanilla crafting_table в этом рецепте использоваться не должен (только TFC workbenches)
+  - структурно — sub-recipe override: pattern и аутпут неизменны, поменялся только один ингредиент (как `chute.json` / `rope_pulley.json` / `steam_whistle.json`)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тегов не требуется: `#tfc:workbenches` — стандартный tag из датапака TFC (20 пород)
+  - recipe-id остаётся `create:crafting/kinetics/mechanical_crafter`, advancement Create засчитывается без правок
 
 ## Новые рецепты
 
@@ -321,7 +338,17 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - оба рецепта в namespace `tfc_aeronautics` по конвенции recipe-make (см. `.claude/skills/recipe-make/`)
   - `show_notification` не задан (дефолт `true`) — это новые content-рецепты, не override'ы существующих; игрок должен увидеть подсказку
   - шейдинг-тегов не требуется: `tfc:rope` и `simulated:rope_coupling` — прямые item-id
-  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK × 2), `./gradlew compileJava` BUILD SUCCESSFUL (recipes — JSON-only, Java не менялся для новых файлов)
+  - **проверено**: JSON валиден (`python3 -c "import json; load(...)"` OK × 2), `./gradlew compileJava` BUILD SUCCESSFUL (recipes — JSON-only, Java не менялся для новых файлов)
+- [x] `data/tfc_aeronautics/recipe/sequenced_assembly/electron_tube.json` — `create:sequenced_assembly`: 1× `tfc_aeronautics:metal/tight_sheet/copper` (вход) → 3 шага deploy'а (redstone → nickel powder → `#tfc:glass_bottles`) → 1× `create:electron_tube`. Альтернатива ручному shaped-крафту, без `BANNED_RECIPES` (сосуществует)
+  - тип — новый recipe в namespace `tfc_aeronautics` (Create не имеет sequenced_assembly для `electron_tube`, это не override — путь не шейдит существующий JSON)
+  - требует регистрации transitional-предмета: `tfc_aeronautics:incomplete_electron_tube` — `SequencedAssemblyItem` (Create) в `src/main/java/ru/tfc_aeronautics/sequenced/SequencedRegistration.java`, подключён в `TFCAeronautics.java`
+  - placeholder-текстура `assets/tfc_aeronautics/textures/item/incomplete_electron_tube.png` скопирована из `create:item/electron_tube.png` (210 байт, 16×16) — пользователь позже нарисует специфичную
+  - модель `assets/tfc_aeronautics/models/item/incomplete_electron_tube.json` — `item/generated`, layer0 → своя текстура
+  - `loops` не указан → один цикл из 3 шагов (1 deploy × 3 = 1 лампа); порядок шагов фиксирован
+  - `show_notification: false` (конвенция override/structural-reshape recipes)
+  - шейдинг-тегов не требуется: `#tfc:glass_bottles` — штатный тег TFC, остальные id — прямые item-id
+  - recipe-id `tfc_aeronautics:sequenced_assembly/electron_tube` (новый)
+  - подробности в `DOCS.md` §27
 
 ## TODO (новые добавлять сюда)
 

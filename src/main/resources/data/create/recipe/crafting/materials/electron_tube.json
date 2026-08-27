@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": { "tag": "tfc:glass_bottles" },
+    "N": { "item": "tfc_aeronautics:powder/nickel" },
+    "R": { "item": "minecraft:redstone" },
+    "C": { "item": "tfc_aeronautics:metal/tight_sheet/copper" }
+  },
+  "pattern": [ " B ", "NRN", " C " ],
+  "result": { "count": 1, "id": "create:electron_tube" },
+  "show_notification": false
+}

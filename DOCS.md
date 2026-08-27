@@ -1962,6 +1962,7 @@ milling/pressing/квен-моста — см. `feedback_recipe_override_convent
 | `data/tfc_aeronautics/recipe/anvil/brass_hand.json` | Create shaped `[" A ","BBB"," B "]` с `create:andesite_alloy` (A, 1 шт.) + tag `c:plates/brass` (B, 3 шт.) → 1 `create:brass_hand` (recipe-id `create:crafting/kinetics/brass_hand`). В TFC-сборке мёртв: `andesite_alloy` — Create-only сплав (требует mechanical mixer); `c:plates/brass` — общий тег латунных пластин | TFC-наковальня tier 2: tag `c:ingots/brass` → 1 `create:brass_hand`. Rules `["bend_last","draw_second_last","hit_third_last"]` + `apply_bonus: true` (семантическая последовательность: HIT → DRAW → BEND — расплющить слиток в плоскую заготовку → вытянуть «пальцы» → согнуть в форму хвата). Отличается от `wrench_head_brass.json` (3×HIT) и `copper_valve_handle.json` (DRAW → UPSET → BEND из прутка). Мотивация: brass_hand — кованая латунная заготовка; латунь tier 2 = латунная наковальня (`tfc:metal/anvil/brass`). **Ветка 2** скилла `recipe-override` — оригинал `create:crafting/kinetics/brass_hand` запрещён через `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`. Шейдинг-тегов не требуется: `c:ingots/brass` — common-тег (содержит `tfc:metal/ingot/brass` и `create:brass_ingot`). Recipe-id **новый** (`tfc_aeronautics:anvil/brass_hand`), advancement Create по этому пути **не** засчитывается (компромисс Datapack, как у `copper_valve_handle.json` / `mechanical_plough/*.json`) |
 | `data/create/recipe/crafting/logistics/redstone_contact.json` | Create shaped 3×3 `[" S ","CWC","CCC"]` с 1× `#c:plates/iron` (S) + 1× tag `c:dusts/redstone` (W) + 7× `minecraft:cobblestone` (C) → 2 (recipe-id `create:crafting/logistics/redstone_contact`). В TFC-сборке `c:plates/iron` пуст — оригинал мёртв | TFC-style shaped 1×3 `["S","R","C"]`: 1× `tfc_aeronautics:metal/tight_sheet/wrought_iron` (S) + 1× tag `c:dusts/redstone` (R) + 1× tag `c:cobblestones` (C) → 2 `create:redstone_contact`. Мотивация: `c:plates/iron` в TFC-сборке пуст; `tfc_aeronautics:metal/tight_sheet/wrought_iron` — кованый железный лист из TFC anvil или pressing; `c:cobblestones` — common-тег булыжника (прецедент `sticker.json` в самом Create). Pattern сжат с 3×3 до 1×3 — redstone_contact это маленькая релейная плата, полоска «лист-контакт → редстоун → булыжник-подложка» семантически точнее, чем 9-блоковый «крест». Выход ×2 сохранён как в оригинале. `show_notification` опущен (как у `andesite_funnel.json` — соседнего override в `crafting/logistics/`). **Ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`). Шейдинг-тегов не требуется. Recipe-id `create:crafting/logistics/redstone_contact` сохраняется, advancement Create засчитывается без правок |
 | `data/create/recipe/sequenced_assembly/precision_mechanism.json` | Create `create:sequenced_assembly` (5 циклов): 1× `c:plates/gold` (вход) + 3 шага деплоера (cogwheel → large_cogwheel → `c:nuggets/iron`), 9 результатов в `results[]` с суммарным шансом 28 у побочек (iron_ingot, clock, gold_nugget, shaft, crushed_raw_gold, golden_sheet, andesite_alloy, cogwheel) против 120 у `create:precision_mechanism` (≈81% успеха) | тот же `create:sequenced_assembly` (3 цикла): 1× `tfc_aeronautics:metal/tight_sheet/steel` (вход) + 3 шага деплоера (cogwheel → large_cogwheel → `tfc:metal/chain/copper`), 1 результат в `results[]` (`create:precision_mechanism` без `chance` → дефолт 1.0 → **100% гарантия**). Мотивация: `c:plates/gold` в TFC-сборке фактически мёртв (содержит только `create:golden_sheet` — Create-only лист, требует mechanical press); `tfc_aeronautics:metal/tight_sheet/steel` — аэронавтический стальной лист (100 мБ, tier 4 steel через TFC anvil или pressing), естественно ложится в TFC-металлургический путь. Iron nugget (`c:nuggets/iron` пуст в TFC) заменён на `tfc:metal/chain/copper` — медная цепь TFC, базовый TFC-металл. Сокращение 5 → 3 циклов убирает два лишних круга cogwheel/large_cogwheel, побочный дроп полностью убран (precision_mechanism = точный механизм, лишний мусор не нужен). `show_notification: false` (structural reshape). **Ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`). Шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/steel` — наш прямой item-id (`src/main/java/ru/tfc_aeronautics/metal/TightSheet.java:35`), `tfc:metal/chain/copper` — TFC-форма `chain` для меди (literal item, не тег), `create:cogwheel` / `create:large_cogwheel` / `create:incomplete_precision_mechanism` — Create items. Recipe-id `create:sequenced_assembly/precision_mechanism` сохраняется |
+| `data/create/recipe/crafting/kinetics/mechanical_crafter.json` | Create shaped 1×3 `["B","C","R"]`: 1× `create:electron_tube` (B) + 1× `create:brass_casing` (C) + 1× `minecraft:crafting_table` (R) → 3 `create:mechanical_crafter` | тот же pattern, ключ `R = #tfc:workbenches` → 3 `create:mechanical_crafter`. Мотивация: `minecraft:crafting_table` в TFC-мире выпадает из стилистики — 20 TFC-вариантов верстака (`tfc:wood/workbench/<wood>`), объединённых в `tfc:workbenches`, естественно заменяют его. По запросу пользователя vanilla crafting_table в этом рецепте использоваться не должен (только TFC workbenches). `show_notification: false` (конвенция). **Ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`). Шейдинг-тегов не требуется: `#tfc:workbenches` — стандартный tag из датапака TFC (20 пород). Recipe-id `create:crafting/kinetics/mechanical_crafter` сохраняется, advancement Create засчитывается без правок |
 
 Для sail/funnel/tunnel потребовался shadow-тег `tfc:cloths`
 (`data/tfc/tags/item/cloths.json`): burlap + wool + silk (других cloth items TFC не имеет).
@@ -2840,3 +2841,128 @@ python3 -c "import json; [json.load(open(p)) for p in [
 - [ ] В логе `logs/latest.log` нет
   `Recipe ... `simulated:rope_coupling` was removed` / `missing recipe` —
   наш БАН проходит тихо через `RecipeManagerMixin`.
+
+## 27. `create:electron_tube`: ручной и deploy-альтернативный крафт
+
+### Мотивация
+
+Ванильная `create:electron_tube` крафтится через
+`minecraft:crafting_shaped` из `polished_rose_quartz` + `#c:plates/iron`
+(см. `code_references/Create/.../crafting/materials/electron_tube.json`).
+В мире TFC оба ингредиента неестественны: `polished_rose_quartz` привязан
+к аметистовой руде (Create-only), железные пластины редки и обычно
+уходят на наковальни. Электронная лампа нужна для всех Create-логистических
+блоков (funnel/tunnel/observer/clockwork_bearing/deployer/...), поэтому в
+TFC-прогрессии она должна быть доступна раньше и из подручных материалов.
+
+### Два параллельных пути
+
+#### Shaped — ручной крафт 3×3
+
+Файл: `src/main/resources/data/create/recipe/crafting/materials/electron_tube.json`
+(тот же путь, что у оригинала — recipe-id `create:crafting/materials/electron_tube`,
+ветка 1 override'а, без `BANNED_RECIPES`).
+
+Паттерн `[" B ", "NRN", " C "]`:
+
+```
+. B .
+N R N
+. C .
+```
+
+- `B` = `#tfc:glass_bottles` (тег TFC — все четыре стеклянных бутылки)
+- `C` = `tfc_aeronautics:metal/tight_sheet/copper` (прокатная медная пластина
+  через `stamping_press`)
+- `N` = `tfc_aeronautics:powder/nickel` (порошок никеля)
+- `R` = `minecraft:redstone`
+
+`show_notification: false` по конвенции override-рецептов.
+
+#### Sequenced assembly — deploy-цепочка
+
+Файл: `src/main/resources/data/tfc_aeronautics/recipe/sequenced_assembly/electron_tube.json`
+(новый recipe в нашем namespace — `tfc_aeronautics:sequenced_assembly/electron_tube`,
+Create не имеет sequenced_assembly для `electron_tube`).
+
+Стартовый материал — `tfc_aeronautics:metal/tight_sheet/copper` (прокатная
+медная пластина через `stamping_press`, тот же ингредиент, что в shaped).
+Один цикл из трёх deploy-шагов:
+
+1. deployer → `minecraft:redstone`
+2. deployer → `tfc_aeronautics:powder/nickel`
+3. deployer → любой `#tfc:glass_bottles`
+
+Порядок шагов фиксирован; deployer'ы должны быть выстроены последовательно
+вдоль конвейера, подающего пластины. `loops` не указан — один проход =
+1 лампа. `show_notification: false`.
+
+### Регистрация `tfc_aeronautics:incomplete_electron_tube`
+
+В Create есть `SequencedAssemblyItem` для transitional-предмета — он хранит
+progress-bar (см. `code_references/Create/.../processing/sequenced/SequencedAssemblyItem.java`).
+У Create штатные `incomplete_precision_mechanism` / `incomplete_track` уже
+зарегистрированы, но `incomplete_electron_tube` — нет. Регистрируем свой:
+
+- `src/main/java/ru/tfc_aeronautics/sequenced/SequencedRegistration.java` —
+  `DeferredRegister.Items` + одно поле `INCOMPLETE_ELECTRON_TUBE` типа
+  `com.simibubi.create.content.processing.sequenced.SequencedAssemblyItem`.
+  Подключается в `TFCAeronautics.java` рядом с другими `*Registration.register(...)`.
+- `src/main/resources/assets/tfc_aeronautics/models/item/incomplete_electron_tube.json` —
+  `item/generated`, layer0 → своя текстура.
+- `src/main/resources/assets/tfc_aeronautics/textures/item/incomplete_electron_tube.png` —
+  **placeholder**: скопирована из `create:item/electron_tube.png` (210 байт).
+  Визуально «незавершённая лампа = лампа» до того, как пользователь нарисует
+  специфичную (например, с накладными слоями redstone/nickel/bottle).
+
+### Что НЕ сделано
+
+- BANNED_RECIPES не тронут — оба пути (shaped и sequenced_assembly)
+  сосуществуют как альтернативы, никто не «запрещён».
+- Placeholder-текстура не отличается от `create:electron_tube` — это
+  сознательно, чтобы модель грузилась до того, как будет нарисована
+  правильная. Чтобы отличать визуально, нужна собственная PNG
+  (например, тонкий серый цилиндр без свечения).
+- Не пытались использовать существующие `create:incomplete_*` вместо
+  своего — общий `transitional_item` на несколько рецептов не поддержан
+  Create-движком.
+
+### Верификация (статическая)
+
+```bash
+# JSON валидны (parses без ошибок)
+python3 -c "import json; json.load(open('src/main/resources/data/create/recipe/crafting/materials/electron_tube.json'))"
+python3 -c "import json; json.load(open('src/main/resources/data/tfc_aeronautics/recipe/sequenced_assembly/electron_tube.json'))"
+python3 -c "import json; json.load(open('src/main/resources/assets/tfc_aeronautics/models/item/incomplete_electron_tube.json'))"
+
+# Java-регистрация компилируется
+./gradlew compileJava
+# BUILD SUCCESSFUL (SequencedRegistration + TFCAeronautics.java patch)
+
+# Все id, на которые ссылается рецепт, зарегистрированы
+grep -rn 'powder/nickel\|metal/tight_sheet/copper\|glass_bottles' src/main/java/ru/tfc_aeronautics/ src/main/resources/data/tfc/tags/item/glass_bottles.json 2>/dev/null
+# Должно вернуть: enum NICKEL в powder/MetalPowder.java, enum COPPER в metal/TightSheet.java,
+# тег tfc:glass_bottles в code_references/TerraFirmaCraft (либо в src/main/resources, если шейдили).
+```
+
+### Smoke-проверка в игре
+
+- [ ] `/reload` без ошибок: в `logs/latest.log` нет
+  `Could not find item tfc_aeronautics:incomplete_electron_tube` /
+  `Unknown sequenced assembly transitional_item` / `Unbound values in
+  recipe ... sequenced_assembly/electron_tube`.
+- [ ] В JEI `create:electron_tube` показывает **два** рецепта:
+  shaped 3×3 с `[" B ", "NRN", " C "]` и sequenced_assembly с тремя
+  deploy-шагами.
+- [ ] Верстак: `[" B ", "NRN", " C "]` → 1× `create:electron_tube`
+  (любая TFC-бутылка подходит по тегу; в среднем столбце любой
+  никелевый порошок — но он у нас один).
+- [ ] Deploy-цепочка (deployer1 → redstone → deployer2 → nickel powder
+  → deployer3 → glass bottle) при подаче
+  `tfc_aeronautics:metal/tight_sheet/copper` выдаёт 1×
+  `create:electron_tube`. У `incomplete_electron_tube` в
+  руке виден оранжево-голубой progress-bar как у
+  `create:incomplete_precision_mechanism`.
+- [ ] JEI/creative tab: предмет `tfc_aeronautics:incomplete_electron_tube`
+  существует, рендерится с placeholder-текстурой (та же, что у
+  `create:electron_tube`).
