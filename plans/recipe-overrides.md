@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 21/? ✓ (overrides + 31 envelope)
+**Прогресс:** 22/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -330,6 +330,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция проекта)
   - шейдинг-тегов не требуется: `#tfc:workbenches` — стандартный tag из датапака TFC (20 пород)
   - recipe-id остаётся `create:crafting/kinetics/mechanical_crafter`, advancement Create засчитывается без правок
+- [x] `data/simulated/recipe/sequenced_assembly/engine_assembly.json`
+  - оригинал Simulated `create:sequenced_assembly` (8 циклов): `create:iron_sheet` (вход) + 2 шага (`create:cutting` → `create:pressing`); results: `simulated:engine_assembly` chance=50, `create:iron_sheet`=16, `minecraft:iron_nugget`=15, `create:industrial_iron_block`=10, `minecraft:iron_bars`=8, `minecraft:iron_helmet` (no-chance fallback)
+  - новый: тот же `create:sequenced_assembly` (8 циклов): `tfc_aeronautics:metal/tight_sheet/steel` (вход); results: `simulated:engine_assembly` chance=75, `tfc_aeronautics:metal/tight_sheet/steel` chance=15 (возврат входа при неудаче), `create:industrial_iron_block` chance=10. Удалены мусорные выходы `iron_nugget`/`iron_bars`/`iron_helmet`
+  - мотивация: TFC-интеграция через `tfc_aeronautics:metal/tight_sheet/steel` (наш аэронавтический стальной лист, tier 4 steel через TFC anvil или pressing); сумма chance-весов 100 → ровно 75% успеха; при неудаче возвращается входной материал (semantic match с оригиналом, где `iron_sheet` был «возвратом входа»)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция override-рецептов)
+  - шейдинг-тегов не требуется: все id — прямые item-id
+  - recipe-id `simulated:sequenced_assembly/engine_assembly` сохраняется
 
 ## Новые рецепты
 
