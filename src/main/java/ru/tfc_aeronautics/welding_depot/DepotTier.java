@@ -3,7 +3,7 @@ package ru.tfc_aeronautics.welding_depot;
 import net.dries007.tfc.util.Metal;
 import net.minecraft.world.level.material.MapColor;
 
-enum DepotTier {
+public enum DepotTier {
     WROUGHT_IRON(Metal.WROUGHT_IRON, "wrought_iron", MapColor.METAL, 3),
     STEEL       (Metal.STEEL,        "steel",        MapColor.COLOR_LIGHT_GRAY, 4),
     BLACK_STEEL (Metal.BLACK_STEEL,  "black_steel",  MapColor.COLOR_BLACK, 5),

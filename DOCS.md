@@ -36,6 +36,8 @@
 26. [Бесплатная конвертация `tfc:rope` ↔ `simulated:rope_coupling`](#26-бесплатная-конвертация-tfcrope--simulatedrope_coupling)
 27. [`create:electron_tube`: ручной и deploy-альтернативный крафт](#27-createelectron_tube-ручной-и-deploy-альтернативный-крафт)
 28. [Сварочный стол (Welding Depot)](#28-сварочный-стол-welding-depot)
+29. [Точная температура через инженерные очки Create](#29-точная-температура-через-инженерные-очки-create)
+30. [Точная температура в heat-индикаторах блок-GUI](#30-точная-температура-в-heat-индикаторах-блок-gui)
 
 ---
 
@@ -3123,3 +3125,186 @@ Placeholder: модель скопирована с `create:block/depot/block.js
 - Сейчас все 5 вариантов блока выглядят одинаково (верх — одна и та же
   текстура). Когда появится настоящий `.bbmodel`, можно сделать
   per-material различия (например, разные цвета/узоры верха под металл).
+
+---
+
+## 29. Точная температура через инженерные очки Create
+
+TFC показывает температуру предмета в тултипе строкой вида
+«Оранжевое****», где категория привязана к `Heat`-enum, а звёздочки — к
+положению температуры внутри диапазона. Это удобно для общего понимания
+«горячо ли», но скрывает точное значение — а оно важно для ремесленных
+операций (ковка при 1100 °C, сварка при 1300 °C).
+
+Идея: расширить поведение инженерных очков Create (`create:goggles`) на
+TFC-предметы. Когда игрок носит очки, те же строки тултипа заменяются на
+точные значения в градусах Цельсия, окрашенные в цвет heat-категории.
+Для разных строк используются разные температуры, потому что семантика
+различается:
+
+| Контекст | Источник температуры |
+|----------|----------------------|
+| Самостоятельная heat-строка (`tfc.enum.heat.*`, `tfc.tooltip.temperature_*`) | `HeatCapability.getTemperature(stack)` — текущая температура предмета |
+| `tfc.tooltip.melts_into` (вложенная) | `HeatingRecipe.getRecipe(stack).getTemperature()` — температура плавления |
+| `tfc.tooltip.fuel_burns_at` (вложенная) | `Fuel.get(stack).temperature()` — температура горения |
+
+### Точка перехвата
+
+Без mixin в TFC. Подписка на тот же `ItemTooltipEvent`, что и сам TFC
+(`ClientForgeEventHandler.onItemTooltip` → `IHeatView.addTooltipInfo`).
+Класс подписчика:
+
+* `src/client/java/ru/aeronautics/client/HeatTooltipGoggles.java`
+* `@EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)` — авторегистрация,
+  без правок в `TFCAeronautics.java`.
+* `@SubscribeEvent(priority = EventPriority.LOWEST)` — выполняемся после TFC,
+  поэтому TFC-строка уже лежит в `event.getToolTip()`.
+
+### Алгоритм
+
+Два прохода по `event.getToolTip()`:
+
+**Pass 1 — самостоятельная heat-строка.** Ищем компонент с
+`getContents().getKey().startsWith("tfc.enum.heat.")` или
+`"tfc.tooltip.temperature_"` — это строка из `IHeatView.addTooltipInfo`.
+Заменяем её на нашу `replacement` плюс siblings оригинала, кроме
+Unicode-звёздочек `٭` (TFC их приклеивает к базе в COLOR-стиле).
+Суффиксы « - can work» / « - can weld» / « - DANGER» сохраняются.
+
+**Pass 2 — вложенная heat-категория.** Многие TFC-строки (топливо,
+плавление, плюс любые строки, которые TFC или другой аддон соберёт через
+`Component.translatable(..., heatCategory, ...)`) встраивают heat-категорию
+как `Component`-аргумент в `TranslatableContents.args[]`. Рекурсивный
+`remapNestedHeat` обходит args[] каждого TranslatableContents, находит
+sub-component с ключом `tfc.enum.heat.*` и пересобирает компонент
+через `Component.translatable(key, newArgs)`, заменяя только этот
+аргумент на наш `replacement`. Если в `args[]` ничего не нашлось —
+возвращает оригинал, чтобы `tooltip.set(...)` не сработал.
+
+Это покрывает не только `tfc.tooltip.fuel_burns_at` и
+`tfc.tooltip.melts_into`, но и любые будущие TFC/аддон-строки, которые
+держат heat-категорию как вложенный Component.
+
+### Что показывается
+
+* Без очков: «Оранжевое****» (стандартное TFC-поведение).
+* С очками, для нагретого медного слитка при 777 °C:
+  * самостоятельная heat-строка: «777 °C - Can Work» (цвет heat-категории);
+  * `Melts into 200 mB of Copper (at 1080 °C)` — температура плавления из
+    рецепта, не текущая;
+  * для топлива типа charcoal: «Burns at 850 °C for 1 hour» — температура
+    горения из реестра `Fuel`.
+
+Суффиксы « - can work», « - can weld», « - DANGER» сохраняются в
+самостоятельной строке (TFC хранит их как siblings одного
+`MutableComponent`, мы их копируем через `append(sibling)`, отбрасывая
+только Unicode-звёздочки `٭`, которые TFC добавляет в COLOR-стиле — см.
+`TemperatureDisplayStyle.COLOR`).
+
+### Используемое API
+
+* `net.dries007.tfc.common.component.heat.HeatCapability.get(stack)`,
+  `HeatCapability.getTemperature(stack)` — публичные методы (см.
+  `code_references/TerraFirmaCraft/src/main/java/net/dries007/tfc/common/component/heat/HeatCapability.java`).
+* `net.dries007.tfc.common.component.heat.Heat.getHeat(float).getColor()` —
+  публичное API.
+* `net.dries007.tfc.common.recipes.HeatingRecipe.getRecipe(stack)` →
+  `getTemperature()` — публичное API.
+* `net.dries007.tfc.util.data.Fuel.get(stack)` → `temperature()` —
+  публичное API.
+* `com.simibubi.create.content.equipment.goggles.GogglesItem#isWearingGoggles(Player)`
+  — публичный статический метод, автоматически учитывает Curios через
+  предикаты, добавленные `Curios.init()`.
+
+### Переводы
+
+Новые строки не нужны. Используется уже существующий TFC-ключ
+`tfc.tooltip.temperature_celsius` (`%s °C`), определённый в
+`assets/tfc/lang/*.json` для всех локалей, включая `ru_ru.json` (даст
+«1050 °C» в русской локали).
+
+### Краевые случаи
+
+| Случай | Поведение |
+|--------|-----------|
+| Игрок не носит очки | TFC-категория как обычно; ранний выход на шаге 3. |
+| Предмет без `HeatCapability` | Ранний выход на шаге 2. |
+| Предмет холодный (`temperature ≤ 0`) | Ранний выход на шаге 4. |
+| Очки в Curios-слоте | `isWearingGoggles` учитывает это автоматически. |
+| TFC-стиль `CELSIUS/Fahrenheit/etc.` | Числовая строка получает цвет категории — бонус. |
+| `event.getEntity() == null` (титульный экран и пр.) | Ранний выход на шаге 1. |
+| TFC/Create отключены | `catch (Throwable)` в обработчике — fail silent, тултипы других модов не страдают. |
+| `melts_into`, но рецепт не найден | Используется текущая температура стека как fallback. |
+| `fuel_burns_at`, но топливо не определено | Используется текущая температура стека как fallback. |
+
+### Что НЕ делается
+
+* Не правим `HeatTooltip`-стиль в TFC-конфиге — приоритет нашего подписчика ниже TFC, поэтому иначе строка дублировалась бы.
+* Не добавляем миксины (`tfc_aeronautics.mixins.json` остаётся без изменений).
+* Не делаем свой ключ перевода — переиспользуем TFC-ключ.
+
+## 30. Точная температура в heat-индикаторах блок-GUI
+
+Расширение фичи из §29 на блок-GUI TFC. Без очков — TFC рисует heat-категорию («Оранжевое****») в тултипе, всплывающем при наведении на полоску жара у костра/печи/кузни/тигля. С очками в той же строке — точное значение в °C, окрашенное в цвет категории.
+
+### Что именно расширяем
+
+TFC рисует heat-индикатор в `renderTooltip` семи экранов:
+
+| Экран | Блок |
+|---|---|
+| `FirepitScreen`        | Костёр (Fire Pit) |
+| `FireboxScreen`        | Firebox (камин/очаг) |
+| `CharcoalForgeScreen`  | Charcoal Forge (угольная кузня) |
+| `BlastFurnaceScreen`   | Blast Furnace (печь) |
+| `CrucibleScreen`       | Crucible (тигель) |
+| `GrillScreen`          | Grill |
+| `PotScreen`            | Pot |
+
+Все они используют **один и тот же паттерн**:
+
+```java
+final var text = TFCConfig.CLIENT.heatTooltipStyle.get().formatColored(blockEntity.getTemperature());
+if (text != null) {
+    graphics.renderTooltip(font, text, mouseX, mouseY);
+}
+```
+
+Это — единственное место, где нужно перехватывать.
+
+### Реализация
+
+`@Redirect` на `INVOKE` интерфейсного метода
+`net.dries007.tfc.config.TemperatureDisplayStyle#formatColored(F)MutableComponent` в каждом из семи экранов.
+Хэлпер `HeatTooltipGoggles.withGoggles(temperature)` возвращает `MutableComponent` точного °C, если игрок в очках; иначе `null` — в этом случае `@Redirect` пробрасывает в оригинальный `style.formatColored(temperature)`.
+
+Семь файлов-прайм-фейсов (каждый ≈ 22 строки), общий хэлпер на `HeatTooltipGoggles.exactTemp` (тот же, что для тултипов предметов):
+
+- `src/client/java/ru/tfc_aeronautics/mixin/client/screens/CharcoalForgeScreenMixin.java`
+- `src/client/java/ru/tfc_aeronautics/mixin/client/screens/FirepitScreenMixin.java`
+- `src/client/java/ru/tfc_aeronautics/mixin/client/screens/BlastFurnaceScreenMixin.java`
+- `src/client/java/ru/tfc_aeronautics/mixin/client/screens/CrucibleScreenMixin.java`
+- `src/client/java/ru/tfc_aeronautics/mixin/client/screens/FireboxScreenMixin.java`
+- `src/client/java/ru/tfc_aeronautics/mixin/client/screens/GrillScreenMixin.java`
+- `src/client/java/ru/tfc_aeronautics/mixin/client/screens/PotScreenMixin.java`
+
+Регистрация — одним блоком `"client"` в существующем `tfc_aeronautics.mixins.json` (см. `src/main/resources/tfc_aeronautics.mixins.json`). Имена в блоке имеют префикс `client.screens.<ClassName>` — они резолвятся в `ru.tfc_aeronautics.mixin.client.screens.<ClassName>`, что укладывается в общий `"package"` корень и не плодит отдельный JSON/`mods.toml` `[[mixins]]`-блок.
+
+### Краевые случаи
+
+| Случай | Поведение |
+|---|---|
+| Игрок без очков | `withGoggles` → `null` → пробрасываем в оригинальный `formatColored`. |
+| Блок холодный (`temperature ≤ 0`) | `withGoggles` → `null` (Heat.getHeat вернёт `null` или цвет `WHITE`). |
+| Очки в Curios | `isWearingGoggles` учтёт. |
+| Игрок `null` (титульный экран) | `Minecraft.getInstance().player == null` → возврат `null` в `withGoggles`. |
+| Категория как стиль уже `CELSIUS/Fahrenheit/etc.` | Берём ту же температуру из `getTemperature()`, красим в цвет категории — бонус как в §29. |
+| `CrucibleScreen` показывает alloy и металлы | alloy-строки (без heat) не затрагиваются — перехват только на конкретный `formatColored` INVOKE. |
+| TFC отключён | mixin просто не загрузится — никаких side-effects на сервере. |
+
+### Что НЕ делается
+
+* Не правим `TemperatureDisplayStyle` (нет интерфейс-миксина).
+* Не дублируем логику очков — общий `HeatTooltipGoggles.withGoggles`.
+* Не трогаем `ItemTooltipEvent` (`§29`) — оно про слоты инвентаря, здесь про блок-GUI.
+
