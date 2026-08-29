@@ -25,6 +25,7 @@ import ru.tfc_aeronautics.resin.ResinRegistration;
 import ru.tfc_aeronautics.sequenced.SequencedRegistration;
 import ru.tfc_aeronautics.saw.SawBladeRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
+import ru.tfc_aeronautics.welding_depot.WeldingDepotRegistration;
 import ru.tfc_aeronautics.wrench.WrenchHeadRegistration;
 import ru.tfc_aeronautics.worldgen.ProcessorTypes;
 import ru.tfc_aeronautics.worldgen.StructurePieceTypes;
@@ -63,6 +64,7 @@ public class TFCAeronautics {
         AnvilRegistration.register(modEventBus);
         ChainConveyorRegistration.register(modEventBus);
         WoodenBracketRegistration.register(modEventBus);
+        WeldingDepotRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
         RecipeRegistration.register(modEventBus);
 

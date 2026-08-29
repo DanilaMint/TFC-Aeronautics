@@ -23,6 +23,7 @@ import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.resin.ResinRegistration;
 import ru.tfc_aeronautics.saw.SawBladeRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
+import ru.tfc_aeronautics.welding_depot.WeldingDepotRegistration;
 import ru.tfc_aeronautics.wrench.WrenchHeadRegistration;
 
 /**
@@ -54,6 +55,7 @@ public final class CreativeTabs
                 output.accept(DrillHeadRegistration.DRILL_HEAD.get());
                 output.accept(WrenchHeadRegistration.WRENCH_HEAD.get());
                 WoodenBracketRegistration.BRACKETS.keySet().forEach(wood -> output.accept(WoodenBracketRegistration.BRACKET_ITEMS.get(wood).get()));
+                WeldingDepotRegistration.DEPOT_ITEMS.values().forEach(i -> output.accept(i.get()));
             })
             .build());
 

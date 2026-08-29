@@ -34,6 +34,8 @@
 24. [TFC FOOD processing в Create-машинах](#24-tfc-food-processing-в-create-машинах)
 25. [Сверло через TFC-сварку (Drill Head)](#25-сверло-через-tfc-сварку-drill-head)
 26. [Бесплатная конвертация `tfc:rope` ↔ `simulated:rope_coupling`](#26-бесплатная-конвертация-tfcrope--simulatedrope_coupling)
+27. [`create:electron_tube`: ручной и deploy-альтернативный крафт](#27-createelectron_tube-ручной-и-deploy-альтернативный-крафт)
+28. [Сварочный стол (Welding Depot)](#28-сварочный-стол-welding-depot)
 
 ---
 
@@ -2973,3 +2975,151 @@ grep -rn 'powder/nickel\|metal/tight_sheet/copper\|glass_bottles' src/main/java/
 - [ ] JEI/creative tab: предмет `tfc_aeronautics:incomplete_electron_tube`
   существует, рендерится с placeholder-текстурой (та же, что у
   `create:electron_tube`).
+
+---
+
+## 28. Сварочный стол (Welding Depot)
+
+Автоматизация TFC-сварки через `create:mechanical_press`. Игрок кладёт на стол
+две детали и флюс; когда пресс над столом опускается в нижнюю точку, стол
+ищет `tfc:welding`-рецепт по двум деталям и, если tier подходит и обе детали
+достаточно горячие, выполняет его. Результат появляется в отдельном
+«выходном» слоте, который могут забрать воронка, Create-шлюз или хоппер.
+
+### Регистрация
+
+- Пакет `src/main/java/ru/tfc_aeronautics/welding_depot/`.
+- `DepotTier` — `enum` из 5 вариантов: `WROUGHT_IRON` (tier 3), `STEEL` (4),
+  `BLACK_STEEL` (5), `BLUE_STEEL` (6), `RED_STEEL` (6). tier берётся из
+  `Metal.tier()` (через `LevelTier.level()`); реальные значения совпадают с
+  `TFCTiers`.
+- `WeldingDepotBlock extends Block implements IBE<WeldingDepotBlockEntity>` —
+  без `IWrenchable`, без facing/axis. BlockState пустой (как у `create:depot`).
+- `WeldingDepotBlockEntity extends SmartBlockEntity` с 4-слот
+  `ItemStackHandler` и `WeldingDepotItemHandler`-обёрткой.
+- `WeldingDepotRegistration` — три `DeferredRegister` (`Blocks`, `Items`,
+  `BlockEntityTypes`) + per-material цикл. Один общий `BlockEntityType` на
+  все 5 вариантов блока.
+- `WeldingDepotCapabilities` — регистрирует `IItemHandler` capability через
+  `RegisterCapabilitiesEvent`.
+
+### Слоты
+
+Внутри `ItemStackHandler(4)`:
+
+| Слот | Имя | Назначение | Лимит |
+|------|-----|------------|-------|
+| 0 | `SLOT_LEFT` | Первая входная деталь. Любой предмет. | 64 |
+| 1 | `SLOT_RIGHT` | Вторая входная деталь. Любой предмет. | 64 |
+| 2 | `SLOT_FLUX` | Флюс. Только `tfc:powder/flux` через `TFCTags.Items.WELDING_FLUX`. | 64 |
+| 3 | `SLOT_OUTPUT` | Результат сварки. | 64 |
+
+Жёсткое разделение insert/extract реализовано через `WeldingDepotItemHandler`:
+
+* `insertItem(slot, ...)` для `slot == SLOT_OUTPUT` возвращает `stack`
+  неизменённым (внешние системы не могут положить предмет в выход).
+* `extractItem(slot, ...)` для `slot ∈ {LEFT, RIGHT, FLUX}` возвращает
+  `EMPTY` — воронки, Create-шлюзы, хопперы физически не могут забрать
+  входные детали или флюс.
+
+То есть автоматизировать можно только путь «положил → пресс → результат в
+OUTPUT → забрали». Входные детали и флюс игрок всегда забирает вручную
+(через ПКМ пустой рукой — приоритет: OUTPUT → LEFT → RIGHT → FLUX).
+
+### Ручное взаимодействие
+
+- **ПКМ с предметом** (`useItemOn`): кладёт предмет в первый пустой слот из
+  0..2 (проверяет `isItemValid`). SLOT_OUTPUT пропускается — игрок не может
+  положить туда предмет рукой.
+- **ПКМ пустой рукой** (`useWithoutItem`): извлекает **один** предмет из
+  инвентаря по приоритету OUTPUT → LEFT → RIGHT → FLUX.
+- **Предмет сверху** (`fallOn` override): если `ItemEntity` падает на верхнюю
+  грань, его ItemStack вставляется в первый подходящий пустой слот 0..2.
+  Это поведение «как у `create:depot`» — кинул предмет, он лежит.
+
+### Детекция пресса
+
+`WeldingDepotBlockEntity.tick()` (каждый серверный тик):
+
+1. Найти `MechanicalPressBlockEntity` блок прямо над столом.
+2. Получить `PressingBehaviour` через `press.getPressingBehaviour()`.
+3. Edge-detection: `pb.running && pb.prevRunningTicks < CYCLE/2 &&
+   pb.runningTicks >= CYCLE/2`, где `CYCLE = 240`. Это момент, когда
+   пресс находится в нижней точке (тик 120 из 240).
+4. Debounce по `level.getGameTime()`: если с момента последней сварки
+   прошло меньше `CYCLE/2` тиков — пропускаем (на случай, если на одном
+   тике сработало несколько edge-ов).
+5. Вызвать `tryWeld()`.
+
+### Алгоритм сварки (`tryWeld`)
+
+1. Проверить, что LEFT, RIGHT, FLUX непустые, а OUTPUT — пуст (не
+   перезаписывать невыбранный результат).
+2. Собрать `WeldingInventory` (record, имплементит `WeldingRecipe.Inventory`).
+3. `RecipeHelpers.getHolder(level, TFCRecipeTypes.WELDING, inv)` → если
+   рецепт не найден, выйти.
+4. `recipe.isCorrectTier(getTier())` — tier депо должен быть ≥ tier рецепта.
+5. Null-safe heat check:
+   `(leftHeat != null && !leftHeat.canWeld()) || (rightHeat != null &&
+   !rightHeat.canWeld())`. Предметы без heat-компонента проходят
+   автоматически.
+6. `recipe.assemble(inv)` → результат. `resultHeat.setTemperatureIfWarmer(...)`
+   для каждого входа (`IHeat.setTemperatureIfWarmer(@Nullable IHeat)` сам
+   no-op'ится на null).
+7. Записать результат в `SLOT_OUTPUT`, очистить LEFT и RIGHT, уменьшить
+   FLUX на 1.
+
+### Рецепты блоков
+
+5 файлов в `src/main/resources/data/tfc_aeronautics/recipe/crafting/welding_depot/`:
+
+```
+"III" (3 двойных слитка металла)
+" C " (create:andesite_casing в центре)
+```
+
+`show_notification: false` по конвенции override-рецептов.
+
+### Капасити (Capabilities)
+
+`WeldingDepotCapabilities.register`:
+
+- `Capabilities.ItemHandler.BLOCK` → `WeldingDepotItemHandler` (обёртка
+  с жёстким разделением insert/extract, см. выше).
+
+### Модели и текстуры
+
+Placeholder: модель скопирована с `create:block/depot/block.json` (5
+текстур — side, top_*, casing; 5 файлов верха сейчас идентичны для
+последующей подмены под настоящий `.bbmodel`). Структура файлов:
+
+- `models/block/welding_depot/base.json` — родитель, наследует геометрию
+  Create's depot и переопределяет текстуры на наши.
+- `models/block/welding_depot/{wrought_iron,steel,black_steel,blue_steel,red_steel}.json`
+  — 5 child-моделей, parent = base, у 4 из них override `top` на свой
+  файл (для `wrought_iron` оставлен дефолтный из base).
+- `models/item/metal/welding_depot/<material>.json` — 5 item-моделей,
+  parent = соответствующая block-модель.
+- `blockstates/metal/welding_depot/<material>.json` — 5 blockstate'ов,
+  каждый `{"variants": {"": {"model": "tfc_aeronautics:block/welding_depot/<material>"}}}`.
+- `textures/block/welding_depot/{side, top_wrought_iron, top_steel,
+  top_black_steel, top_blue_steel, top_red_steel, casing}.png` — 7 PNG.
+  5 файлов верха — копия `create:block/depot/depot_top.png`, side —
+  копия `depot_side.png`, casing — копия `andesite_casing.png`.
+
+### Регистрация в моде
+
+- `TFCAeronautics.java`: добавлен вызов
+  `WeldingDepotRegistration.register(modEventBus);` перед
+  `CreativeTabs.register(modEventBus);`.
+- `CreativeTabs.java`: добавлен вывод `DEPOT_ITEMS.values()` в
+  `displayItems`.
+
+### Что ещё нужно сделать
+
+- `.bbmodel` от пользователя — после получения заменить 5 PNG-файлов верха
+  и при необходимости обновить `base.json` (если новая геометрия
+  отличается от Create's depot).
+- Сейчас все 5 вариантов блока выглядят одинаково (верх — одна и та же
+  текстура). Когда появится настоящий `.bbmodel`, можно сделать
+  per-material различия (например, разные цвета/узоры верха под металл).

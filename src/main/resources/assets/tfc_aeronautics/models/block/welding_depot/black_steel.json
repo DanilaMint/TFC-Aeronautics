@@ -1,0 +1,6 @@
+{
+  "parent": "tfc_aeronautics:block/welding_depot/base",
+  "textures": {
+    "top": "tfc_aeronautics:block/welding_depot/top_black_steel"
+  }
+}
