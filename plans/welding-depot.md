@@ -47,12 +47,12 @@
 
 **Ресурсы:**
 8. `src/main/resources/assets/tfc_aeronautics/models/block/welding_depot/base.json` — родительская модель с плейсхолдерами `#side`, `#top`, `#casing`.
-9. `src/main/resources/assets/tfc_aeronautics/models/block/welding_depot/wrought_iron.json` — child с `#top = top_wrought_iron`.
+9. `src/main/resources/assets/tfc_aeronautics/models/block/welding_depot/wrought_iron.json` — child, `#top` наследуется из base (`tfc:block/metal/smooth/wrought_iron`).
 10. …то же для `steel`, `black_steel`, `blue_steel`, `red_steel`.
 11. `src/main/resources/assets/tfc_aeronautics/models/item/welding_depot/wrought_iron.json` и ещё 4 — `{ "parent": ".../block/welding_depot/wrought_iron" }`.
 12. `src/main/resources/assets/tfc_aeronautics/blockstates/welding_depot/wrought_iron.json` и ещё 4 — `{ "variants": { "": { "model": "..." } } }`.
 13. `src/main/resources/assets/tfc_aeronautics/textures/block/welding_depot/side.png` — общая боковая.
-14. `src/main/resources/assets/tfc_aeronautics/textures/block/welding_depot/top_wrought_iron.png` и ещё 4 — уникальные верхи.
+14. Верхняя грань — текстуры TFC `tfc:block/metal/smooth/<metal>`, собственных PNG нет.
 15. `src/main/resources/assets/tfc_aeronautics/textures/block/welding_depot/casing.png` — низ/внутри.
 16. `src/main/resources/assets/tfc_aeronautics/lang/en_us.json` — добавить 5 ключей `block.tfc_aeronautics.metal.welding_depot.*`.
 17. `src/main/resources/assets/tfc_aeronautics/lang/ru_ru.json` — добавить 5 русских переводов.
@@ -391,7 +391,7 @@ public class WeldingDepotClientRegistration {
 
 **Родитель** (`models/block/welding_depot/base.json`) — структура как у Create depot, но **.bbmodel от пользователя**. До получения `.bbmodel` файл содержит заглушку из 2 элементов с текстурами `#side`, `#top`, `#casing` по образцу `models/block/stamping_press.json`.
 
-**5 children** — каждый `{ "parent": ".../welding_depot/base", "textures": { "top": ".../top_<material>" } }` по образцу `models/block/metal/anvil/high_carbon_steel.json`.
+**5 children** — каждый `{ "parent": ".../welding_depot/base", "textures": { "top": "tfc:block/metal/smooth/<material>" } }` по образцу `models/block/metal/anvil/high_carbon_steel.json` (`wrought_iron` — без override, дефолт из base).
 
 **5 item-models** — `{ "parent": ".../block/welding_depot/<material>" }`.
 

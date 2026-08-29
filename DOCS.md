@@ -3091,23 +3091,24 @@ OUTPUT → забрали». Входные детали и флюс игрок 
 
 ### Модели и текстуры
 
-Placeholder: модель скопирована с `create:block/depot/block.json` (5
-текстур — side, top_*, casing; 5 файлов верха сейчас идентичны для
-последующей подмены под настоящий `.bbmodel`). Структура файлов:
+Placeholder: геометрия скопирована с `create:block/depot/block.json`
+(side и casing — наши placeholder-PNG, верх — текстуры TFC
+`tfc:block/metal/smooth/<metal>`). Структура файлов:
 
 - `models/block/welding_depot/base.json` — родитель, наследует геометрию
   Create's depot и переопределяет текстуры на наши.
 - `models/block/welding_depot/{wrought_iron,steel,black_steel,blue_steel,red_steel}.json`
-  — 5 child-моделей, parent = base, у 4 из них override `top` на свой
-  файл (для `wrought_iron` оставлен дефолтный из base).
+  — 5 child-моделей, parent = base, у 4 из них override `top` на
+  `tfc:block/metal/smooth/<metal>` (для `wrought_iron` оставлен дефолтный
+  из base — тот же TFC-путь).
 - `models/item/metal/welding_depot/<material>.json` — 5 item-моделей,
   parent = соответствующая block-модель.
 - `blockstates/metal/welding_depot/<material>.json` — 5 blockstate'ов,
   каждый `{"variants": {"": {"model": "tfc_aeronautics:block/welding_depot/<material>"}}}`.
-- `textures/block/welding_depot/{side, top_wrought_iron, top_steel,
-  top_black_steel, top_blue_steel, top_red_steel, casing}.png` — 7 PNG.
-  5 файлов верха — копия `create:block/depot/depot_top.png`, side —
-  копия `depot_side.png`, casing — копия `andesite_casing.png`.
+- `textures/block/welding_depot/{side, casing}.png` — 2 PNG: side —
+  копия `create:block/depot/depot_side.png`, casing — копия
+  `andesite_casing.png`. Верхняя грань собственных текстур не имеет —
+  берётся из TFC (`tfc:block/metal/smooth/<metal>`, 16×16, без анимации).
 
 ### Регистрация в моде
 
@@ -3119,12 +3120,10 @@ Placeholder: модель скопирована с `create:block/depot/block.js
 
 ### Что ещё нужно сделать
 
-- `.bbmodel` от пользователя — после получения заменить 5 PNG-файлов верха
-  и при необходимости обновить `base.json` (если новая геометрия
-  отличается от Create's depot).
-- Сейчас все 5 вариантов блока выглядят одинаково (верх — одна и та же
-  текстура). Когда появится настоящий `.bbmodel`, можно сделать
-  per-material различия (например, разные цвета/узоры верха под металл).
+- `.bbmodel` от пользователя — после получения при необходимости обновить
+  `base.json` (если новая геометрия отличается от Create's depot). Верх
+  уже привязан к TFC `tfc:block/metal/smooth/<metal>`, PNG-заглушки верха
+  удалены.
 
 ---
 

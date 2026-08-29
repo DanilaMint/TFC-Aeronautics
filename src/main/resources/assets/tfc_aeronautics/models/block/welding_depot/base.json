@@ -3,7 +3,7 @@
   "parent": "block/block",
   "textures": {
     "side": "tfc_aeronautics:block/welding_depot/side",
-    "top": "tfc_aeronautics:block/welding_depot/top_wrought_iron",
+    "top": "tfc:block/metal/smooth/wrought_iron",
     "casing": "tfc_aeronautics:block/welding_depot/casing",
     "particle": "tfc_aeronautics:block/welding_depot/casing"
   },
