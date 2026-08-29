@@ -367,6 +367,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id `simulated:laser_pointer` сохраняется, advancement `data/simulated/advancement/recipes/misc/laser_pointer.json` ссылается на тот же id — засчитывается без правок
   - тег `simulated:laser_point_lens` не трогаем (может использоваться в других местах Simulated; удалять чужой namespace-тег не вправе)
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/create/recipe/crafting/kinetics/controller_rail.json`
+  - оригинал Create shaped `["A A","ASA","AEA"]`: 6× `c:ingots/gold` (A) + 1× `c:rods/wooden` (S) + 1× `create:electron_tube` (E) → 6 `create:controller_rail`
+  - новый: тот же pattern, ключ `A = tfc:metal/rod/gold` → 16 `create:controller_rail`
+  - мотивация: в TFC-мире золотые слитки — не базовая форма золота (стержень → слиток → двойной слиток → лист); `tfc:metal/rod/gold` — первая стадия TFC-металлургии (anvil-work), прямой аналог золотого слитка без «пропуска» стадии стержня. count 6 → 16: стимулирует TFC-металлургический цикл и даёт запас рельсов для постройки путей
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция override-рецептов)
+  - шейдинг-тегов не требуется: `tfc:metal/rod/gold` — прямой item-id (подтверждён в `code_references/TerraFirmaCraft/src/generated/resources/data/c/tags/item/rods/gold.json`)
+  - recipe-id `create:crafting/kinetics/controller_rail` сохраняется
+  - подробности в `DOCS.md` §19
 
 ## Новые рецепты
 
