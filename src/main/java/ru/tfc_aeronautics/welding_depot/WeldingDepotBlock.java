@@ -44,6 +44,7 @@ public class WeldingDepotBlock extends Block implements IBE<WeldingDepotBlockEnt
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (level.isClientSide) return ItemInteractionResult.sidedSuccess(true);
+        if (stack.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         WeldingDepotBlockEntity be = getBlockEntity(level, pos);
         if (be == null) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         IItemHandler handler = be.getExternalHandler();
@@ -69,8 +70,10 @@ public class WeldingDepotBlock extends Block implements IBE<WeldingDepotBlockEnt
         WeldingDepotBlockEntity be = getBlockEntity(level, pos);
         if (be == null) return InteractionResult.PASS;
         for (int slot : WeldingDepotBlockEntity.EXTRACT_PRIORITY) {
-            if (be.getInventory().getStackInSlot(slot).isEmpty()) continue;
-            ItemStack extracted = be.getInventory().extractItem(slot, 1, false);
+            ItemStack current = be.getInventory().getStackInSlot(slot);
+            if (current.isEmpty()) continue;
+            int amount = slot == WeldingDepotBlockEntity.SLOT_FLUX ? current.getCount() : 1;
+            ItemStack extracted = be.getInventory().extractItem(slot, amount, false);
             if (extracted.isEmpty()) continue;
             if (!player.getInventory().add(extracted)) {
                 Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, extracted);

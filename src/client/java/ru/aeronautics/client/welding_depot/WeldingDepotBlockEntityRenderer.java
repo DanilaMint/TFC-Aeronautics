@@ -41,8 +41,8 @@ public class WeldingDepotBlockEntityRenderer extends SafeBlockEntityRenderer<Wel
             ms.translate(0, -0.0625F, 0);
             ms.scale(0.5F, 0.5F, 0.5F);
         } else {
-            ms.scale(0.5F, 0.5F, 0.5F);
-            ms.translate(0, -0.1875F, 0);
+            ms.scale(0.4F, 0.4F, 0.4F);
+            ms.translate(0, -0.15F, 0);
             ms.mulPose(Axis.XP.rotationDegrees(90));
         }
 
