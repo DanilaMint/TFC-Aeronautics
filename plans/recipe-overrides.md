@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 28/? ✓ (overrides + 31 envelope)
+**Прогресс:** 29/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -347,6 +347,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция override-рецептов)
   - шейдинг-тегов не требуется: все id — прямые item-id
   - recipe-id `simulated:sequenced_assembly/engine_assembly` сохраняется
+- [x] `data/simulated/recipe/sequenced_assembly/gyroscopic_mechanism.json`
+  - оригинал Simulated `create:sequenced_assembly` (5 циклов): `create:iron_sheet` (вход) + 3 шага деплоера (cogwheel → shaft → `create:brass_nugget`); results: `simulated:gyroscopic_mechanism` chance=200, `create:iron_sheet`=8, `create:andesite_alloy`=8, `create:brass_nugget`=3, `create:crushed_raw_iron`=2, `minecraft:compass` (no-chance fallback)
+  - новый: тот же `create:sequenced_assembly` (3 цикла): `tfc_aeronautics:metal/tight_sheet/wrought_iron` (вход); sequence: cogwheel → shaft → `tfc:metal/chain/copper` (шаг 3 заменён с `brass_nugget`); results: только `simulated:gyroscopic_mechanism` chance=200, побочный дроп убран
+  - мотивация: `create:iron_sheet` и `create:brass_nugget` — Create-only металлы, недостижимые в TFC-мире (`c:nuggets/iron` пуст по TFC-конвенции); `tfc_aeronautics:metal/tight_sheet/wrought_iron` — кованый железный лист из TFC anvil/pressing; `tfc:metal/chain/copper` — нативный TFC-предмет (базовый TFC-металл). Сокращение 5 → 3 циклов убирает два лишних круга cogwheel/shaft/chain-copper, побочный дроп полностью убран (gyroscopic_mechanism = точный механизм, лишний мусор не нужен)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция override-рецептов)
+  - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/wrought_iron` — наш прямой item-id (`src/main/java/ru/tfc_aeronautics/metal/TightSheet.java`), `tfc:metal/chain/copper` — TFC-форма `chain` для меди (literal item, не тег), `create:cogwheel` / `create:shaft` / `simulated:incomplete_gyroscopic_mechanism` — Create/Simulated items
+  - recipe-id `simulated:sequenced_assembly/gyroscopic_mechanism` сохраняется
 - [x] `data/simulated/recipe/optical_sensor.json`
   - оригинал Simulated shaped 3×3 `[" A "," C "," B "]`: 1× `minecraft:amethyst_shard` (A, верх-середина) + 1× `create:electron_tube` (C, центр) + 1× `create:brass_casing` (B, низ-середина) → 1 `simulated:optical_sensor`
   - новый: тот же pattern, ключ `A = #tfc_aeronautics:gem` + `C = create:electron_tube` + `B = create:brass_casing` → 1 `simulated:optical_sensor`
