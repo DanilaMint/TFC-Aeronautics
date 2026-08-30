@@ -413,6 +413,17 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id
   - recipe-id `simulated:rope_winch` сохраняется, advancement Simulated (если есть) ссылается на тот же id — засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` UP-TO-DATE
+- [x] `data/create/recipe/crafting/kinetics/sticker.json`
+  - оригинал Create shaped 2×3 `["ISI","CRC"]` с `create:andesite_alloy` (I, 2 шт.) + `#c:slimeballs` (S) + `#c:cobblestones` (C, 2 шт.) + `#c:dusts/redstone` (R) → 1 (recipe-id `create:crafting/kinetics/sticker`). `create:andesite_alloy` в TFC-сборке недостижим (Create-only сплав, циклически требует mechanical mixer)
+  - новый: shaped 2×3 `[" S ","CRC"]`, ключи `S = #c:slimeballs` + `C = #c:cobblestones` + `R = #c:dusts/redstone` → 1 `create:sticker`. Ключ `I` удалён без замены — pattern сжат с `ISI/CRC` до `" "/S/" "/CRC` (верхние углы пустые)
+  - мотивация: slimeballs/булыжник/редстоун остаются нативными для TFC-мира (`#c:cobblestones` покрыт TFC-подагами из `code_references/TerraFirmaCraft/.../tags/item/cobblestones/normal.json`)
+  - структурно — простой sub-recipe override с удалением ключа. Без `BANNED_RECIPES`
+  - `show_notification: false` (конвенция проекта)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется: `#c:slimeballs` / `#c:cobblestones` / `#c:dusts/redstone` — common-теги
+  - recipe-id `create:crafting/kinetics/sticker` сохраняется, advancement Create (если есть) ссылается на тот же id — засчитывается без правок
+  - подробности в `DOCS.md` §19
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` UP-TO-DATE
 
 ## Новые рецепты
 
