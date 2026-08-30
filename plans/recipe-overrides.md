@@ -385,6 +385,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: все 3 ingredient'а — прямые item-id
   - recipe-id сохраняется, advancement Create засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c 'import json; json.load(...)'` OK), `./gradlew compileJava` UP-TO-DATE
+- [x] `data/create/recipe/sequenced_assembly/track.json`
+  - оригинал Create `create:sequenced_assembly` (1 цикл): tag `create:sleepers` (вход) + 2 шага деплоера (`c:nuggets/iron` | `c:nuggets/zinc`, по 1 нугте за шаг) + 1 шаг прессования → 1 `create:track`, transitional_item `create:incomplete_track`
+  - новый: тот же `create:sequenced_assembly` (1 цикл): tag `c:stones/smooth_slabs` (вход — любая TFC-каменная плита, 22 шт `tfc:rock/smooth/{rock}_slab`) + 2 шага деплоера (по 1× `tfc:metal/rod/steel` за шаг — итого 2 стержня) + 1 шаг прессования → 4 `create:track`, transitional_item `create:incomplete_track`
+  - мотивация: `create:sleepers` в TFC-сборке мёртв (Create-only деревянные шпалы, производятся через `create:item_application` с `create:andesite_alloy`); `c:stones/smooth_slabs` — common-тег TFC-каменных плит (через rock-cutting → stonecutting → smooth slab), естественный TFC-аналог шпалы как «опоры рельса». `c:nuggets/iron` / `c:nuggets/zinc` в TFC-сборке пусты (per TFC convention — металл приходит через `c:ingots/<metal>`), заменены на `tfc:metal/rod/steel` (стальной стержень, tier 4 steel через TFC anvil) — сталь семантически точна как рельсовый металл. count 1 → 4: рельс — дешёвый расходник при постройке путей, два стержня × прессование дают 4 сегмента за один цикл
+  - структурно — sequenced_assembly override с structural reshape (новый вход + новый deploying-материал), без `BANNED_RECIPES`. **Ветка 1** скилла `recipe-override` (recipe-id в namespace `create`)
+  - `show_notification: false` (конвенция override-рецептов, structural reshape)
+  - шейдинг-тегов не требуется: `c:stones/smooth_slabs` — common-тег, в датапаке TFC содержит 22 TFC-плиты (`code_references/TerraFirmaCraft/src/generated/resources/data/c/tags/item/stones/smooth_slabs.json`); `tfc:metal/rod/steel` — прямой item-id (подтверждён в `code_references/TerraFirmaCraft/src/main/resources/assets/tfc/models/item/metal/rod/steel.json`)
+  - recipe-id `create:sequenced_assembly/track` сохраняется. Advancement Create по track-рецепту (если есть) ссылается на тот же id — засчитывается без правок
+  - подробности в `DOCS.md` §19
 
 ## Новые рецепты
 
