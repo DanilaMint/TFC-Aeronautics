@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 26/? ✓ (overrides + 31 envelope)
+**Прогресс:** 27/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -403,6 +403,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `c:stones/smooth_slabs` — common-тег, в датапаке TFC содержит 22 TFC-плиты (`code_references/TerraFirmaCraft/src/generated/resources/data/c/tags/item/stones/smooth_slabs.json`); `tfc:metal/rod/steel` — прямой item-id (подтверждён в `code_references/TerraFirmaCraft/src/main/resources/assets/tfc/models/item/metal/rod/steel.json`)
   - recipe-id `create:sequenced_assembly/track` сохраняется. Advancement Create по track-рецепту (если есть) ссылается на тот же id — засчитывается без правок
   - подробности в `DOCS.md` §19
+- [x] `data/simulated/recipe/rope_winch.json`
+  - оригинал Simulated shaped 3×1 `["I","H","S"]` с `create:iron_sheet` (I) + `create:shaft` (H) + `create:industrial_iron_block` (S) → 1 `simulated:rope_winch`. `create:iron_sheet` — это переименованный `create:iron_plate` в Create 6+ (тот же предмет)
+  - новый: shaped 2×1 `["H","S"]`, ключи `H = create:shaft` + `S = create:industrial_iron_block` → 1 `simulated:rope_winch`. Ключ `I` удалён, без замены — pattern сжат с 3-х до 2-х слотов
+  - мотивация: лебёдка становится дешевле (2 ингредиента вместо 3). Игрок уже имеет доступ к `create:shaft` (через Create-крутилки) и `create:industrial_iron_block` (через anvil-путь из `data/tfc_aeronautics/recipe/anvil/industrial_iron_block_{cast_iron,steel}.json` с BAN оригинального stonecutting); `create:iron_sheet` в TFC-сборке редок (требует Create mechanical press). По запросу пользователя — убрать железную пластину без замены
+  - структурно — простой sub-recipe override с structural reshape (3×1 → 2×1), как `redstone_contact.json` / `powered_toggle_latch.json`. Без `BANNED_RECIPES`
+  - `show_notification: false` (конвенция проекта для override-рецептов, memory `feedback_show_notification_false.md`)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id
+  - recipe-id `simulated:rope_winch` сохраняется, advancement Simulated (если есть) ссылается на тот же id — засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` UP-TO-DATE
 
 ## Новые рецепты
 

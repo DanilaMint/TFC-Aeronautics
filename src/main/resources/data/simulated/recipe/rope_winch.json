@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "H": {
+      "item": "create:shaft"
+    },
+    "S": {
+      "item": "create:industrial_iron_block"
+    }
+  },
+  "pattern": [
+    "H",
+    "S"
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:rope_winch"
+  },
+  "show_notification": false
+}
