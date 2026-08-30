@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 25/? ✓ (overrides + 31 envelope)
+**Прогресс:** 26/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -248,6 +248,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция проекта)
   - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id
   - recipe-id `create:item_application/railway_casing` сохраняется. Advancement `create:train_casing_00` — встроенный builtin-trigger в коде Create (см. `CreateAdvancements.java` в code_references), не recipe-based; override рецепта не сломает его (выдаётся за поднятие предмета, не за крафт)
+- [x] `data/create/recipe/crafting/kinetics/schedule.json`
+  - оригинал Create shapeless: tag `c:plates/obsidian` (= `create:sturdy_sheet` в Create 6.0.11) + `minecraft:paper` → 4 `create:schedule`. В TFC-сборке `c:plates/obsidian` сводится к `create:sturdy_sheet` (Create-only обсидиановый лист, требует mechanical press) — недостижимо в TFC
+  - новый: `tfc_aeronautics:metal/tight_sheet/steel` + `minecraft:paper` → 4 `create:schedule`. Тот же свап, что у `railway_casing.json` (там тоже `c:plates/obsidian` → `tfc_aeronautics:metal/tight_sheet/steel`), но другой recipe-id (`create:crafting/kinetics/schedule` вместо `create:item_application/railway_casing`)
+  - мотивация: schedule — бумажный предмет с «обложкой» из жёсткого листа (расписание поезда); стальной tight_sheet семантически точен как «жёсткая обложка» и лежит в TFC-металлургическом пути (tier 4 steel через TFC anvil `data/tfc_aeronautics/recipe/anvil/tight_sheet_steel.json` или pressing)
+  - структурно — простой sub-recipe override (как `rope_pulley.json` / `chute.json`): pattern и аутпут неизменны, поменялся только один ингредиент (tag → direct item)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id
+  - recipe-id `create:crafting/kinetics/schedule` сохраняется. Caveat: advancement `data/create/advancement/recipes/misc/crafting/kinetics/schedule.json` содержит `has_item` на `#c:plates/obsidian` в AND с `has_the_recipe` — после override триггер `has_item` не сработает, «recipe unlocked» toast может не появиться. Типичный side-effect для override-рецептов (прецедент `gearshift.json`, `rope_pulley.json`, `transmitter.json` и др.); шадить advancement в рамках этой задачи не требуется, конвенция
 - [x] `data/create/recipe/crafting/materials/transmitter.json`
   - оригинал Create shaped 3×3 `[" N ","LLL"," R "]`: 3× `c:plates/copper` (L) + `minecraft:lightning_rod` (N) + tag `c:dusts/redstone` (R) → 1 `create:transmitter`
   - новый: shapeless `tfc_aeronautics:metal/tight_sheet/copper` + `minecraft:redstone` → 1 `create:transmitter`
