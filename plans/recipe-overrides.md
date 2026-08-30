@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 24/? ✓ (overrides + 31 envelope)
+**Прогресс:** 25/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -376,6 +376,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `tfc:metal/rod/gold` — прямой item-id (подтверждён в `code_references/TerraFirmaCraft/src/generated/resources/data/c/tags/item/rods/gold.json`)
   - recipe-id `create:crafting/kinetics/controller_rail` сохраняется
   - подробности в `DOCS.md` §19
+- [x] `data/create/recipe/crafting/kinetics/smart_fluid_pipe.json`
+  - оригинал Create shaped 1×3 `["I","S","P"]`: 1× tag `c:plates/brass` (I) + 1× `create:fluid_pipe` (S) + 1× `create:electron_tube` (P) → 1 `create:smart_fluid_pipe` (recipe-id `create:crafting/kinetics/smart_fluid_pipe`). В TFC-сборке мёртв: `c:plates/brass` сводится к `create:brass_sheet` (Create-only, требует mechanical press)
+  - TFC-style shaped 3×3 `[" B ","PPP"," E "]`: 1× `tfc:metal/sheet/brass` (B, верх-середина) + 3× `create:fluid_pipe` (P, средний ряд) + 1× `create:electron_tube` (E, низ-середина) → 3 `create:smart_fluid_pipe`
+  - мотивация: `tfc:metal/sheet/brass` — кованый латунный лист из TFC anvil (латунь tier 2, после welding из меди + цинка); паттерн отражает устройство изделия: лист-обшивка сверху, 3 трубы-сегмента в среднем ряду, электронная лампа снизу. Выход ×3 — симметрия с `fluid_valve.json` («1 труба-сегмент = 1 готовый smart-pipe»)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (structural reshape)
+  - шейдинг-тегов не требуется: все 3 ingredient'а — прямые item-id
+  - recipe-id сохраняется, advancement Create засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -c 'import json; json.load(...)'` OK), `./gradlew compileJava` UP-TO-DATE
 
 ## Новые рецепты
 
