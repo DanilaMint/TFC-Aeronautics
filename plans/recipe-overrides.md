@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 27/? ✓ (overrides + 31 envelope)
+**Прогресс:** 28/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -501,6 +501,13 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `tfc:metal/sheet/copper` — прямой item-id (прецедент `crushing/copper_sheet.json` и др.)
 
 **Все 9 рецептов — это «первый набор» на `redstone_plate` (см. `plans/redstone-plate.md` если есть, иначе DOCS.md раздел про redstone_plate).** Общая мотивация: в TFC-мире обычный камень — особый ресурс, требующий knapping'а, а не прямого шахтёрского ломания. `redstone_plate` (4 шт. из 2 smooth slabs по тегу `c:stones/smooth_slabs`) становится «стандартным» 1-юнитовым заменителем камня в редстоун-схемах: повторяемость формы (полный 3×3 низ), удобный крафт-путь, ложится в редстоун-прогрессию TFC. Семантика `redstone_plate` именно «камень-заменитель в редстоун-крафтах» закреплена в этом батче.
+
+- [x] `data/create/recipe/crafting/kinetics/smart_chute.json`
+  - оригинал Create shaped 1×3 `["I","S","P"]`: 1× tag `c:plates/brass` (I) + 1× `create:chute` (S) + 1× `create:electron_tube` (P) → 1 `create:smart_chute` (recipe-id `create:crafting/kinetics/smart_chute`). В TFC-сборке мёртв: `c:plates/brass` сводится к `create:brass_sheet` (Create-only, требует mechanical press)
+  - тот же shaped 1×3 `["I","S","P"]`, заменён только ключ `I`: 1× `tfc:metal/sheet/brass` (кованый латунный лист из TFC anvil `data/tfc/recipe/anvil/metal/sheet/brass.json`, латунь tier 2) + 1× `create:chute` (S) + 1× `create:electron_tube` (P) → 1 `create:smart_chute`. Паттерн, `category` и count не тронуты — pure ingredient swap, без reshape
+  - `show_notification: false`
+  - **ветка 1** (recipe-id `create:crafting/kinetics/smart_chute`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется: `tfc:metal/sheet/brass` — прямой item-id (прецедент `smart_fluid_pipe.json`, `pulse_repeater.json`, `redstone_inductor.json`)
 
 ## TODO (новые добавлять сюда)
 
