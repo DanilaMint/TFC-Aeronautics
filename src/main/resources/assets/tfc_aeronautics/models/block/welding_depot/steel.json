@@ -1,0 +1,6 @@
+{
+  "parent": "tfc_aeronautics:block/welding_depot/base",
+  "textures": {
+    "top": "tfc:block/metal/smooth/steel"
+  }
+}

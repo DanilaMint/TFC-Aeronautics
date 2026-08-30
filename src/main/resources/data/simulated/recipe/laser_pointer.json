@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "A": { "tag": "tfc_aeronautics:gem" },
+    "C": { "item": "create:andesite_casing" },
+    "T": { "item": "minecraft:redstone_torch" }
+  },
+  "pattern": [
+    "A",
+    "T",
+    "C"
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:laser_pointer"
+  }
+}

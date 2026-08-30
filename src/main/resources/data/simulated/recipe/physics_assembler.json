@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "tfc_aeronautics:composite"
+    },
+    "N": {
+      "item": "minecraft:lever"
+    },
+    "R": {
+      "item": "create:andesite_casing"
+    }
+  },
+  "pattern": [
+    "   ",
+    " N ",
+    "ARA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:physics_assembler"
+  },
+  "show_notification": false
+}

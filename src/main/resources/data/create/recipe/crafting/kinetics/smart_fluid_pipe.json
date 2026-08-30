@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "B": { "item": "tfc:metal/sheet/brass" },
+    "P": { "item": "create:fluid_pipe" },
+    "E": { "item": "create:electron_tube" }
+  },
+  "pattern": [
+    " B ",
+    "PPP",
+    " E "
+  ],
+  "result": { "count": 3, "id": "create:smart_fluid_pipe" }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "B": { "item": "tfc:metal/sheet/wrought_iron" },
+    "C": { "tag": "c:chests/wooden" }
+  },
+  "pattern": [ "B", "C", "B" ],
+  "result": { "count": 1, "id": "create:item_vault" }
+}

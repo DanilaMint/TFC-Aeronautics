@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": { "item": "minecraft:tinted_glass" },
+    "A": { "tag": "tfc_aeronautics:gem" },
+    "C": { "item": "create:andesite_casing" }
+  },
+  "pattern": [
+    "G",
+    "A",
+    "C"
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:laser_sensor"
+  },
+  "show_notification": false
+}

@@ -12,6 +12,7 @@ import ru.tfc_aeronautics.bracket.WoodenBracketRegistration;
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.chain.ChainConveyorRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
+import ru.tfc_aeronautics.drill_head.DrillHeadRegistration;
 import ru.tfc_aeronautics.fluid.FluidBlocks;
 import ru.tfc_aeronautics.fluid.FluidItems;
 import ru.tfc_aeronautics.fluid.Fluids;
@@ -20,9 +21,12 @@ import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.recipe.RecipeRegistration;
+import ru.tfc_aeronautics.redstone_plate.RedstonePlateRegistration;
 import ru.tfc_aeronautics.resin.ResinRegistration;
+import ru.tfc_aeronautics.sequenced.SequencedRegistration;
 import ru.tfc_aeronautics.saw.SawBladeRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
+import ru.tfc_aeronautics.welding_depot.WeldingDepotRegistration;
 import ru.tfc_aeronautics.wrench.WrenchHeadRegistration;
 import ru.tfc_aeronautics.worldgen.ProcessorTypes;
 import ru.tfc_aeronautics.worldgen.StructurePieceTypes;
@@ -45,9 +49,12 @@ public class TFCAeronautics {
 
         PowderRegistration.register(modEventBus);
         CompositeRegistration.register(modEventBus);
+        SequencedRegistration.register(modEventBus);
         TightSheetRegistration.register(modEventBus);
         SawBladeRegistration.register(modEventBus);
+        DrillHeadRegistration.register(modEventBus);
         WrenchHeadRegistration.register(modEventBus);
+        RedstonePlateRegistration.register(modEventBus);
         FluidBlocks.register(modEventBus);
         FluidItems.register(modEventBus);
         Fluids.register(modEventBus);
@@ -59,6 +66,7 @@ public class TFCAeronautics {
         AnvilRegistration.register(modEventBus);
         ChainConveyorRegistration.register(modEventBus);
         WoodenBracketRegistration.register(modEventBus);
+        WeldingDepotRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
         RecipeRegistration.register(modEventBus);
 

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "B": {
+      "item": "create:electron_tube"
+    },
+    "C": {
+      "item": "create:brass_casing"
+    },
+    "R": {
+      "tag": "tfc:workbenches"
+    }
+  },
+  "pattern": [
+    "B",
+    "C",
+    "R"
+  ],
+  "result": {
+    "count": 3,
+    "id": "create:mechanical_crafter"
+  }
+}

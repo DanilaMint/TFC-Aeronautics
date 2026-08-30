@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "A": { "item": "tfc:metal/rod/gold" },
+    "E": { "item": "create:electron_tube" },
+    "S": { "tag": "c:rods/wooden" }
+  },
+  "pattern": [
+    "A A",
+    "ASA",
+    "AEA"
+  ],
+  "result": {
+    "count": 16,
+    "id": "create:controller_rail"
+  }
+}

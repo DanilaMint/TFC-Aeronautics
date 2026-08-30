@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": {
+      "tag": "c:stones/smooth_slabs"
+    }
+  },
+  "pattern": [
+    "SS"
+  ],
+  "result": {
+    "count": 4,
+    "id": "tfc_aeronautics:redstone_plate"
+  },
+  "show_notification": true
+}

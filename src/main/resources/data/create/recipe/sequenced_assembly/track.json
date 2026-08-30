@@ -1,0 +1,32 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": { "tag": "c:stones/smooth_slabs" },
+  "results": [
+    { "id": "create:track", "count": 4 }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "create:incomplete_track" },
+        { "item": "tfc:metal/rod/steel" }
+      ],
+      "results": [ { "id": "create:incomplete_track" } ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "create:incomplete_track" },
+        { "item": "tfc:metal/rod/steel" }
+      ],
+      "results": [ { "id": "create:incomplete_track" } ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [ { "item": "create:incomplete_track" } ],
+      "results": [ { "id": "create:incomplete_track" } ]
+    }
+  ],
+  "transitional_item": { "id": "create:incomplete_track" },
+  "show_notification": false
+}

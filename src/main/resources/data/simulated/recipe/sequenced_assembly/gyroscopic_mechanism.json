@@ -1,0 +1,15 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": { "item": "tfc_aeronautics:metal/tight_sheet/wrought_iron" },
+  "loops": 3,
+  "results": [
+    { "chance": 200.0, "id": "simulated:gyroscopic_mechanism" }
+  ],
+  "sequence": [
+    { "type": "create:deploying", "ingredients": [{"item":"simulated:incomplete_gyroscopic_mechanism"}, {"item":"create:cogwheel"}], "results":[{"id":"simulated:incomplete_gyroscopic_mechanism"}] },
+    { "type": "create:deploying", "ingredients": [{"item":"simulated:incomplete_gyroscopic_mechanism"}, {"item":"create:shaft"}], "results":[{"id":"simulated:incomplete_gyroscopic_mechanism"}] },
+    { "type": "create:deploying", "ingredients": [{"item":"simulated:incomplete_gyroscopic_mechanism"}, {"item":"tfc:metal/chain/copper"}], "results":[{"id":"simulated:incomplete_gyroscopic_mechanism"}] }
+  ],
+  "transitional_item": { "id": "simulated:incomplete_gyroscopic_mechanism" },
+  "show_notification": false
+}

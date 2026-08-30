@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "simulated:rope_coupling"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc:rope"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": { "item": "tfc_aeronautics:metal/tight_sheet/copper" },
+  "results": [ { "id": "create:electron_tube" } ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "tfc_aeronautics:incomplete_electron_tube" },
+        { "item": "minecraft:redstone" }
+      ],
+      "results": [ { "id": "tfc_aeronautics:incomplete_electron_tube" } ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "tfc_aeronautics:incomplete_electron_tube" },
+        { "item": "tfc_aeronautics:powder/nickel" }
+      ],
+      "results": [ { "id": "tfc_aeronautics:incomplete_electron_tube" } ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "tfc_aeronautics:incomplete_electron_tube" },
+        { "tag": "tfc:glass_bottles" }
+      ],
+      "results": [ { "id": "tfc_aeronautics:incomplete_electron_tube" } ]
+    }
+  ],
+  "transitional_item": { "id": "tfc_aeronautics:incomplete_electron_tube" },
+  "show_notification": false
+}
