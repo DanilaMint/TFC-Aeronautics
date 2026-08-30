@@ -1,6 +1,6 @@
 # Heater
 
-**Прогресс:** 22/26 ⏳
+**Прогресс:** 23/27 ⏳
 
 ## Регистрация
 - [x] block `tfc_aeronautics:heater` — `heater/HeaterBlock.java` (`Block implements IBE<HeaterBlockEntity>, IWrenchable`, props `LIT` + `HORIZONTAL_FACING`, light 14, analog signal 15, `mapColor STONE, strength 2.0/6.0, sound STONE, pushReaction BLOCK`)
@@ -44,3 +44,6 @@
 ## Ponder-сцены
 - [ ] Сцена о загрузке и выгрузке топлива и предметов автоматически или вручную
 - [ ] Сцена о плавлении предметов в жидкость
+
+## Рецепт
+- [x] `data/tfc_aeronautics/recipe/crafting/heater.json` — shaped-крафт `[" C ", "STS", " M "]`: `create:andesite_casing` + 2× лист чугуна (тег `c:sheets/cast_iron`) + `create:fluid_tank` + `create:precision_mechanism`, `show_notification: true`
