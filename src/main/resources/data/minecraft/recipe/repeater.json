@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "T": { "item": "minecraft:redstone_torch" },
+    "R": { "item": "minecraft:redstone" },
+    "P": { "item": "tfc_aeronautics:redstone_plate" }
+  },
+  "pattern": [ "TRT", " P " ],
+  "result": { "count": 1, "id": "minecraft:repeater" },
+  "show_notification": false
+}

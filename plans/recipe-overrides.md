@@ -404,6 +404,64 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `#tfc:glass_bottles` — штатный тег TFC, остальные id — прямые item-id
   - recipe-id `tfc_aeronautics:sequenced_assembly/electron_tube` (новый)
   - подробности в `DOCS.md` §27
+- [x] `data/minecraft/recipe/repeater.json`
+  - оригинал vanilla shaped 3×3 `R R / RTR / SSS` с 2× `minecraft:redstone` + 1× `minecraft:redstone_torch` + 3× `minecraft:stone` → 3 (recipe-id `minecraft:repeater`)
+  - TFC-style 3×2 `TRT / P `: 1× `minecraft:redstone_torch` (T, верх-середина) + 2× `minecraft:redstone` (R, верх-углы) + 3× `tfc_aeronautics:redstone_plate` (P, низ полностью — заменяет ванильные 3× `minecraft:stone`) → 1 `minecraft:repeater`. count 3 → 1 — `redstone_plate` реже ванильного булыжника
+  - `show_notification: false` (structural reshape, конвенция)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `minecraft`, без `BANNED_RECIPES`). Впервые в проекте override в `data/minecraft/recipe/...` — datapack merge работает идентично для ванильного namespace
+  - шейдинг-тегов не требуется: все 3 ingredient'а — прямые item-id
+  - **внимание**: пустой слот — пробел `" "`, не `.` (1.21.1 парсер требует именно `' '`, прецедент `goggles.json` / `mechanical_piston.json` / `smart_fluid_pipe.json`)
+- [x] `data/minecraft/recipe/comparator.json`
+  - оригинал vanilla shaped 3×3 ` R / RQR / SSS` с 3× `minecraft:redstone` + 1× `minecraft:nether_quartz` + 3× `minecraft:stone` → 1
+  - TFC-style 3×3 ` T / TRT / P `: 2× `minecraft:redstone_torch` (T, центр столбца 1 и 3) + 4× `minecraft:redstone` (R, углы столбца 2) + 3× `tfc_aeronautics:redstone_plate` (P, низ полностью — заменяет ванильные 3× `minecraft:stone`) → 1 `minecraft:comparator`. `minecraft:nether_quartz` удалён из рецепта — в TFC-сборке компаратор это редстоун-схема без кварца (кварц в TFC = `tfc:gem/amethyst` через tag `tfc_aeronautics:gem`, но не вписывается в «схему на платах»)
+  - `show_notification: false` (structural reshape)
+  - **ветка 1** (recipe-id `minecraft:comparator`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется
+- [x] `data/create/recipe/crafting/logistics/pulse_repeater.json`
+  - оригинал Create shaped 3×3 `RCT/SSS` с 1× `c:plates/brass` (C) + 1× tag `c:dusts/redstone` (R) + 3× tag `c:stones` (S) + 1× `minecraft:redstone_torch` (T) → 1 (recipe-id `create:crafting/logistics/pulse_repeater`)
+  - TFC-style 3×2 `RBT/PPP`: 1× `minecraft:redstone` (R, верх-левый) + 1× `tfc:metal/sheet/brass` (B, верх-середина) + 1× `minecraft:redstone_torch` (T, верх-правый) + 3× `tfc_aeronautics:redstone_plate` (P, низ полностью — заменяет 3× `c:stones` + `c:plates/brass` из оригинала) → 3 `create:pulse_repeater`. count 1 → 3 — `redstone_plate` реже ванильного камня, увеличение выхода компенсирует
+  - `show_notification: false` (structural reshape, конвенция)
+  - **ветка 1** (recipe-id `create:crafting/logistics/pulse_repeater`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется: `tfc:metal/sheet/brass` — прямой item-id (прецедент `smart_fluid_pipe.json`)
+- [x] `data/create/recipe/crafting/logistics/pulse_extender.json`
+  - оригинал Create shaped 3×3 `  T/RCT/SSS` с теми же ингредиентами, что и `pulse_repeater` → 1
+  - тот же TFC-style сдвиг: 3×2 формат не помещается, оставлен 3×3 `  T/RBT/PPP`: 1× `minecraft:redstone_torch` (T, верх-правый) + 1× `minecraft:redstone` (R, средний-левый) + 1× `tfc:metal/sheet/brass` (B, средний-середина) + 3× `tfc_aeronautics:redstone_plate` (P, низ полностью — заменяет 3× `c:stones` + `c:plates/brass` из оригинала) → 3 `create:pulse_extender`
+  - `show_notification: false`
+  - **ветка 1** (recipe-id `create:crafting/logistics/pulse_extender`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется
+- [x] `data/create/recipe/crafting/logistics/pulse_timer.json`
+  - оригинал Create shaped 3×3 `RCT/SSS` с `minecraft:amethyst_shard` (R) вместо redstone → 1 (recipe-id `create:crafting/logistics/pulse_timer`)
+  - TFC-style 3×2 `GBT/PPP`: 1× tag `tfc_aeronautics:gem` (G, верх-левый — расширяет с 1 аметиста до 9 TFC-гемов из `Ore.Type.GEM`: amethyst/diamond/emerald/lapis_lazuli/opal/pyrite/ruby/sapphire/topaz) + 1× `tfc:metal/sheet/brass` (B, верх-середина) + 1× `minecraft:redstone_torch` (T, верх-правый) + 3× `tfc_aeronautics:redstone_plate` (P, низ полностью) → 3 `create:pulse_timer`. count 1 → 3, `minecraft:amethyst_shard` → `#tfc_aeronautics:gem`
+  - мотивация тега: `minecraft:amethyst_shard` в TFC-сборке труднодоступен (ванильные аметистовые блоки растут только в `amethyst_geode` биомах, которых нет в TFC progression); замена на любой TFC-гем через umbrella-тег открывает craft-путь через TFC-металлургию. Прецедент `optical_sensor.json` / `laser_sensor.json` / `laser_pointer.json` — тот же свап
+  - `show_notification: false`
+  - **ветка 1** (recipe-id `create:crafting/logistics/pulse_timer`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется: `#tfc_aeronautics:gem` уже создан в нашем namespace (`src/main/resources/data/tfc_aeronautics/tags/item/gem.json`, 9 TFC gem item-id'ов)
+- [x] `data/create/recipe/crafting/logistics/powered_latch.json`
+  - оригинал Create shaped 3×3 ` T / RCR / SSS` с `minecraft:lever` (C) + tag `c:dusts/redstone` (R) + tag `c:stones` (S) + `minecraft:redstone_torch` (T) → 1 (recipe-id `create:crafting/logistics/powered_latch`)
+  - TFC-style 3×3 ` T / RLR / P `: 1× `minecraft:redstone_torch` (T, верх-середина) + 2× `minecraft:redstone` (R, средний-углы) + 1× `minecraft:lever` (L, средний-середина) + 3× `tfc_aeronautics:redstone_plate` (P, низ полностью — заменяет 3× `c:stones`) → 1 `create:powered_latch`. `minecraft:lever` сохранён как ингредиент (у него нет TFC-аналога)
+  - `show_notification: false`
+  - **ветка 1** (recipe-id `create:crafting/logistics/powered_latch`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется
+- [x] `data/create/recipe/crafting/logistics/powered_toggle_latch.json`
+  - оригинал Create shaped 3×1 `T/C/SSS` с `minecraft:redstone_torch` (T) + `minecraft:lever` (C) + tag `c:stones` (S) → 1 (recipe-id `create:crafting/logistics/powered_toggle_latch`)
+  - TFC-style 3×1 `T/L/P`: 1× `minecraft:redstone_torch` (T, верх) + 1× `minecraft:lever` (L, середина) + 1× `tfc_aeronautics:redstone_plate` (P, низ — заменяет 3× `c:stones`) → 1 `create:powered_toggle_latch`. Паттерн сжат с 3-строчного `T/C/SSS` до 3 однострочных букв — `redstone_plate` 1-юнитовый заменитель 3-юнитового `c:stones`
+  - `show_notification: false`
+  - **ветка 1** (recipe-id `create:crafting/logistics/powered_toggle_latch`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется
+- [x] `data/simulated/recipe/redstone_accumulator.json`
+  - оригинал Simulated shaped 3×3 ` Q / RBT / SSS` с `create:polished_rose_quartz` (Q) + `create:brass_sheet` (B) + tag `c:dusts/redstone` (R) + tag `c:stones` (S) + `minecraft:redstone_torch` (T) → 1 (recipe-id `simulated:redstone_accumulator`)
+  - TFC-style 3×3 `RRR/RBT/PPP`: 6× `minecraft:redstone` (R, 3 в верхнем ряду + 1 средний-левый = 4) + 1× `tfc:metal/sheet/brass` (B, средний-середина — заменяет `create:brass_sheet` Create-only) + 1× `minecraft:redstone_torch` (T, средний-правый) + 3× `tfc_aeronautics:redstone_plate` (P, низ полностью — заменяет 3× `c:stones`). `create:polished_rose_quartz` удалён из верхнего ряда, его место заняли 3× `minecraft:redstone` — в TFC-сборке `polished_rose_quartz` недостижим (Create-only, требует mechanical press), а редстоун-пыль в избытке в accum-контексте (накопитель редстоуна)
+  - `show_notification: false` (structural reshape)
+  - **ветка 1** (recipe-id `simulated:redstone_accumulator`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется
+- [x] `data/simulated/recipe/redstone_inductor.json`
+  - оригинал Simulated shaped 3×3 ` C / RBT / SSS` с `create:copper_sheet` (C) + `create:brass_sheet` (B) + tag `c:dusts/redstone` (R) + tag `c:stones` (S) + `minecraft:redstone_torch` (T) → 1 (recipe-id `simulated:redstone_inductor`)
+  - TFC-style 3×3 ` C / RBT / PPP`: 1× `tfc:metal/sheet/copper` (C, верх-середина — заменяет `create:copper_sheet` Create-only) + 1× `minecraft:redstone` (R, средний-левый) + 1× `tfc:metal/sheet/brass` (B, средний-середина — заменяет `create:brass_sheet`) + 1× `minecraft:redstone_torch` (T, средний-правый) + 3× `tfc_aeronautics:redstone_plate` (P, низ полностью — заменяет 3× `c:stones`)
+  - `show_notification: false` (structural reshape)
+  - **ветка 1** (recipe-id `simulated:redstone_inductor`, без `BANNED_RECIPES`)
+  - шейдинг-тегов не требуется: `tfc:metal/sheet/copper` — прямой item-id (прецедент `crushing/copper_sheet.json` и др.)
+
+**Все 9 рецептов — это «первый набор» на `redstone_plate` (см. `plans/redstone-plate.md` если есть, иначе DOCS.md раздел про redstone_plate).** Общая мотивация: в TFC-мире обычный камень — особый ресурс, требующий knapping'а, а не прямого шахтёрского ломания. `redstone_plate` (4 шт. из 2 smooth slabs по тегу `c:stones/smooth_slabs`) становится «стандартным» 1-юнитовым заменителем камня в редстоун-схемах: повторяемость формы (полный 3×3 низ), удобный крафт-путь, ложится в редстоун-прогрессию TFC. Семантика `redstone_plate` именно «камень-заменитель в редстоун-крафтах» закреплена в этом батче.
 
 ## TODO (новые добавлять сюда)
 

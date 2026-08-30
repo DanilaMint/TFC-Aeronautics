@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "T": { "item": "minecraft:redstone_torch" },
+    "L": { "item": "minecraft:lever" },
+    "P": { "item": "tfc_aeronautics:redstone_plate" }
+  },
+  "pattern": [ "T", "L", "P" ],
+  "result": { "count": 1, "id": "create:powered_toggle_latch" },
+  "show_notification": false
+}

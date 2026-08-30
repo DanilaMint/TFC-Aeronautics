@@ -21,6 +21,7 @@ import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.PowderRegistration;
 import ru.tfc_aeronautics.recipe.RecipeRegistration;
+import ru.tfc_aeronautics.redstone_plate.RedstonePlateRegistration;
 import ru.tfc_aeronautics.resin.ResinRegistration;
 import ru.tfc_aeronautics.sequenced.SequencedRegistration;
 import ru.tfc_aeronautics.saw.SawBladeRegistration;
@@ -53,6 +54,7 @@ public class TFCAeronautics {
         SawBladeRegistration.register(modEventBus);
         DrillHeadRegistration.register(modEventBus);
         WrenchHeadRegistration.register(modEventBus);
+        RedstonePlateRegistration.register(modEventBus);
         FluidBlocks.register(modEventBus);
         FluidItems.register(modEventBus);
         Fluids.register(modEventBus);
