@@ -432,6 +432,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id `create:crafting/kinetics/sticker` сохраняется, advancement Create (если есть) ссылается на тот же id — засчитывается без правок
   - подробности в `DOCS.md` §19
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` UP-TO-DATE
+- [x] `data/aeronautics/recipe/adjustable_burner.json`
+  - оригинал Simulated/Aeronautics shaped `["S S","SCS","ARA"]` с `create:iron_sheet` (S) + `aeronautics:burner_fire` (C) + `create:andesite_alloy` (A) + `minecraft:redstone` (R) → 1 `aeronautics:adjustable_burner`. В TFC-сборке мёртв: `create:iron_sheet` и `create:andesite_alloy` — Create-only металл/сплав, циклически требует mechanical mixer
+  - новый: shaped 3×2 `["ScS","CRC"]`: ключ `S` = `[tfc:metal/sheet/wrought_iron, tfc_aeronautics:metal/tight_sheet/steel]` (массив alternatives — оба кованых листа, даёт игроку выбор металла) + `c` = `#minecraft:coals` (ванильный тег угля; в TFC ForgeFuel — прецедент `code_references/TerraFirmaCraft/.../tfc/tags/item/forge_fuel.json`) + `C` = `tfc_aeronautics:composite` (Industrial Composite, наш аналог андезитового сплава — barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`) + `R` = `minecraft:redstone` → 1 `aeronautics:adjustable_burner`
+  - мотивация: hot air burner — TFC-style нагреватель с редстоун-управлением (`HotAirBurnerBlock.updateSignal` в code_references). Уголь — топливо для нагревателя (TFC forge_fuel), композит — корпус/рама (тот же свап, что у `hand_crank.json` / `piston_extension_pole.json` / `linear_chassis.json` / `radial_chassis.json` / `crushing_wheel.json`), кованый лист — каркас камеры сгорания (тот же подход, что у `rope_pulley.json` / `chute.json`)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `aeronautics`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Simulated/Aeronautics рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта, memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: `tfc:metal/sheet/wrought_iron` — TFC item (уже использован в `rope_pulley.json` / `item_vault.json` / `whisk.json`), `tfc_aeronautics:metal/tight_sheet/steel` — наш прямой item-id (`metal/TightSheet.java:33`), `tfc_aeronautics:composite` — наш прямой item-id (`composite/CompositeRegistration.java:28`), `minecraft:redstone` ванильный, `#minecraft:coals` — ванильный тег
+  - recipe-id `aeronautics:adjustable_burner` сохраняется, advancement `data/aeronautics/advancement/recipes/misc/adjustable_burner.json` засчитывается без правок
+  - подробности в `DOCS.md` §19
+  - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
 
 ## Новые рецепты
 

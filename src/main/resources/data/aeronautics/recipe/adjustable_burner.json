@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": [
+      { "item": "tfc:metal/sheet/wrought_iron" },
+      { "item": "tfc_aeronautics:metal/tight_sheet/steel" }
+    ],
+    "c": { "tag": "minecraft:coals" },
+    "C": { "item": "tfc_aeronautics:composite" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "pattern": [ "ScS", "CRC" ],
+  "result": { "count": 1, "id": "aeronautics:adjustable_burner" },
+  "show_notification": false
+}
