@@ -2,12 +2,15 @@ package ru.tfc_aeronautics.welding_depot;
 
 import java.util.List;
 
+import com.simibubi.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
+import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.simibubi.create.content.kinetics.press.MechanicalPressBlockEntity;
 import com.simibubi.create.content.kinetics.press.PressingBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -52,6 +55,7 @@ public class WeldingDepotBlockEntity extends SmartBlockEntity {
     private final ItemStackHandler inventory;
     private final WeldingDepotItemHandler externalHandler;
     private long lastWeldGameTime = Long.MIN_VALUE;
+    private DirectBeltInputBehaviour beltInputBehaviour;
 
     public WeldingDepotBlockEntity(BlockPos pos, BlockState state) {
         super(WeldingDepotRegistration.WELDING_DEPOT_BE.get(), pos, state);
@@ -83,7 +87,12 @@ public class WeldingDepotBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
+    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+        beltInputBehaviour = new DirectBeltInputBehaviour(this)
+            .setInsertionHandler(this::tryInsertingFromSide)
+            .considerOccupiedWhen(this::isOccupied);
+        behaviours.add(beltInputBehaviour);
+    }
 
     @Override
     protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
@@ -224,6 +233,38 @@ public class WeldingDepotBlockEntity extends SmartBlockEntity {
 
     public IItemHandler getExternalHandler() {
         return externalHandler;
+    }
+
+    /**
+     * Belt-insert callback for {@link DirectBeltInputBehaviour}: routes a stack
+     * from the end of a Create belt into the depot. Flux → SLOT_FLUX (limit 64);
+     * everything else → SLOT_LEFT then SLOT_RIGHT (limit 1 each). If the only
+     * matching slot is occupied, returns the stack unchanged so the belt keeps it.
+     */
+    public ItemStack tryInsertingFromSide(TransportedItemStack transported, Direction side, boolean simulate) {
+        ItemStack item = transported.stack;
+        if (item.isEmpty()) return item;
+        boolean isFlux = Helpers.isItem(item, TFCTags.Items.WELDING_FLUX);
+        if (isFlux) {
+            ItemStack current = inventory.getStackInSlot(SLOT_FLUX);
+            if (current.getCount() >= inventory.getSlotLimit(SLOT_FLUX)) return item;
+            return inventory.insertItem(SLOT_FLUX, item, simulate);
+        }
+        if (inventory.getStackInSlot(SLOT_LEFT).isEmpty())
+            return inventory.insertItem(SLOT_LEFT, item, simulate);
+        if (inventory.getStackInSlot(SLOT_RIGHT).isEmpty())
+            return inventory.insertItem(SLOT_RIGHT, item, simulate);
+        return item;
+    }
+
+    /**
+     * Belt-input-occupied: both work-piece slots full means the depot can't
+     * accept another ingot from the belt. Flux slot is intentionally excluded
+     * — it does not block ingot delivery.
+     */
+    public boolean isOccupied(Direction side) {
+        return !inventory.getStackInSlot(SLOT_LEFT).isEmpty()
+            && !inventory.getStackInSlot(SLOT_RIGHT).isEmpty();
     }
 
     public int getTier() {
