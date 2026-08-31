@@ -14,6 +14,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import com.simibubi.create.content.processing.AssemblyOperatorBlockItem;
+
 import ru.tfc_aeronautics.TFCAeronautics;
 
 /**
@@ -41,7 +43,7 @@ public final class StampingPressRegistration {
                 .pushReaction(PushReaction.BLOCK)));
 
     public static final DeferredHolder<Item, BlockItem> STAMPING_PRESS_ITEM =
-        ITEMS.register("stamping_press", () -> new BlockItem(STAMPING_PRESS.get(), new Item.Properties()));
+        ITEMS.register("stamping_press", () -> new AssemblyOperatorBlockItem(STAMPING_PRESS.get(), new Item.Properties()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StampingPressBlockEntity>> STAMPING_PRESS_BE =
         BLOCK_ENTITY_TYPES.register("stamping_press", StampingPressRegistration::createBlockEntityType);
