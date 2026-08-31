@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": {
+      "item": "tfc:metal/sheet/brass"
+    },
+    "c": {
+      "item": "tfc_aeronautics:metal/tight_sheet/copper"
+    },
+    "C": {
+      "item": "tfc_aeronautics:composite"
+    }
+  },
+  "pattern": [
+    " b ",
+    "CcC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "aeronautics:steam_vent"
+  },
+  "show_notification": false
+}

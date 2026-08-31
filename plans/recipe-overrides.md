@@ -526,6 +526,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false`
   - **ветка 1** (recipe-id `create:crafting/kinetics/smart_chute`, без `BANNED_RECIPES`)
   - шейдинг-тегов не требуется: `tfc:metal/sheet/brass` — прямой item-id (прецедент `smart_fluid_pipe.json`, `pulse_repeater.json`, `redstone_inductor.json`)
+- [x] `data/aeronautics/recipe/steam_vent.json`
+  - оригинал Aeronautics shaped 2×1 `["G","C"]` с `#c:plates/gold` (G) + `minecraft:copper_block` (C) → 1 `aeronautics:steam_vent` (recipe-id `aeronautics:steam_vent`). В TFC-сборке мёртв: `#c:plates/gold` сводится к Create-only `golden_sheet` (требует mechanical press); `minecraft:copper_block` — ванильный блок, мимо TFC-металлургии
+  - TFC-style shaped 2×3 `[" b ","CcC"]`: 1× `tfc:metal/sheet/brass` (b, верх-середина — кованый латунный лист из TFC anvil) + 2× `tfc_aeronautics:metal/tight_sheet/copper` (c, средний ряд слева и справа — аэронавтический медный лист 100 мБ) + 2× `tfc_aeronautics:composite` (C, нижние углы — промкомпозит, barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`) → 1 `aeronautics:steam_vent`
+  - мотивация: steam_vent — паровой клапан, семантически «корпус из композита с медными уплотнителями и латунным штоком сверху». Латунный лист через TFC anvil — естественный ТФЦ-металлургический путь (прецедент `smart_fluid_pipe` / `smart_chute` / `pulse_extender` с тем же ингредиентом). tight_sheet/copper — точный ТФЦ-аналог медной пластины (tier 1). composite — базовый корпусной материал (прецедент `hand_crank` / `piston_extension_pole` / `linear_chassis` / `radial_chassis`)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `aeronautics`, без `BANNED_RECIPES`) — файл по тому же пути затеняет оригинал автоматически (конвенция `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тегов не требуется: все три ingredient'а — прямые item-id (`tfc:metal/sheet/brass` из датапака TFC, `tfc_aeronautics:metal/tight_sheet/copper` из `metal/TightSheetRegistration.java`, `tfc_aeronautics:composite` из `composite/CompositeRegistration.java:28`)
+  - recipe-id остаётся `aeronautics:steam_vent`, advancement (если есть) ссылается на тот же id — засчитывается без правок
+  - **внимание к паттерну**: пустой слот — пробел `" "`, не `"."` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException`, если Pattern ссылается на символ вне `key`; конвенция та же, что в `goggles.json` / `whisk.json` / `propeller.json`)
 
 ## TODO (новые добавлять сюда)
 
