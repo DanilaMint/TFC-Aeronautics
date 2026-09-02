@@ -452,6 +452,17 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id остаётся `create:crafting/kinetics/mechanical_arm`, advancement Create (если есть) ссылается на тот же id — засчитывается без правок
   - **внимание к паттерну**: пустые слоты — пробелы `" "`, не `.` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException`, если Pattern ссылается на символ вне `key`; конвенция та же, что в `goggles.json` / `whisk.json` / `propeller.json` / `hand_crank.json` / `mechanical_piston.json`)
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
+- [x] `data/create/recipe/crafting/kinetics/speedometer.json`
+  - оригинал Create shaped 1×2 `["C","A"]`: 1× `minecraft:compass` (C) + 1× `create:andesite_casing` (A) → 1 `create:speedometer` (recipe-id `create:speedometer`). Слишком простой — не использует `tfc:brass_mechanisms`, ключевой TFC-металлургический ингредиент для касинговых приборов
+  - новый: shaped 3×2 `["BRB", " C "]`: 2× `tfc:brass_mechanisms` (B, углы верхнего ряда) + 1× tag `c:dusts/redstone` (R, верх-середина) + 1× `create:andesite_casing` (C, низ-середина) → 1 `create:speedometer`. Раскладка «крест»: латунные механизмы + редстоун в верхнем ряду, касинг снизу по центру — отражает устройство speedometer'а (касинг с редстоун-сенсором и латунными точками подключения)
+  - мотивация: в TFC-мире compass не имеет TFC-аналога (он остаётся ванильным), а латунные механизмы — ключевая промежуточная стадия TFC-металлургии (3-шаговый anvil-recipe из латунных слитков). Перенос прогрессии на «латунь + редстоун» вместо «компас» органичнее для TFC-контура: `tfc:brass_mechanisms` уже используется в `clutch.json` / `mechanical_piston.json` / `steam_engine.json` / `mechanical_arm.json` (через `brass_hand`)
+  - параллельно с override'ом остаётся живым shapeless `data/create/recipe/crafting/kinetics/speedometer_from_conversion.json` (recipe-id `create:speedometer_from_conversion`, stressometer → speedometer) — отдельный конверсионный путь по выбору пользователя
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Create'овский shaped-оригинал автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для всех override-рецептов — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: `c:dusts/redstone` идёт с Create (прецедент `gearshift.json` / `clutch.json` / `mechanical_crafter.json` / `transmitter.json` / `redstone_contact.json`), `tfc:brass_mechanisms` / `create:andesite_casing` — прямые item-id
+  - recipe-id остаётся `create:speedometer`, advancement Create (если есть) ссылается на тот же id — засчитывается без правок
+  - **внимание к паттерну**: пустые слоты — пробелы `" "`, не `.` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException`, если Pattern ссылается на символ вне `key`; конвенция та же, что в `goggles.json` / `whisk.json` / `propeller.json` / `mechanical_piston.json`)
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## Новые рецепты
 

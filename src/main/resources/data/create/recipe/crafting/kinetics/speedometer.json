@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "B": { "item": "tfc:brass_mechanisms" },
+    "R": { "tag": "c:dusts/redstone" },
+    "C": { "item": "create:andesite_casing" }
+  },
+  "pattern": ["BRB", " C "],
+  "result": { "count": 1, "id": "create:speedometer" }
+}
