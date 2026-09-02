@@ -17,6 +17,7 @@ import ru.tfc_aeronautics.drill_head.DrillHeadRegistration;
 import ru.tfc_aeronautics.fluid.FluidBlocks;
 import ru.tfc_aeronautics.fluid.FluidItems;
 import ru.tfc_aeronautics.fluid.Fluids;
+import ru.tfc_aeronautics.harvester_blade.HarvesterBladeRegistration;
 import ru.tfc_aeronautics.heat.HeatDealerRegistration;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
@@ -53,6 +54,7 @@ public class TFCAeronautics {
         SequencedRegistration.register(modEventBus);
         TightSheetRegistration.register(modEventBus);
         SawBladeRegistration.register(modEventBus);
+        HarvesterBladeRegistration.register(modEventBus);
         DrillHeadRegistration.register(modEventBus);
         WrenchHeadRegistration.register(modEventBus);
         RedstonePlateRegistration.register(modEventBus);

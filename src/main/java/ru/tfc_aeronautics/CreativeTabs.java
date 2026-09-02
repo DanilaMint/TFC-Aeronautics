@@ -17,6 +17,7 @@ import ru.tfc_aeronautics.ceramic.CeramicRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.drill_head.DrillHeadRegistration;
 import ru.tfc_aeronautics.fluid.FluidItems;
+import ru.tfc_aeronautics.harvester_blade.HarvesterBladeRegistration;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.metal.TightSheetRegistration;
 import ru.tfc_aeronautics.powder.MetalPowder;
@@ -54,6 +55,7 @@ public final class CreativeTabs
                 output.accept(FluidItems.ROSIN_BUCKET.get());
                 output.accept(ChainConveyorRegistration.CHAIN_CONVEYOR_ITEM.get());
                 output.accept(SawBladeRegistration.SAW_BLADE.get());
+                output.accept(HarvesterBladeRegistration.HARVESTER_BLADE.get());
                 output.accept(DrillHeadRegistration.DRILL_HEAD.get());
                 output.accept(WrenchHeadRegistration.WRENCH_HEAD.get());
                 output.accept(RedstonePlateRegistration.REDSTONE_PLATE.get());

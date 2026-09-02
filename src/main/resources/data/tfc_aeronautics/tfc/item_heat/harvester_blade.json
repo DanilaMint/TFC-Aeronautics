@@ -1,0 +1,6 @@
+{
+  "ingredient": { "item": "tfc_aeronautics:harvester_blade" },
+  "heat_capacity": 6.0,
+  "forging_temperature": 921.0,
+  "welding_temperature": 1228.0
+}

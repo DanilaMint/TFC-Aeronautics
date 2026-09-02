@@ -38,6 +38,8 @@
 28. [Сварочный стол (Welding Depot)](#28-сварочный-стол-welding-depot)
 29. [Точная температура через инженерные очки Create](#29-точная-температура-через-инженерные-очки-create)
 30. [Точная температура в heat-индикаторах блок-GUI](#30-точная-температура-в-heat-индикаторах-блок-gui)
+31. [Редстоун-пластина (Redstone Plate)](#31-редстоун-пластина-redstone-plate)
+32. [Лезвие харвестера через TFC-наковальню (Harvester Blade)](#32-лезвие-харвестера-через-tfc-наковальню-harvester-blade)
 
 ---
 
@@ -3383,3 +3385,75 @@ if (text != null) {
 * **Первый в проекте `data/minecraft/recipe/`-override.** `repeater.json` / `comparator.json` — впервые в проекте override в ванильном namespace. Datapack-merge для `minecraft:` работает идентично, без специальных правок (см. `feedback_recipe_override_convention.md`).
 * **Pulse_timer и `#tfc_aeronautics:gem`.** Оригинальный Create-рецепт `pulse_timer` использует `minecraft:amethyst_shard`. После override через тег `#tfc_aeronautics:gem` ванильный аметист больше не работает — это намеренное решение (TFC-only прогрессия), прецедент — `optical_sensor.json` / `laser_sensor.json` / `laser_pointer.json` в `data/simulated/recipe/`.
 * **Count ×3 для 5 рецептов.** `pulse_repeater` / `pulse_extender` / `pulse_timer` / `redstone_accumulator` / `redstone_inductor` идут count=3 (сравни с 1 в оригиналах Create/Simulated) — компенсация за более редкие TFC-материалы. `repeater` / `comparator` / `powered_latch` / `powered_toggle_latch` — count=1 (repeater упал 3→1 относительно vanilla, остальные совпадают с оригиналами).
+
+---
+
+## 32. Лезвие харвестера через TFC-наковальню (Harvester Blade)
+
+Механический харвестер Create собирается по ванильному рецепту `["AIA","AIA"," C "]` (`create:andesite_alloy` + `c:plates/iron` + `create:andesite_casing`). В TFC-сборке оба ключевых ингредиента недоступны (`c:plates/iron` пуст по per-metal subtag-конвенции, андезитовый сплав — Create-only цикл), а сам харвестер — один из ключевых блоков ранней фермерской автоматизации (см. `§24 TFC FOOD processing в Create-машинах`). Заменяем на двухступенчатую цепочку:
+
+1. **Шаг 1** — выковать лезвие на TFC-наковальне tier ≥ 3 из листа кованого железа.
+2. **Шаг 2** — заверстать pattern `["BC"]` на верстаке: blade + andesite_casing → `create:mechanical_harvester`.
+
+Прецедент — раздел `§25 Drill Head` (идентичная двухступенчатая схема «TFC-наковальня + crafting override»).
+
+### Регистрация предмета
+
+Пакет `src/main/java/ru/tfc_aeronautics/harvester_blade/`. По образцу `SawBladeRegistration` — один `DeferredHolder<Item, Item>` `HARVESTER_BLADE` (`tfc_aeronautics:harvester_blade`) с vanilla `Item.Properties()`. Подключён в `TFCAeronautics` через `HarvesterBladeRegistration.register(modEventBus)` сразу после `SawBladeRegistration`; в `CreativeTabs.MAIN.displayItems` добавлен `output.accept(HARVESTER_BLADE.get())` между saw_blade и drill_head. Локализация — `item.tfc_aeronautics.harvester_blade` = «Harvester Blade» / «Лезвие комбайна».
+
+### Модель
+
+`parent: "create:block/mechanical_harvester/blade"` — Fleck partial model Create, описывающая динамическую часть харвестера (2 wheel + 4 blade + 4 trim). Прецедент импорта чужой block-модели через `parent` — `unfired_basin.json` (§15, тоже `parent: "create:block/basin/block"`). Свои текстуры не задаём — `blade.json` уже содержит `harvester` / `anvil` / `andesite_casing_short`, которые резолвятся в стандартный Minecraft + Create-текстуры.
+
+`display` секция задана для всех контекстов рендера (`ground` / `fixed` / `gui` / `thirdperson` / `firstperson`); значения `rotation` / `translation` / `scale` взяты из `display.fixed` родительской модели `create:block/mechanical_harvester/item` (`rotation: [0, 180, 0]`, `translation: [0, 0.5, -4]`, `scale: [0.5, 0.5, 0.5]`). Для `ground` и `fixed` translation скорректирован под ручной инвентарь; `gui` оставлен с rotation `[30, 45, 0]` (стандартный угол обзора блока в GUI). Без полного display'а предмет в `thirdperson` / `firstperson` рендерился бы дефолтным transform (прецедент бага — `feedback_block_model_uvs.md`).
+
+Поля `__comment` и `neoforge_data` в `blade.json` ванильный `BlockModel`-десериализатор игнорирует — они не ломают item-рендер.
+
+### Anvil-рецепт
+
+Один рецепт в `data/tfc_aeronautics/recipe/anvil/harvester_blade.json` (прецедент — `saw_blade.json` рядом, идентичная металлургическая форма «лист → режущий инструмент»):
+
+```json
+{
+  "type": "tfc:anvil",
+  "ingredient": { "item": "tfc:metal/sheet/wrought_iron" },
+  "result": { "count": 1, "id": "tfc_aeronautics:harvester_blade" },
+  "rules": ["punch_last", "hit_not_last", "bend_not_last"],
+  "apply_bonus": false,
+  "tier": 3
+}
+```
+
+`tier: 3` — wrought iron (как `saw_blade`). Forge-цепочка намеренно отличается от `saw_blade` (`hit_last/hit_second_last/hit_third_last`): `punch_last` продавливает контур лезвия, `hit_not_last` требует хотя бы одного общего уковывания, `bend_not_last` добавляет изгиб кромки — три разных `ForgeRule`-типа, что делает крафт выразительно отличным и не позволяет «закликать» рецепт одной операцией.
+
+### Item heat
+
+`src/main/resources/data/tfc_aeronautics/tfc/item_heat/harvester_blade.json` — точная копия `saw_blade.json`: `heat_capacity: 6.0`, `forging_temperature: 921.0°C`, `welding_temperature: 1228.0°C`. Wrought iron — единственный металл рецепта, никакого `bonus: copy_worst` не требуется (как и у `saw_blade`).
+
+Без `tfc:item_heat` записи TFC fire pit / coal forge / наковальня **тихо отвергают** предмет (`Cannot heat tfc_aeronautics:harvester_blade` в логе) — прецедент `feedback_tfc_item_heat_required.md`.
+
+### Shadow crafting-рецепта
+
+Файл `data/create/recipe/crafting/kinetics/mechanical_harvester.json` лежит под тем же путём, что ванильный Create-рецепт (`code_references/Create/src/generated/resources/data/create/recipe/crafting/kinetics/mechanical_harvester.json`), поэтому datapack-merge автоматически заменяет его без правки `BANNED_RECIPES` (конвенция `feedback_recipe_override_convention.md`, ветка 1 скилла `recipe-override`):
+
+```json
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "B": { "item": "tfc_aeronautics:harvester_blade" },
+    "C": { "item": "create:andesite_casing" }
+  },
+  "pattern": [ "BC" ],
+  "result": { "count": 1, "id": "create:mechanical_harvester" }
+}
+```
+
+`show_notification: false` — структурный reshape (3×3 «крест» оригинала → 1×2 «полоску»), конвенция для всех override-рецептов мода (`feedback_show_notification_false.md`). Recipe-id остаётся `create:crafting/kinetics/mechanical_harvester`, advancement Create (если он ссылается на этот id) засчитывается без правок.
+
+### Что НЕ сделано и почему
+
+* **3D-модель предмета не своя** — используется `parent` на Fleck partial `create:block/mechanical_harvester/blade`. Это работает, потому что текстуры и элементы лезвия уже описаны в `blade.json`; создавать свою копию JSON с теми же текстурами не имеет смысла до тех пор, пока не появится уникальный арт.
+* **Нет `bonus: copy_worst`** — лезвие крафтится строго из wrought_iron, единого «материала» нет.
+* **Один anvil-рецепт** — нет second-tier (steel) варианта. Если в будущем потребуется более прочный вариант (например, для тяжёлых культур типа sugarcane), добавляется вторым рецептом с `tier: 4` и `tfc:metal/sheet/steel` (прецедент — двухрецептная схема `drill_head` через welding, §25).
