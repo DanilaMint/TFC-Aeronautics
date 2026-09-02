@@ -442,6 +442,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id `aeronautics:adjustable_burner` сохраняется, advancement `data/aeronautics/advancement/recipes/misc/adjustable_burner.json` засчитывается без правок
   - подробности в `DOCS.md` §19
   - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
+- [x] `data/create/recipe/crafting/kinetics/mechanical_arm.json`
+  - оригинал Create shaped 3×3 `["LLA","L  ","IC "]`: 2× `#c:plates/brass` (L) + 1× `create:andesite_alloy` (A) + 1× `create:precision_mechanism` (I) + 1× `create:brass_casing` (C) → 1 `create:mechanical_arm`. В TFC-сборке `andesite_alloy` недоступен (Create-only сплав, циклически требует mechanical mixer)
+  - новый: тот же формат (shaped 3×3, `minecraft:crafting_shaped`), другой паттерн `[" RH","R  ","PC "]`: 2× `tfc:metal/rod/steel` (R, позиции (0,1) и (1,0)) + 1× `create:brass_hand` (H, (0,2)) + 1× `create:precision_mechanism` (P, (2,0)) + 1× `create:brass_casing` (C, (2,1)) → 1 `create:mechanical_arm`. Паттерн визуально читается как «схват манипулятора»: вертикальная штанга слева (P-R), горизонтальная рука с хватом справа (R-H), основание с механизмом внизу (P-C)
+  - мотивация: `create:andesite_alloy` в TFC-сборке недостижим (Create-only); `tfc:metal/rod/steel` — стальной стержень TFC (tier 4, anvil/pressing-путь, уже использован в `steam_engine.json`, `track.json`, `steel_propeller.json`). `create:brass_hand` сам производится через TFC-наковальню (`data/tfc_aeronautics/recipe/anvil/brass_hand.json`, tier 2) — замыкает TFC-контур: латунный слиток → anvil (HIT/DRAW/BEND) → brass_hand → mechanical_arm. `precision_mechanism` и `brass_casing` уже overridden в этом проекте (sequenced_assembly/item_application)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Create'овский рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для всех override-рецептов — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: все 4 ingredient'а — прямые item-id (`tfc:metal/rod/steel` уже в TFC-датапаке и в 3 других наших override'ах; `create:brass_hand` / `precision_mechanism` / `brass_casing` — прямые Create-item'ы)
+  - recipe-id остаётся `create:crafting/kinetics/mechanical_arm`, advancement Create (если есть) ссылается на тот же id — засчитывается без правок
+  - **внимание к паттерну**: пустые слоты — пробелы `" "`, не `.` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException`, если Pattern ссылается на символ вне `key`; конвенция та же, что в `goggles.json` / `whisk.json` / `propeller.json` / `hand_crank.json` / `mechanical_piston.json`)
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
 
 ## Новые рецепты
 

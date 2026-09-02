@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": { "item": "tfc:metal/rod/steel" },
+    "H": { "item": "create:brass_hand" },
+    "P": { "item": "create:precision_mechanism" },
+    "C": { "item": "create:brass_casing" }
+  },
+  "pattern": [
+    " RH",
+    "R  ",
+    "PC "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:mechanical_arm"
+  },
+  "show_notification": false
+}
