@@ -52,6 +52,11 @@ public final class RecipeRemoval
      * is stripped because its only path is now TFC-anvil recipes under
      * {@code tfc_aeronautics:anvil/industrial_iron_block_cast_iron} and
      * {@code tfc_aeronautics:anvil/industrial_iron_block_steel}.
+     *
+     * <p>{@code create:crafting/kinetics/basin} is stripped because its only
+     * path is now the ceramic preform route:
+     * {@code tfc_aeronautics:ceramic/unfired_basin} (shaped craft) →
+     * {@code tfc:heating} → {@code create:basin}.
      */
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
@@ -65,6 +70,7 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/depot"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/copper_valve_handle"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/mechanical_plough"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/basin"),
         ResourceLocation.fromNamespaceAndPath("simulated", "rope_coupling"),
         ResourceLocation.fromNamespaceAndPath("create", "industrial_iron_block_from_ingots_iron_stonecutting")
     );

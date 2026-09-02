@@ -1,0 +1,18 @@
+{
+  "parent": "create:block/basin/block",
+  "textures": {
+    "12": "tfc_aeronautics:item/ceramic/unfired_basin"
+  },
+  "display": {
+    "ground": {
+      "scale": [0.667, 0.667, 0.667],
+      "translation": [0, 1, 0]
+    },
+    "fixed": {
+      "scale": [0.667, 0.667, 0.667],
+      "translation": [0, 1, 0]
+    },
+    "thirdperson": { "scale": [0.667, 0.667, 0.667] },
+    "firstperson": { "scale": [0.667, 0.667, 0.667] }
+  }
+}

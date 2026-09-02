@@ -13,6 +13,7 @@ import ru.tfc_aeronautics.anvil.AnvilRegistration;
 import ru.tfc_aeronautics.bracket.WoodenBracketRegistration;
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.chain.ChainConveyorRegistration;
+import ru.tfc_aeronautics.ceramic.CeramicRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.drill_head.DrillHeadRegistration;
 import ru.tfc_aeronautics.fluid.FluidItems;
@@ -58,6 +59,7 @@ public final class CreativeTabs
                 output.accept(RedstonePlateRegistration.REDSTONE_PLATE.get());
                 WoodenBracketRegistration.BRACKETS.keySet().forEach(wood -> output.accept(WoodenBracketRegistration.BRACKET_ITEMS.get(wood).get()));
                 WeldingDepotRegistration.DEPOT_ITEMS.values().forEach(i -> output.accept(i.get()));
+                output.accept(CeramicRegistration.UNFIRED_BASIN.get());
             })
             .build());
 

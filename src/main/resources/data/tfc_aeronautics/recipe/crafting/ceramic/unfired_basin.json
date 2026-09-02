@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C C",
+    "C C",
+    "CVC"
+  ],
+  "key": {
+    "C": { "item": "minecraft:clay_ball" },
+    "V": { "item": "tfc:ceramic/unfired_large_vessel" }
+  },
+  "result": {
+    "count": 1,
+    "id": "tfc_aeronautics:ceramic/unfired_basin"
+  },
+  "show_notification": true
+}

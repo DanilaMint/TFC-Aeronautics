@@ -1,0 +1,6 @@
+{
+  "type": "tfc:heating",
+  "ingredient": { "item": "tfc_aeronautics:ceramic/unfired_basin" },
+  "result_item": { "count": 1, "id": "create:basin" },
+  "temperature": 1399.0
+}
