@@ -576,6 +576,13 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id остаётся `aeronautics:steam_vent`, advancement (если есть) ссылается на тот же id — засчитывается без правок
   - **внимание к паттерну**: пустой слот — пробел `" "`, не `"."` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException`, если Pattern ссылается на символ вне `key`; конвенция та же, что в `goggles.json` / `whisk.json` / `propeller.json`)
 
+- [x] `data/create/recipe/crafting/schematics/schematic_table.json`
+  - оригинал Create shaped 3×3 `["WWW"," S "," S "]`: 3× tag `#minecraft:wooden_slabs` (W) + 2× `minecraft:smooth_stone` (S) → 1 `create:schematic_table` (recipe-id `create:crafting/schematics/schematic_table`). В TFC-сборке мёртв: ванильный smooth_stone недоступен, каменная прогрессия заменена на породы + knapping
+  - тот же shaped 3×3, заменён только ключ `S`: 2× tag `#c:stones/smooth` — 21 гладкая порода TFC (`tfc:rock/smooth/granite` … `tfc:rock/smooth/marble`), тег задаёт сам TFC (`code_references/TerraFirmaCraft/src/generated/resources/data/c/tags/item/stones/smooth.json`); ванильный smooth_stone в тег не входит. Ключ `W` не тронут — TFC переопределяет `#minecraft:wooden_slabs` под свои 20 пород, тег уже эффективно TFC-only. Паттерн, `category` и count не тронуты — pure ingredient swap, без reshape
+  - `show_notification: false`
+  - **ветка 1** (recipe-id `create:crafting/schematics/schematic_table`, без `BANNED_RECIPES`) — advancement Create засчитывается без правок
+  - шейдинг-тегов не требуется: `c:stones/smooth` — common-тег из датапака TFC (прецедент `c:stones/smooth_slabs` в `redstone_plate.json` и `sequenced_assembly/track.json`)
+
 ## TODO (новые добавлять сюда)
 
 - [ ]
