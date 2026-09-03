@@ -8,6 +8,7 @@
     "BasinBlockEntityMixin",
     "BasinMixingFoodDataMixin",
     "MillstoneBlockEntityMixin",
+    "RecipeApplierHeatMixin",
     "RecipeManagerMixin"
   ],
   "injectors": {

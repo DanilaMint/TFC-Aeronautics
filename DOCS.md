@@ -40,6 +40,7 @@
 30. [Точная температура в heat-индикаторах блок-GUI](#30-точная-температура-в-heat-индикаторах-блок-gui)
 31. [Редстоун-пластина (Redstone Plate)](#31-редстоун-пластина-redstone-plate)
 32. [Лезвие харвестера через TFC-наковальню (Harvester Blade)](#32-лезвие-харвестера-через-tfc-наковальню-harvester-blade)
+33. [Сохранение тепла в `create:pressing` (RecipeApplierHeatMixin)](#33-сохранение-тепла-в-createpressing-recipeapplierheatmixin)
 
 ---
 
@@ -3463,3 +3464,157 @@ if (text != null) {
 * **3D-модель предмета не своя** — используется `parent` на Fleck partial `create:block/mechanical_harvester/blade`. Это работает, потому что текстуры и элементы лезвия уже описаны в `blade.json`; создавать свою копию JSON с теми же текстурами не имеет смысла до тех пор, пока не появится уникальный арт.
 * **Нет `bonus: copy_worst`** — лезвие крафтится строго из wrought_iron, единого «материала» нет.
 * **Один anvil-рецепт** — нет second-tier (steel) варианта. Если в будущем потребуется более прочный вариант (например, для тяжёлых культур типа sugarcane), добавляется вторым рецептом с `tier: 4` и `tfc:metal/sheet/steel` (прецедент — двухрецептная схема `drill_head` через welding, §25).
+
+---
+
+## 33. Сохранение тепла в `create:pressing` (RecipeApplierHeatMixin)
+
+### Проблема
+
+Ванильный `MechanicalPressBlockEntity` Create обрабатывает рецепты типа `create:pressing`
+через `RecipeApplier.applyRecipeOn`. Эта утилита собирает выходные `ItemStack`-и
+через `pr.rollResults(...)` → `output.rollOutput(random)` — **свежие** `ItemStack`
+без data-компонентов входа. TFC-heat (data-компонент `TFCComponents.HEAT`) при
+этом теряется: положив горячий медный слиток в `MechanicalPress` под рецептом
+`create:pressing/tight_sheet_copper`, на выходе получаем холодный тонкий лист —
+даже несмотря на то, что `data/tfc_aeronautics/tfc/item_heat/copper_tight_sheet.json`
+определяет для tight_sheet heat-компонент.
+
+`StampingPressBlockEntity` (наш собственный пресс) этой проблемы не имеет: он
+ходит через `PressingBehaviour`, но рецепты берёт из TFC `AnvilRecipe` и копирует
+heat вручную в `assemble(...)` (`stamping_press/StampingPressBlockEntity.java:172`).
+Покрыть нужно именно ванильный Create-пресс + belt-press + sequenced assembly
+с pressing.
+
+### Точка вставки
+
+Файл: `src/main/java/ru/tfc_aeronautics/mixin/RecipeApplierHeatMixin.java`.
+
+```java
+@Mixin(RecipeApplier.class)
+public abstract class RecipeApplierHeatMixin
+{
+    @Inject(method = "applyRecipeOn(Lnet/minecraft/world/level/Level;"
+        + "Lnet/minecraft/world/item/ItemStack;"
+        + "Lnet/minecraft/world/item/crafting/Recipe;Z)Ljava/util/List;",
+        at = @At("RETURN"))
+    private static void aeronautics$preserveHeatOnPressingOutputs(
+        Level level, ItemStack stackIn, Recipe<?> recipe,
+        boolean returnProcessingRemainder, CallbackInfoReturnable<List<ItemStack>> cir
+    ) { ... }
+}
+```
+
+* **Цель** — `com.simibubi.create.foundation.recipe.RecipeApplier`, метод
+  `applyRecipeOn(Level, ItemStack, Recipe<?>, boolean) → List<ItemStack>`.
+  Это **level-overload** — entity-overload (для `ItemEntity`) внутри
+  делегирует ему (`RecipeApplier.java:18`), так что один inject покрывает
+  оба сценария.
+* **Точка инжекта** — `at = @At("RETURN")`. Нам нужно модифицировать
+  уже созданные `ItemStack`-и в выходном списке; `HEAD` не подходит, потому
+  что выход ещё не сформирован. Поскольку мы держим **ту же ссылку** на
+  `ItemStack`, что потом идёт в `entity.setItem(...)` (entity-overload)
+  или в `outputs` (caller-сайт в `MechanicalPressBlockEntity`), правки
+  пропагируются в инвентарь / `ItemEntity` без отдельной сериализации.
+* **Фильтр** — `if (!(recipe instanceof PressingRecipe)) return;`.
+  `PressingRecipe` импортируется из `com.simibubi.create.content.kinetics.press`.
+  Mixin не активируется для `create:mixing`, `create:milling`,
+  `create:compacting`, `create:splashing` и других `ProcessingRecipe`-ов —
+  они проходят через тот же `applyRecipeOn`, но не должны получать
+  TFC-heat-поведение.
+
+### Heat transfer
+
+Тот же inline-паттерн, что уже сложился в `StampingPressBlockEntity.assemble`
+(L171-173) и `WeldingDepotBlockEntity.tryWeld` (L210-215):
+
+```java
+IHeat inputHeat = HeatCapability.get(stackIn);
+if (inputHeat == null) return;             // вход не TFC-предмет, no-op
+for (ItemStack out : outputs) {
+    if (out.isEmpty()) continue;
+    IHeat outputHeat = HeatCapability.get(out);
+    if (outputHeat == null) continue;      // выход не heat-capable, no-op
+    outputHeat.setTemperatureIfWarmer(inputHeat);
+}
+```
+
+* `HeatCapability.get(ItemStack)` (`HeatCapability.java:42`) — `@Nullable IHeat`,
+  возвращает `null` если у предмета нет `TFCComponents.HEAT`.
+* `IHeat.setTemperatureIfWarmer(IHeat other)` (`IHeat.java:41`) — оставляет
+  `output.temperature = max(input.temperature, output.temperature)`. Это
+  и есть «точное сохранение»: выход не холоднее входа.
+* `setTemperatureIfWarmer` (default-метод) уже делает `null`-проверку на
+  `other`, но мы делаем её явно ради ясности (и чтобы не делать лишний
+  capability-lookup на холодных входах).
+
+### Что покрыто
+
+* **World-mode** ванильного `MechanicalPressBlockEntity` —
+  `tryProcessInWorld` (`MechanicalPressBlockEntity.java:115-146`).
+  Bulk-ветка вызывает entity-overload → level-overload (через mixin);
+  non-bulk-ветка сразу зовёт level-overload.
+* **Belt-mode** — `tryProcessOnBelt` (`MechanicalPressBlockEntity.java:149-168`),
+  тоже level-overload.
+* **Sequenced assembly** с `create:pressing`-шагом — `SequencedAssemblyRecipe`
+  резолвится в `PressingRecipe` через `AllRecipeTypes.PRESSING.find(...)`
+  и проходит тот же путь.
+* **Кастомный пресс мода (`tfc_aeronautics:stamping_press`)** — не
+  затрагивается, потому что он идёт мимо `PressingRecipe` (рецепты
+  TFC-`AnvilRecipe` и своя ручная сборка выхода). Это правильно —
+  штамп сам копирует heat.
+
+### No-op случаи (намеренные)
+
+* **Рецепт не `PressingRecipe`** — `instanceof` гейт отсекает все прочие
+  `ProcessingRecipe`-ы.
+* **Вход без TFC heat** — `HeatCapability.get(stackIn) == null` →
+  ранний return.
+* **Выход без `tfc/item_heat` JSON** — `HeatCapability.get(out) == null` →
+  skip элемента. Это критично: если другие моды добавят `create:pressing`
+  рецепты с не-TFC выходами (например, ванильный `create:copper_sheet`),
+  mixin тихо пропустит их, не уронив NPE.
+
+### Что НЕ покрыто (известное ограничение)
+
+* **Basin-mode** ванильного `MechanicalPressBlockEntity`. Сценарий:
+  пресс стоит над басейном, басейн уже прогрет, игрок кладёт в басейн
+  ингот. `tryProcessInBasin` (`MechanicalPressBlockEntity.java:82-99`)
+  вызывает унаследованный `BasinOperatingBlockEntity.applyBasinRecipe()`
+  → `BasinRecipe.apply()` (`BasinRecipe.java:65-177`). Внутри — **другая**
+  ветка создания выхода: `recipe.getResultItem(level.registryAccess())`
+  (L161) + `basin.acceptOutputs(...)` (L172), минуя `RecipeApplier.applyRecipeOn`.
+  Mixin туда не дотянется.
+
+  Для TFC-металлов basin-прессование практически не используется
+  (basin-рецепты обычно жидкостные: сплавы, отливка через
+  `SpoutCastingBehavior`). Если потребуется покрыть — добавляется
+  отдельным mixin на `BasinRecipe.apply` или TAIL на `applyBasinRecipe`,
+  с логикой «найти input слот с heat-capability, скопировать на
+  result».
+
+### Почему mixin на `RecipeApplier`, а не recipe wrapper
+
+Альтернативы, которые были отвергнуты:
+
+* **Mixin на `PressingRecipe.assemble(...)`**. `assemble` унаследован от
+  `ProcessingRecipe` (L174) и вызывается не из press-флоу — реальный
+  press зовёт `rollResults()` напрямую, минуя `assemble()`. Миксить
+  `assemble` означало бы покрыть не-press сценарии (recipe book, JEI)
+  и пропустить именно press. Бесполезно.
+* **Mixin на `MechanicalPressBlockEntity.tryProcessInWorld` /
+  `tryProcessOnBelt`**. Два отдельных mixin-сайта, плюс аналогичные
+  методы в кастомных BE, реализующих `PressingBehaviourSpecifics`
+  (наш `StampingPressBlockEntity` — но он идёт мимо `PressingRecipe`).
+  Хрупко и множится при добавлении новых consumer-ов.
+* **Wrapper вокруг `PressingRecipe` через `RecipeManager.apply`**. Каждый
+  `create:pressing` JSON-рецепт оборачивается в подкласс с overridden
+  `assemble`. Чище концептуально, но требует ещё один mixin (на
+  `RecipeManager.apply`) и усложняет recipe-id resolution.
+
+Mixin на `RecipeApplier.applyRecipeOn` — единая точка перехвата для
+**всех** consumer-ов `create:pressing`, не ломает `PressingRecipe.assemble()`
+контракт, не требует модификации recipe-сериализатора. LVT-рисков нет:
+`HeatCapability` и `IHeat` — обычные TFC-классы, не mixin-ы, поэтому
+памятки `feedback_mixin_cross_target_access.md` и
+`feedback_mixin_lvt_hierarchy_check.md` не актуальны.
