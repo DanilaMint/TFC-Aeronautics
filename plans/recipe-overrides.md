@@ -582,7 +582,19 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false`
   - **ветка 1** (recipe-id `create:crafting/schematics/schematic_table`, без `BANNED_RECIPES`) — advancement Create засчитывается без правок
   - шейдинг-тегов не требуется: `c:stones/smooth` — common-тег из датапака TFC (прецедент `c:stones/smooth_slabs` в `redstone_plate.json` и `sequenced_assembly/track.json`)
+- [x] `create:pressing/copper_ingot` — **удалён** через `BANNED_RECIPES`, replacement-JSON нет
+  - оригинал Create `create:pressing`: тег `c:ingots/copper` → 1 `create:copper_sheet` (только датаген Create, `CreatePressingRecipeGen.java`; в `src/main/resources` файла нет)
+  - мотивация: на том же входе `c:ingots/copper` уже висел наш `create:pressing/tight_sheet_copper` → `tfc_aeronautics:metal/tight_sheet/copper`, и Create выбирал первый подошедший — прессование медного слитка было недетерминировано. `create:copper_sheet` в TFC-сборке лишний (Create-only лист, дублирует tight sheet)
+  - **чистое удаление** (не ветка 1 и не ветка 2): datapack-тень переопределяет, а не удаляет, поэтому единственный путь — `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java` (прецедент `create:crafting/kinetics/encased_chain_drive_from_zinc`)
+  - шейдинг-тегов не требуется
+  - **осознанный побочный эффект:** `create:copper_sheet` теперь недобываем; ломаются три ещё не переопределённых потребителя — `create:crafting/kinetics/hose_pulley` (тег `c:plates/copper`; и так мёртв из-за `minecraft:dried_kelp_block`), `simulated:redstone_magnet`, `aeronautics:mounted_potato_cannon`. См. TODO ниже
+  - `pressing/tight_sheet_{copper,steel,wrought_iron}.json` не тронуты — другие recipe-id
 
 ## TODO (новые добавлять сюда)
+
+- [ ] Перевести потребителей `create:copper_sheet` / тега `c:plates/copper` на `tfc_aeronautics:metal/tight_sheet/copper` — предмет стал недобываем после бана `create:pressing/copper_ingot`:
+  - `create:crafting/kinetics/hose_pulley` (заодно `minecraft:dried_kelp_block`, из-за которого рецепт мёртв и без этого)
+  - `simulated:redstone_magnet`
+  - `aeronautics:mounted_potato_cannon` (mechanical crafting)
 
 - [ ]

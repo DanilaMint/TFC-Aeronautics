@@ -64,6 +64,13 @@ public final class RecipeRemoval
      * handle) and {@code tfc_aeronautics:anvil/iron_handle_steel} (tier 4, two
      * handles). The {@code simulated:handle_undye} shapeless recipe stays — it
      * strips dye off a coloured handle rather than producing iron.
+     *
+     * <p>{@code create:pressing/copper_ingot} is stripped so that pressing a
+     * copper ingot yields only {@code tfc_aeronautics:metal/tight_sheet/copper}
+     * via {@code create:pressing/tight_sheet_copper}. Both recipes matched the
+     * same {@code c:ingots/copper} input, so which sheet came out depended on
+     * recipe iteration order. This is a pure removal — {@code create:copper_sheet}
+     * has no other production path and becomes unobtainable by design.
      */
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
@@ -78,6 +85,7 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/copper_valve_handle"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/mechanical_plough"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/basin"),
+        ResourceLocation.fromNamespaceAndPath("create", "pressing/copper_ingot"),
         ResourceLocation.fromNamespaceAndPath("simulated", "rope_coupling"),
         ResourceLocation.fromNamespaceAndPath("simulated", "copper_handle"),
         ResourceLocation.fromNamespaceAndPath("simulated", "iron_handle"),
