@@ -52,6 +52,17 @@ public class Config {
             .comment("Volume of the sound played when a shaft hits an entity. 0.0 = silent.")
             .defineInRange("shaftSoundVolume", 0.5, 0.0, 1.0);
 
+    public static final ModConfigSpec.DoubleValue HEATER_SPEED_MULTIPLIER = BUILDER
+            .comment("Multiplier on heating speed for the tfc_aeronautics:heater block. "
+                    + "Scales TFC's HeatCapability.addTemp `modifier` (default 3) so the per-tick heating "
+                    + "rate (`modifier / heatCapacity`) is multiplied by this value, and scales the temperature "
+                    + "handed to HeatCapability.provideHeatTo (block above). 1.0 = as currently; "
+                    + "2.0 = roughly twice as fast heating; 0.0 = item in slot 0 (and block above) is set "
+                    + "instantly to the knob value (maxTemperature) in one tick; if a HeatingRecipe fires at that "
+                    + "temperature, it transforms the item normally. The knob must be set to at least the recipe's "
+                    + "required temperature for the recipe to fire.")
+            .defineInRange("heaterSpeedMultiplier", 1.0, 0.0, 10.0);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     @EventBusSubscriber(modid = TFCAeronautics.MOD_ID)
