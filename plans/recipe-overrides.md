@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 30/? ✓ (overrides + 31 envelope)
+**Прогресс:** 31/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -473,6 +473,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - кованое железо: `tfc:metal/rod/wrought_iron`, tier 3 → 1 шт.; сталь: `tfc:metal/rod/steel`, tier 4 → 2 шт. (награда за более высокий тир металлургии)
   - `simulated:handle_undye` (shapeless из тега `simulated:handle_variants`) оставлен живым — это смывка краски, а не источник железа
   - шейдинг-тегов не требуется: оба прутка — прямые item-id TFC
+- [x] `data/create/recipe/mechanical_crafting/potato_cannon.json`
+  - оригинал Create `create:mechanical_crafting` 5×2 `["LRSSS","CC   "]`: 1× `create:andesite_alloy` (L, (0,0)) + 1× `create:precision_mechanism` (R, (0,2)) + 3× `create:fluid_pipe` (S, (0,3)/(0,4)/(1,2)) + 2× tag `c:ingots/copper` (C, (1,0)/(1,1)) → 1 `create:potato_cannon` (recipe-id `create:mechanical_crafting/potato_cannon`, `accept_mirrored: true`, `category: "misc"`)
+  - новый: тот же формат, замена одного ключа — `key.L.item: create:andesite_alloy` → `key.L.tag: c:ingots/brass`. Pattern, count, recipe-id, `accept_mirrored`, `category` сохраняются
+  - мотивация: `create:andesite_alloy` — Create-only сплав (получается через mixing, но в TFC-сборке циклически недостижим без `mechanical_mixer`, который сам просит andesite_alloy). Латунь — alloy меди и цинка через TFC-alloy (`data/tfc/recipe/alloy/brass.json`), естественна для ТФК-контура (прецедент: `brass_funnel.json` / `brass_tunnel.json`). Тег `c:ingots/brass` даёт игроку выбор: и TFC-слиток `tfc:metal/ingot/brass`, и Create-слиток `create:brass_ingot` (Neo/Forge-тег уже содержит оба, подтверждено в `code_references/TerraFirmaCraft/.../c/tags/item/ingots/brass.json`)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Create'овский рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для всех override-рецептов — memory `feedback_show_notification_false.md`; прецедент в той же директории: `data/create/recipe/mechanical_crafting/crushing_wheel.json`)
+  - шейдинг-тегов не требуется: `c:ingots/brass` — общий Neo/Forge-тег, уже подключённый в датапаке; все остальные ключи (precision_mechanism, fluid_pipe) — прямые Create item-id
+  - recipe-id остаётся `create:mechanical_crafting/potato_cannon`, advancement Create (если есть) ссылается на тот же id — засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## Новые рецепты
 
