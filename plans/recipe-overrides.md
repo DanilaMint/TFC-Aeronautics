@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 29/? ✓ (overrides + 31 envelope)
+**Прогресс:** 30/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -467,6 +467,12 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - оригинал — shapeless `simulated:iron_handle` + `create:copper_nugget`; смена станка ⇒ ветка 2
   - `tfc:anvil` tier 1, ingredient `tfc:metal/rod/copper`, rules `["bend_last","bend_not_last"]`, `apply_bonus: false`
   - формат по образцу соседнего `anvil/copper_valve_handle.json`; шейдинг-тегов не требуется
+- [x] `data/tfc_aeronautics/recipe/anvil/iron_handle_wrought_iron.json` + `.../iron_handle_steel.json` (вытеснили `simulated:iron_handle` через `BANNED_RECIPES`)
+  - оригинал — shaped 1×2 `["N","A"]`: `minecraft:iron_nugget` + `create:andesite_alloy`; в TFC-сборке мёртв (andesite_alloy обходит металлургию). Смена станка ⇒ ветка 2
+  - `tfc:anvil`, rules `["bend_last","bend_not_last"]` (те же два сгиба, что у `anvil/copper_handle.json`), `apply_bonus: false`
+  - кованое железо: `tfc:metal/rod/wrought_iron`, tier 3 → 1 шт.; сталь: `tfc:metal/rod/steel`, tier 4 → 2 шт. (награда за более высокий тир металлургии)
+  - `simulated:handle_undye` (shapeless из тега `simulated:handle_variants`) оставлен живым — это смывка краски, а не источник железа
+  - шейдинг-тегов не требуется: оба прутка — прямые item-id TFC
 
 ## Новые рецепты
 

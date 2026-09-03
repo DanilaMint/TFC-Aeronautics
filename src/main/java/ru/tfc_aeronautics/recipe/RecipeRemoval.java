@@ -57,6 +57,13 @@ public final class RecipeRemoval
      * path is now the ceramic preform route:
      * {@code tfc_aeronautics:ceramic/unfired_basin} (shaped craft) →
      * {@code tfc:heating} → {@code create:basin}.
+     *
+     * <p>{@code simulated:iron_handle} is stripped because its only path is now
+     * TFC-anvil forging of a metal rod:
+     * {@code tfc_aeronautics:anvil/iron_handle_wrought_iron} (tier 3, one
+     * handle) and {@code tfc_aeronautics:anvil/iron_handle_steel} (tier 4, two
+     * handles). The {@code simulated:handle_undye} shapeless recipe stays — it
+     * strips dye off a coloured handle rather than producing iron.
      */
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
@@ -73,6 +80,7 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/basin"),
         ResourceLocation.fromNamespaceAndPath("simulated", "rope_coupling"),
         ResourceLocation.fromNamespaceAndPath("simulated", "copper_handle"),
+        ResourceLocation.fromNamespaceAndPath("simulated", "iron_handle"),
         ResourceLocation.fromNamespaceAndPath("create", "industrial_iron_block_from_ingots_iron_stonecutting")
     );
 
