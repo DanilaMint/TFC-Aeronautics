@@ -72,6 +72,7 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/mechanical_plough"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/basin"),
         ResourceLocation.fromNamespaceAndPath("simulated", "rope_coupling"),
+        ResourceLocation.fromNamespaceAndPath("simulated", "copper_handle"),
         ResourceLocation.fromNamespaceAndPath("create", "industrial_iron_block_from_ingots_iron_stonecutting")
     );
 

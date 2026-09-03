@@ -463,6 +463,10 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id остаётся `create:speedometer`, advancement Create (если есть) ссылается на тот же id — засчитывается без правок
   - **внимание к паттерну**: пустые слоты — пробелы `" "`, не `.` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException`, если Pattern ссылается на символ вне `key`; конвенция та же, что в `goggles.json` / `whisk.json` / `propeller.json` / `mechanical_piston.json`)
   - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/tfc_aeronautics/recipe/anvil/copper_handle.json` (вытеснил `simulated:copper_handle` через `BANNED_RECIPES`)
+  - оригинал — shapeless `simulated:iron_handle` + `create:copper_nugget`; смена станка ⇒ ветка 2
+  - `tfc:anvil` tier 1, ingredient `tfc:metal/rod/copper`, rules `["bend_last","bend_not_last"]`, `apply_bonus: false`
+  - формат по образцу соседнего `anvil/copper_valve_handle.json`; шейдинг-тегов не требуется
 
 ## Новые рецепты
 
