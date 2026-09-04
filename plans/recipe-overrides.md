@@ -525,6 +525,8 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `tfc:metal/sheet/gold` — прямой item-id (модель и текстура в `code_references/TerraFirmaCraft/.../assets/tfc/models/item/metal/sheet/gold.json`)
   - recipe-id остаётся `simulated:modulating_linked_receiver`, advancement Simulated по этому пути ссылается на тот же id — засчитывается без правок
   - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/simulated/recipe/white_nameplate.json`
+  - `create:andesite_alloy` → `tfc_aeronautics:composite`
 
 ## Новые рецепты
 
