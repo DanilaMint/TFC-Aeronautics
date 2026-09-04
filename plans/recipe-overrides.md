@@ -492,6 +492,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `c:ingots/brass` — общий Neo/Forge-тег, уже подключённый в датапаке; все остальные ключи (precision_mechanism, fluid_pipe) — прямые Create item-id
   - recipe-id остаётся `create:mechanical_crafting/potato_cannon`, advancement Create (если есть) ссылается на тот же id — засчитывается без правок
   - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/simulated/recipe/mechanical_crafting/linked_typewriter.json`
+  - оригинал Simulated `create:mechanical_crafting` 5×3 `BBBBT/BBBBB/" GPG "` (`accept_mirrored: true`, `category: "misc"`): 9× tag `minecraft:buttons` (B) + 2× `create:golden_sheet` (G, (2,1)/(2,3)) + 1× `create:precision_mechanism` (P, (2,2)) + 1× `create:transmitter` (T, (0,4)) → 1 `simulated:linked_typewriter` (recipe-id `simulated:mechanical_crafting/linked_typewriter`)
+  - новый: тот же `mechanical_crafting`, ключ `G` расщеплён на два разных ключа — `L` = `tfc:metal/sheet/brass` (left, (2,1)) и `R` = `tfc:metal/sheet/gold` (right, (2,3)). Pattern `" GPG "` → `" LPR "`, остальные ключи/слоты без изменений. `accept_mirrored: true` сохранён (с разными L/R зеркалирование автоматически не сматчится — LPR ≠ RPL; формат оригинала сохранён)
+  - мотивация: `create:golden_sheet` — Create-only золотой лист (требует mechanical press, недостижимо в TFC); `tfc:metal/sheet/brass` (латунь tier 2) и `tfc:metal/sheet/gold` (золото через TFC anvil) — оба прямые TFC-предметы из естественного металлургического пути. Асимметричная раскладка подчёркивает назначение механизма (linked_typewriter — сетевая пишущая машинка, два разных металла по сторонам — визуальный сигнал о двух разных интерфейсах)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Simulated-овский рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция)
+  - шейдинг-тегов не требуется: `tfc:metal/sheet/brass` и `tfc:metal/sheet/gold` — прямые item-id (модели и текстуры в `code_references/TerraFirmaCraft/.../assets/tfc/models/item/metal/sheet/{brass,gold}.json`)
+  - recipe-id остаётся `simulated:mechanical_crafting/linked_typewriter`
+  - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew build` BUILD SUCCESSFUL, JAR установлен в `~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/tfc-aeronautics-dev/minecraft/mods/tfc_aeronautics-0.7.0.jar`
 
 ## Новые рецепты
 

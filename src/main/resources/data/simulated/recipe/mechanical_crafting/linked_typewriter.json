@@ -1,0 +1,32 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": true,
+  "category": "misc",
+  "key": {
+    "B": {
+      "tag": "minecraft:buttons"
+    },
+    "L": {
+      "item": "tfc:metal/sheet/brass"
+    },
+    "P": {
+      "item": "create:precision_mechanism"
+    },
+    "R": {
+      "item": "tfc:metal/sheet/gold"
+    },
+    "T": {
+      "item": "create:transmitter"
+    }
+  },
+  "pattern": [
+    "BBBBT",
+    "BBBBB",
+    " LPR "
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:linked_typewriter"
+  },
+  "show_notification": false
+}
