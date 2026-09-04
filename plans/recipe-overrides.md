@@ -516,6 +516,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `tfc:metal/sheet/brass` и `tfc:metal/sheet/gold` — прямые item-id (модели и текстуры в `code_references/TerraFirmaCraft/.../assets/tfc/models/item/metal/sheet/{brass,gold}.json`)
   - recipe-id остаётся `simulated:mechanical_crafting/linked_typewriter`
   - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew build` BUILD SUCCESSFUL, JAR установлен в `~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/tfc-aeronautics-dev/minecraft/mods/tfc_aeronautics-0.7.0.jar`
+- [x] `data/simulated/recipe/modulating_linked_receiver.json`
+  - оригинал Simulated `minecraft:crafting_shaped` 1×3 `["A","B","C"]`: 1× `create:transmitter` (A) + 1× `create:golden_sheet` (B) + 1× `create:brass_casing` (C) → 1 `simulated:modulating_linked_receiver` (recipe-id `simulated:modulating_linked_receiver`)
+  - новый: тот же `crafting_shaped` 1×3 — заменён **только** ключ `B`: 1× `create:transmitter` (A) + 1× `tfc:metal/sheet/gold` (B) + 1× `create:brass_casing` (C) → 1 `simulated:modulating_linked_receiver`. Pattern, count, recipe-id, `category` не тронуты — pure ingredient swap, без reshape
+  - мотивация: `create:golden_sheet` — Create-only золотой лист (требует mechanical press, недостижимо в TFC); `tfc:metal/sheet/gold` — прямой TFC-предмет из естественного металлургического пути (золото через TFC anvil). Прецедент — `data/simulated/recipe/mechanical_crafting/linked_typewriter.json` с тем же свапом `create:golden_sheet → tfc:metal/sheet/gold` (только правый ключ R, рядом — `data/simulated/recipe/directional_linked_receiver.json` с тем же pattern `["A","B","C"]` и `create:transmitter`/`create:brass_casing` сверху/снизу, но с iron_sheet вместо gold)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Simulated-овский рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция)
+  - шейдинг-тегов не требуется: `tfc:metal/sheet/gold` — прямой item-id (модель и текстура в `code_references/TerraFirmaCraft/.../assets/tfc/models/item/metal/sheet/gold.json`)
+  - recipe-id остаётся `simulated:modulating_linked_receiver`, advancement Simulated по этому пути ссылается на тот же id — засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## Новые рецепты
 

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "A": {
+      "item": "create:transmitter"
+    },
+    "B": {
+      "item": "tfc:metal/sheet/gold"
+    },
+    "C": {
+      "item": "create:brass_casing"
+    }
+  },
+  "pattern": [
+    "A",
+    "B",
+    "C"
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:modulating_linked_receiver"
+  }
+}
