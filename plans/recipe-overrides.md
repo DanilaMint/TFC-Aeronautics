@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 31/? ✓ (overrides + 31 envelope)
+**Прогресс:** 32/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -623,6 +623,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется
   - **осознанный побочный эффект:** `create:copper_sheet` теперь недобываем; ломаются три ещё не переопределённых потребителя — `create:crafting/kinetics/hose_pulley` (тег `c:plates/copper`; и так мёртв из-за `minecraft:dried_kelp_block`), `simulated:redstone_magnet`, `aeronautics:mounted_potato_cannon`. См. TODO ниже
   - `pressing/tight_sheet_{copper,steel,wrought_iron}.json` не тронуты — другие recipe-id
+- [x] `data/simulated/recipe/directional_linked_receiver.json`
+  - оригинал Simulated shaped 1×3 `["A","B","C"]`: 1× `create:transmitter` (A) + 1× `create:iron_sheet` (B) + 1× `create:brass_casing` (C) → 1 `simulated:directional_linked_receiver`
+  - новый: тот же pattern, ключ `B = tfc_aeronautics:metal/tight_sheet/wrought_iron` → 1 `simulated:directional_linked_receiver`
+  - мотивация: `create:iron_sheet` — Create-only железный лист (требует mechanical press, недостижимо в TFC); `tfc_aeronautics:metal/tight_sheet/wrought_iron` — кованый железный лист (100 мБ vs 200 мБ для `tfc:metal/sheet/*`), естественно ложится в TFC-металлургический путь (tier 3 wrought_iron через TFC anvil `data/tfc_aeronautics/recipe/anvil/tight_sheet_wrought_iron.json` или pressing). Прецедент — `data/create/recipe/crafting/kinetics/chute.json` / `fluid_valve.json` / `propeller.json` и `data/simulated/recipe/sequenced_assembly/gyroscopic_mechanism.json` с тем же свапом
+  - структурно — простой sub-recipe override (как `throttle_lever.json` / `rope_winch.json` / `navigation_table.json`): pattern и аутпут неизменны, поменялся только один ингредиент
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Simulated-овский рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для sub-recipe override'ов — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/wrought_iron` — прямой item-id из `src/main/java/ru/tfc_aeronautics/metal/TightSheet.java:32`
+  - recipe-id остаётся `simulated:directional_linked_receiver`, advancement `data/simulated/advancement/recipes/misc/directional_linked_receiver.json` (recipe-trigger) ссылается на тот же id — засчитывается без правок
 
 ## TODO (новые добавлять сюда)
 
