@@ -88,6 +88,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: оба ингредиента — прямые item-id
   - recipe-id остаётся `create:crafting/kinetics/gearshift`, advancement Create засчитывается без правок
   - **проверено**: `./gradlew compileJava` UP-TO-DATE, JSON валиден (`python3 -c 'json.load(...)'` OK), сборка `./build.sh install` прошла, JAR установился в `~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/tfc-aeronautics-dev/minecraft/mods/tfc_aeronautics-0.5.0.jar`
+- [x] `data/simulated/recipe/throttle_lever.json`
+  - оригинал Simulated shaped 1×2 `["S", "B"]` с `minecraft:stick` (S) + `create:brass_casing` (B) → 1 `simulated:throttle_lever`
+  - новый: тот же pattern, ключ `S = #c:rods/wooden` → 1 `simulated:throttle_lever`
+  - мотивация: `minecraft:stick` в TFC-сборке труднодоступен (knapping, не базовый ресурс); `#c:rods/wooden` — common-тег из 20 TFC-twigs (`tfc:wood/twig/<wood>`), естественная «любая палка» в TFC-контексте. Прецедент — `create:crafting/kinetics/analog_lever` в самом Create использует тот же тег
+  - структурно — простой sub-recipe override: формат остался shaped 1×2, поменялся только один ингредиент
+  - `show_notification: false` (конвенция проекта для shaped-сабсвапов)
+  - шейдинг-тегов не требуется: `#c:rods/wooden` — common-тег из датапака TFC, уже используется в `white_sail.json` / `controller_rail.json` override'ах нашего мода
+  - recipe-id остаётся `simulated:throttle_lever`, advancement `data/simulated/advancement/recipes/misc/throttle_lever.json` ссылается на этот же recipe-id — засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -c 'import json; json.load(...)'` OK), `./gradlew compileJava` UP-TO-DATE
 - [x] `data/simulated/recipe/directional_gearshift.json`
   - оригинал Simulated shapeless `create:andesite_casing` + `create:cogwheel` + `minecraft:redstone_torch` + `create:shaft` → 1 `simulated:directional_gearshift`
   - новый shapeless: `create:clutch` + `create:gearshift` + tag `c:dusts/redstone` → 2 `simulated:directional_gearshift`
