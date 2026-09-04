@@ -483,6 +483,12 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - кованое железо: `tfc:metal/rod/wrought_iron`, tier 3 → 1 шт.; сталь: `tfc:metal/rod/steel`, tier 4 → 2 шт. (награда за более высокий тир металлургии)
   - `simulated:handle_undye` (shapeless из тега `simulated:handle_variants`) оставлен живым — это смывка краски, а не источник железа
   - шейдинг-тегов не требуется: оба прутка — прямые item-id TFC
+- [x] `data/tfc_aeronautics/recipe/anvil/spring.json` (вытеснил `simulated:spring` через `BANNED_RECIPES`)
+  - оригинал — Simulated shaped `["S","N","S"]`: 2× `create:iron_sheet` + 1× `minecraft:iron_nugget` → 2; в TFC-сборке мёртв (`create:iron_sheet` — Create-only переименованный `create:iron_plate`, требует mechanical press). Смена станка ⇒ ветка 2
+  - `tfc:anvil`, rules `["bend_last","bend_not_last","bend_not_last"]` (три сгиба — расширение паттерна `iron_handle_steel.json` ещё одним bend_not_last), `apply_bonus: false`
+  - сталь: `tfc:metal/rod/steel`, tier 4 → 2 шт. (естественный TFC-металлургический путь; прецедент по тому же ингредиенту/выходу — `iron_handle_steel.json`)
+  - шейдинг-тегов не требуется: `tfc:metal/rod/steel` — прямой item-id TFC
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
 - [x] `data/create/recipe/mechanical_crafting/potato_cannon.json`
   - оригинал Create `create:mechanical_crafting` 5×2 `["LRSSS","CC   "]`: 1× `create:andesite_alloy` (L, (0,0)) + 1× `create:precision_mechanism` (R, (0,2)) + 3× `create:fluid_pipe` (S, (0,3)/(0,4)/(1,2)) + 2× tag `c:ingots/copper` (C, (1,0)/(1,1)) → 1 `create:potato_cannon` (recipe-id `create:mechanical_crafting/potato_cannon`, `accept_mirrored: true`, `category: "misc"`)
   - новый: тот же формат, замена одного ключа — `key.L.item: create:andesite_alloy` → `key.L.tag: c:ingots/brass`. Pattern, count, recipe-id, `accept_mirrored`, `category` сохраняются

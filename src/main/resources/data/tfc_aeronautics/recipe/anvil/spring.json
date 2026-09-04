@@ -1,0 +1,17 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {
+    "item": "tfc:metal/rod/steel"
+  },
+  "result": {
+    "count": 2,
+    "id": "simulated:spring"
+  },
+  "rules": [
+    "bend_last",
+    "bend_not_last",
+    "bend_not_last"
+  ],
+  "apply_bonus": false,
+  "tier": 4
+}

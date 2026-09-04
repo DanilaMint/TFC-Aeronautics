@@ -65,6 +65,13 @@ public final class RecipeRemoval
      * handles). The {@code simulated:handle_undye} shapeless recipe stays — it
      * strips dye off a coloured handle rather than producing iron.
      *
+     * <p>{@code simulated:spring} is stripped because its only path is now
+     * TFC-anvil forging of a steel rod:
+     * {@code tfc_aeronautics:anvil/spring} (tier 4, three bends, two
+     * springs). The vanilla shaped recipe is dead in TFC builds
+     * ({@code create:iron_sheet} requires mechanical press), and the rod
+     * triple-bend yields the same two-spring output as the original.
+     *
      * <p>{@code create:pressing/copper_ingot} is stripped so that pressing a
      * copper ingot yields only {@code tfc_aeronautics:metal/tight_sheet/copper}
      * via {@code create:pressing/tight_sheet_copper}. Both recipes matched the
@@ -89,6 +96,7 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("simulated", "rope_coupling"),
         ResourceLocation.fromNamespaceAndPath("simulated", "copper_handle"),
         ResourceLocation.fromNamespaceAndPath("simulated", "iron_handle"),
+        ResourceLocation.fromNamespaceAndPath("simulated", "spring"),
         ResourceLocation.fromNamespaceAndPath("create", "industrial_iron_block_from_ingots_iron_stonecutting")
     );
 
