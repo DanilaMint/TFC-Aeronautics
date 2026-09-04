@@ -630,7 +630,7 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - мотивация: на том же входе `c:ingots/copper` уже висел наш `create:pressing/tight_sheet_copper` → `tfc_aeronautics:metal/tight_sheet/copper`, и Create выбирал первый подошедший — прессование медного слитка было недетерминировано. `create:copper_sheet` в TFC-сборке лишний (Create-only лист, дублирует tight sheet)
   - **чистое удаление** (не ветка 1 и не ветка 2): datapack-тень переопределяет, а не удаляет, поэтому единственный путь — `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java` (прецедент `create:crafting/kinetics/encased_chain_drive_from_zinc`)
   - шейдинг-тегов не требуется
-  - **осознанный побочный эффект:** `create:copper_sheet` теперь недобываем; ломаются три ещё не переопределённых потребителя — `create:crafting/kinetics/hose_pulley` (тег `c:plates/copper`; и так мёртв из-за `minecraft:dried_kelp_block`), `simulated:redstone_magnet`, `aeronautics:mounted_potato_cannon`. См. TODO ниже
+  - **осознанный побочный эффект:** `create:copper_sheet` теперь недобываем; ломаются два ещё не переопределённых потребителя — `create:crafting/kinetics/hose_pulley` (тег `c:plates/copper`; и так мёртв из-за `minecraft:dried_kelp_block`) и `aeronautics:mounted_potato_cannon`. `simulated:redstone_magnet` переопределён выше (на `tight_sheet/copper`). См. TODO ниже
   - `pressing/tight_sheet_{copper,steel,wrought_iron}.json` не тронуты — другие recipe-id
 - [x] `data/simulated/recipe/directional_linked_receiver.json`
   - оригинал Simulated shaped 1×3 `["A","B","C"]`: 1× `create:transmitter` (A) + 1× `create:iron_sheet` (B) + 1× `create:brass_casing` (C) → 1 `simulated:directional_linked_receiver`
@@ -641,12 +641,13 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция проекта для sub-recipe override'ов — memory `feedback_show_notification_false.md`)
   - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/wrought_iron` — прямой item-id из `src/main/java/ru/tfc_aeronautics/metal/TightSheet.java:32`
   - recipe-id остаётся `simulated:directional_linked_receiver`, advancement `data/simulated/advancement/recipes/misc/directional_linked_receiver.json` (recipe-trigger) ссылается на тот же id — засчитывается без правок
+- [x] `data/simulated/recipe/redstone_magnet.json`
+  - `create:copper_sheet` → `tfc_aeronautics:metal/tight_sheet/copper`
 
 ## TODO (новые добавлять сюда)
 
 - [ ] Перевести потребителей `create:copper_sheet` / тега `c:plates/copper` на `tfc_aeronautics:metal/tight_sheet/copper` — предмет стал недобываем после бана `create:pressing/copper_ingot`:
   - `create:crafting/kinetics/hose_pulley` (заодно `minecraft:dried_kelp_block`, из-за которого рецепт мёртв и без этого)
-  - `simulated:redstone_magnet`
   - `aeronautics:mounted_potato_cannon` (mechanical crafting)
 
 - [ ]

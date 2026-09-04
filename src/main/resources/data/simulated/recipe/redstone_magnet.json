@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "show_notification": false,
+  "ingredients": [
+    {
+      "item": "minecraft:redstone"
+    },
+    {
+      "item": "tfc_aeronautics:metal/tight_sheet/copper"
+    },
+    {
+      "item": "create:industrial_iron_block"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:redstone_magnet"
+  }
+}
