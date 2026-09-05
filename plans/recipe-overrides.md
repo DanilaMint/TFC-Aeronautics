@@ -527,6 +527,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 - [x] `data/simulated/recipe/white_nameplate.json`
   - `create:andesite_alloy` → `tfc_aeronautics:composite`
+- [x] `data/create/recipe/crafting/kinetics/spout.json`
+  - оригинал Create `minecraft:crafting_shaped` 2×1 `["T","P"]`: 1× `create:copper_casing` (T) + 1× `minecraft:dried_kelp` (P) → 1 `create:spout` (recipe-id `create:crafting/kinetics/spout`)
+  - новый: тот же `crafting_shaped` 2×1 — заменён **только** ключ `P`: 1× `create:copper_casing` (T) + 1× `create:fluid_pipe` (P) → 1 `create:spout`. Pattern, count, recipe-id, `category` не тронуты — pure ingredient swap, без reshape
+  - мотивация: `minecraft:dried_kelp` — пищевой ресурс, семантически неуместный как «выходной патрубок»; `create:fluid_pipe` — базовая медная труба (уже ингредиент в `fluid_valve.json` / `smart_fluid_pipe.json`), отражает устройство spout (направляет жидкость из трубы)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Create-овский рецепт автоматически
+  - `show_notification: false` (конвенция)
+  - шейдинг-тегов не требуется: `create:fluid_pipe` — прямой item-id
+  - recipe-id остаётся `create:crafting/kinetics/spout`, advancement Create по этому пути ссылается на тот же id — засчитывается без правок
 
 ## Новые рецепты
 

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "P": {
+      "item": "create:fluid_pipe"
+    },
+    "T": {
+      "item": "create:copper_casing"
+    }
+  },
+  "pattern": [
+    "T",
+    "P"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:spout"
+  }
+}
