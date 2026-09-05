@@ -543,6 +543,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция для sub-recipe overrides — memory `feedback_show_notification_false.md`)
   - **собственный тег в нашем namespace**: `tfc_aeronautics:bars` (`src/main/resources/data/tfc_aeronautics/tags/item/bars.json`) — не шейдим `tfc:metal/bars` (его не существует в датапаке TFC). Прецедент — `tfc_aeronautics:gem` для `optical_sensor` (§19 DOCS.md, prose-блок)
   - recipe-id остаётся `create:crafting/kinetics/item_drain`, advancement Create по этому пути ссылается на тот же id — засчитывается без правок
+- [x] `data/create/recipe/crafting/kinetics/gantry_shaft.json`
+  - оригинал Create `crafting_shaped` 1×3 `["A","R","A"]`: 1× `create:andesite_alloy` (A) + тег `c:dusts/redstone` (R) → 8× `create:gantry_shaft`. В TFC-сборке фактически мёртв — `create:andesite_alloy` Create-only
+  - новый `crafting_shapeless`: 8× `create:shaft` + 1× `minecraft:redstone` → 8× `create:gantry_shaft`
+  - мотивация: gantry_shaft — усиленный вал с редстоун-начинкой; в TFC-мире естественно получать его из обычных валов + ванильного редстоуна (redstone в TFC — стандартный пылевидный материал через quern/barrel, а не Create-only `c:dusts/redstone`). Без `create:andesite_alloy` (Create-only сплав), без tag-шейдинга — оба ингредиента — прямые item-id. Выход ×8 сохранён
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция)
+  - шейдинг-тегов не требуется: `create:shaft` и `minecraft:redstone` — прямые item-id
+  - recipe-id остаётся `create:crafting/kinetics/gantry_shaft`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/gantry_shaft.json` засчитывается без правок
 
 ## Новые рецепты
 
