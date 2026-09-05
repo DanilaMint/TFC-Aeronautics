@@ -551,6 +551,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция)
   - шейдинг-тегов не требуется: `create:shaft` и `minecraft:redstone` — прямые item-id
   - recipe-id остаётся `create:crafting/kinetics/gantry_shaft`, advancement `data/create/advancement/recipes/misc/crafting/kinetics/gantry_shaft.json` засчитывается без правок
+- [x] `data/create/recipe/crafting/kinetics/elevator_pulley.json`
+  - оригинал Create shaped 1×3 `["B","C","I"]`: 1× `create:brass_casing` (B) + 1× `minecraft:dried_kelp_block` (C) + 1× tag `#c:plates/iron` (I) → 1 `create:elevator_pulley` (recipe-id `create:crafting/kinetics/elevator_pulley`). В TFC-сборке мёртв: `minecraft:dried_kelp_block` без естественного источника (морские биомы нестандартны), `c:plates/iron` пуст по TFC-конвенции (металл идёт через `c:plates/<metal>` и `tfc:metal/sheet/<metal>`)
+  - новый TFC-style shaped 3×3 `["RBR","RRR","RSR"]`: 1× `create:brass_casing` (B, верх-середина) + 1× `tfc:metal/sheet/wrought_iron` (S, низ-середина) + 7× `tfc:rope` (R, остальные: 4 угла + 2 бока + центр) → 1 `create:elevator_pulley`
+  - мотивация: точная структурная копия `rope_pulley.json` (rope_pulley — andesite, elevator_pulley — brass; оба «грузоподъёмных» кинематических блока разделяют одну раскладку `R?R/RRR/RSR`). В TFC `tfc:rope` — естественный заменитель dried_kelp/wool как «подвес» в механизме; `create:brass_casing` легален (item_application `data/create/recipe/item_application/tfc_aeronautics_brass_casing.json` — stripped_logs + `c:ingots/brass`); `tfc:metal/sheet/wrought_iron` — кованый металл вместо Create-only iron plate. Rope по углам/бокам/центру подчёркивает «грузоподъёмную» суть блока
+  - структурно — **TFC-style reshape** (shaped 1×3 → shaped 3×3), как `rope_pulley.json`. **Ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (structural reshape, конвенция проекта, как у `rope_pulley.json`)
+  - шейдинг-тегов не требуется: `create:brass_casing`, `tfc:metal/sheet/wrought_iron`, `tfc:rope` — прямые item-id (brass_casing уже зашаден в datapack; rope — стандартный TFC-предмет, уже использован в `rope_pulley.json` / `white_envelope.json` / `nozzle.json`; sheet — из TFC anvil)
+  - recipe-id остаётся `create:crafting/kinetics/elevator_pulley`, advancement Create засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` UP-TO-DATE
 
 ## Новые рецепты
 
