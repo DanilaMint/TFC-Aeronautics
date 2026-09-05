@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "P": {
+      "tag": "tfc_aeronautics:bars"
+    },
+    "S": {
+      "item": "create:copper_casing"
+    }
+  },
+  "pattern": [
+    "P",
+    "S"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:item_drain"
+  }
+}

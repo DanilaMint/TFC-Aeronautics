@@ -535,6 +535,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция)
   - шейдинг-тегов не требуется: `create:fluid_pipe` — прямой item-id
   - recipe-id остаётся `create:crafting/kinetics/spout`, advancement Create по этому пути ссылается на тот же id — засчитывается без правок
+- [x] `data/create/recipe/crafting/kinetics/item_drain.json`
+  - оригинал Create `minecraft:crafting_shaped` 1×2 `["P","S"]`: 1× `minecraft:iron_bars` (P) + 1× `create:copper_casing` (S) → 1 `create:item_drain` (recipe-id `create:crafting/kinetics/item_drain`)
+  - новый: тот же `crafting_shaped` 1×2 — заменён **только** ключ `P`: 1× `#tfc_aeronautics:bars` (P) + 1× `create:copper_casing` (S) → 1 `create:item_drain`. Pattern, count, recipe-id, `category` не тронуты — pure ingredient swap, без reshape
+  - мотивация: `minecraft:iron_bars` в TFC-сборке стилистически чужеродны — железо приходит через per-metal TFC-цепочку кованых оградок (`tfc:metal/bars/<metal>`, 9 металлов: bismuth_bronze/black_bronze/black_steel/blue_steel/bronze/copper/red_steel/steel/wrought_iron). Любая из них подходит — item_drain = «воронка для жидкости», семантически «любая оградка-фильтр сверху»
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Create-овский рецепт автоматически (конвенция: см. `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция для sub-recipe overrides — memory `feedback_show_notification_false.md`)
+  - **собственный тег в нашем namespace**: `tfc_aeronautics:bars` (`src/main/resources/data/tfc_aeronautics/tags/item/bars.json`) — не шейдим `tfc:metal/bars` (его не существует в датапаке TFC). Прецедент — `tfc_aeronautics:gem` для `optical_sensor` (§19 DOCS.md, prose-блок)
+  - recipe-id остаётся `create:crafting/kinetics/item_drain`, advancement Create по этому пути ссылается на тот же id — засчитывается без правок
 
 ## Новые рецепты
 
