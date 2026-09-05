@@ -560,6 +560,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `create:brass_casing`, `tfc:metal/sheet/wrought_iron`, `tfc:rope` — прямые item-id (brass_casing уже зашаден в datapack; rope — стандартный TFC-предмет, уже использован в `rope_pulley.json` / `white_envelope.json` / `nozzle.json`; sheet — из TFC anvil)
   - recipe-id остаётся `create:crafting/kinetics/elevator_pulley`, advancement Create засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` UP-TO-DATE
+- [x] `data/create/recipe/crafting/kinetics/cart_assembler.json`
+  - оригинал Create shaped 2×3 `["CRC","L L"]` с `create:andesite_alloy` (C) + `#minecraft:logs` (L) + `#c:dusts/redstone` (R) → 1 `create:cart_assembler` (recipe-id `create:crafting/kinetics/cart_assembler`). В TFC-сборке мёртв: `andesite_alloy` — Create-only сплав, циклически требует mechanical mixer
+  - новый: тот же pattern `["CRC","L L"]`, заменён **только** ключ `C`: `tfc_aeronautics:composite` (C) + `#minecraft:logs` (L) + `#c:dusts/redstone` (R) → 1 `create:cart_assembler`. Pattern, count, recipe-id, `category` не тронуты — pure ingredient swap, без reshape
+  - мотивация: `create:andesite_alloy` в TFC-сборке недоступен (Create-only сплав, циклически требует mechanical mixer); `tfc_aeronautics:composite` (Industrial Composite) — наш аналог, TFC barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`. Тот же свап, что в `hand_crank.json` / `piston_extension_pole.json` / `linear_chassis.json` / `radial_chassis.json` / `crushing_wheel.json` / `adjustable_burner.json` / `steam_vent.json`
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Create-овский рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для всех sub-recipe overrides — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: `#minecraft:logs` уже в датапаке (20 TFC-пород), `#c:dusts/redstone` — common-тег, `tfc_aeronautics:composite` — прямой item-id из `composite/CompositeRegistration.java:28`
+  - recipe-id остаётся `create:crafting/kinetics/cart_assembler`, advancement Create (если есть) ссылается на тот же id — засчитывается без правок
 
 ## Новые рецепты
 
