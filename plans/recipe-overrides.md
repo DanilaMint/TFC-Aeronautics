@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 32/? ✓ (overrides + 31 envelope)
+**Прогресс:** 33/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -531,6 +531,19 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 - [x] `data/simulated/recipe/white_nameplate.json`
   - `create:andesite_alloy` → `tfc_aeronautics:composite`
+- [x] `data/create/recipe/crafting/kinetics/display_board.json`
+  - `create:andesite_alloy` → `tfc_aeronautics:composite`
+  - `show_notification: false` (конвенция). **Ветка 1** скилла `recipe-override`
+    (recipe-id в namespace `create`, без `BANNED_RECIPES`). Шейдинг-тегов не
+    требуется: `tfc_aeronautics:composite` — прямой item-id, `create:electron_tube`
+    — ингредиент, не требующий правок (уже overridden через наш
+    `data/tfc_aeronautics/recipe/sequenced_assembly/electron_tube.json`)
+  - прецедент: `hand_crank.json` / `piston_extension_pole.json` /
+    `linear_chassis.json` / `radial_chassis.json` / `white_sail.json` /
+    `andesite_funnel.json` / `andesite_tunnel.json` / `crushing_wheel.json` /
+    `andesite_casing.json` — тот же свап
+  - recipe-id `create:crafting/kinetics/display_board` сохраняется,
+    advancement Create засчитывается без правок
 - [x] `data/create/recipe/crafting/kinetics/spout.json`
   - оригинал Create `minecraft:crafting_shaped` 2×1 `["T","P"]`: 1× `create:copper_casing` (T) + 1× `minecraft:dried_kelp` (P) → 1 `create:spout` (recipe-id `create:crafting/kinetics/spout`)
   - новый: тот же `crafting_shaped` 2×1 — заменён **только** ключ `P`: 1× `create:copper_casing` (T) + 1× `create:fluid_pipe` (P) → 1 `create:spout`. Pattern, count, recipe-id, `category` не тронуты — pure ingredient swap, без reshape
