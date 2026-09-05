@@ -34,6 +34,10 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `minecraft:dried_kelp` → `tfc:cloths`
 - [x] `data/create/recipe/crafting/logistics/andesite_tunnel.json`
   - `minecraft:dried_kelp` → `tfc:cloths`
+- [x] `data/create/recipe/crafting/logistics/item_hatch.json`
+  - `create:andesite_alloy` → array `[tfc_aeronautics:metal/tight_sheet/steel, tfc:metal/sheet/wrought_iron]` (любой из двух)
+  - `minecraft:iron_trapdoor` → array из 9 TFC металлических люков (bismuth_bronze / black_bronze / black_steel / blue_steel / bronze / copper / red_steel / steel / wrought_iron)
+  - inline-array ingredients (vanilla 1.21.1 синтаксис «любой из»). Recipe-id и advancement Create сохраняются без правок
 - [x] `data/create/recipe/crafting/kinetics/water_wheel.json`
   - pattern Create `["SSS","SCS","SSS"]` (8× `#minecraft:planks` + 1× `create:shaft`) → TFC-style `["LPL","PAP","LPL"]` (4× `#tfc:lumber` + 4× `#minecraft:planks` + 1× `create:shaft`): lumber по углам, planks на боках, вал в центре
   - ключ `A` = `create:shaft` (центр; в оригинале это был ключ `C` — заменили только букву, предмет тот же)
