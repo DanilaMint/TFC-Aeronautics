@@ -105,5 +105,7 @@
   "item.tfc_aeronautics.wood.bracket.spruce": "Spruce Bracket",
   "item.tfc_aeronautics.wood.bracket.sycamore": "Sycamore Bracket",
   "item.tfc_aeronautics.wood.bracket.white_cedar": "White Cedar Bracket",
-  "item.tfc_aeronautics.wood.bracket.willow": "Willow Bracket"
+  "item.tfc_aeronautics.wood.bracket.willow": "Willow Bracket",
+  "jei.tfc_aeronautics.distillation": "Distillation",
+  "jei.tfc_aeronautics.distillation.temp": "Temp: %1$d°C – %2$d°C"
 }

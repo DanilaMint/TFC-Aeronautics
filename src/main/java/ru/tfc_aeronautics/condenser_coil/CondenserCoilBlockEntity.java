@@ -319,8 +319,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
 
         // 4. WARMUP → wait out the timer (any fluid change resets it).
         if (state == State.WARMUP) {
-            if (!ensureActiveRecipe(controller)) {
-                state = State.IDLE;
+            if (!requireActiveRecipe(controller, State.WARMUP)) {
                 return;
             }
             FluidStack tankFluid = readTankFluid(controller);
@@ -385,12 +384,11 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
 
         // 5. RUNNING → produce.
         if (state == State.RUNNING) {
-            if (!ensureActiveRecipe(controller)) {
+            if (!requireActiveRecipe(controller, State.RUNNING)) {
                 // Couldn't recover the recipe after load — drain residual input
                 // back to nothing and drop to IDLE so the player can restart
                 // cleanly. Anything we already produced is lost; the tank lock
                 // is released by the structure-invalid branch on the next tick.
-                state = State.IDLE;
                 return;
             }
             if (!hasCoolantFlow || !activeRecipe.temperatureInRange(heatTempC)) {
@@ -756,6 +754,39 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
             "condenser_coil: post-load recipe re-resolved at {}: recipe={}",
             worldPosition, activeRecipe);
         return true;
+    }
+
+    /**
+     * Defensive guard for the WARMUP/RUNNING hot-path branches that read
+     * {@link #activeRecipe}. On null, logs a warning with enough context to
+     * triangulate the regression (state, tank fluid amount, controller pos)
+     * and returns {@code false} so the caller can transition to
+     * {@link State#IDLE} and return.
+     *
+     * <p>Replaces the silent {@code NullPointerException} the pre-fix coil
+     * threw on a state-mismatch (e.g. after a save/load where {@code state}
+     * restored as {@code WARMUP}/{@code RUNNING} but the recipe manager has
+     * no matching recipe for the current tank fluid). The original behaviour
+     * was a server-side crash; this gives the player a clean transition to
+     * IDLE plus a WARN log line so a recurrence can be diagnosed.
+     */
+    private boolean requireActiveRecipe(FluidTankBlockEntity controller, State expected) {
+        if (activeRecipe != null) {
+            return true;
+        }
+        int tankAmount = -1;
+        if (controller != null) {
+            FluidStack fluid = controller.getTankInventory().getFluid();
+            tankAmount = fluid != null ? fluid.getAmount() : -1;
+        }
+        TFCAeronautics.LOGGER.warn(
+            "condenser_coil: activeRecipe null in {} branch at {} — falling back to IDLE "
+                + "(tankFluidAmount={}, controllerPos={}, state={}). "
+                + "If this recurs, capture the previous tick's DEBUG log for the recipe re-resolution path.",
+            expected, worldPosition, tankAmount, tankControllerPos, state);
+        state = State.IDLE;
+        activeRecipe = null;
+        return false;
     }
 
     /**

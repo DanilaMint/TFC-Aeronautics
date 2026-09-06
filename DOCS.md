@@ -3964,11 +3964,47 @@ TagKey.codec(Registries.FLUID).fieldOf("tag"))`.
 |------|-----|----------|------------|
 | `distillationWarmupTicks` | int | 0…72000 | Длительность `WARMUP` (200 = 10 с при 20 тик/с). |
 
+### JEI-категория
+
+Дистилляция зарегистрирована в JEI через плагин
+`ru.aeronautics.client.jei.DistillationJeiPlugin` (`@JeiPlugin`). Категория
+одна, отображает три слота жидкостей по горизонтали:
+
+```text
+[ input fluid ] → [ result fluid ] [ residue fluid ]
+                       Temp: %1$d°C – %2$d°C
+```
+
+Реализация:
+
+- **Катализатор** — `condenser_coil` (item-форма блока). Игрок видит
+  категорию в JEI при наведении на блок змеевика.
+- **Слоты** — `builder.addSlot(INPUT, ...)` для жидкости-входа,
+  два `OUTPUT` слота справа для `result` и `residue`. Объём каждого
+  фиксированный — 1000 mB (один ведро-эквивалент) — для согласованного
+  рендера; реальный объём вычисляется в BE по `result_percent`.
+- **Тег-ветка input'а** — если рецепт использует `{"tag": "..."}`,
+  слот вмещает **все** жидкости тега, JEI сам листает их по фокусу.
+  Резолв — `level.registryAccess().lookupOrThrow(Registries.FLUID)
+  .getTag(tag)`.
+- **Температурный текст** — через `createRecipeExtras(builder, recipe,
+  focuses) → builder.addText(translated, x, y)`. Не через `draw(...)` —
+  текстовый widget знает свой Z-order и не ломается при будущих
+  изменениях фона.
+
+Зависимость `compileOnly files('libs/jei-1.21.1-neoforge-19.27.0.343.jar')`
+в `build.gradle` (рядом с TFC/Create). Если JEI отсутствует в модпаке,
+плагин просто не загружается — никаких крашей при старте.
+
+Локализация — два ключа в `en_us.json` / `ru_ru.json`:
+
+| Ключ | en_us | ru_ru |
+|------|-------|-------|
+| `jei.tfc_aeronautics.distillation` | `Distillation` | `Дистилляция` |
+| `jei.tfc_aeronautics.distillation.temp` | `Temp: %1$d°C – %2$d°C` | `Температура: %1$d°C – %2$d°C` |
+
 ### Что НЕ сделано в этой итерации
 
-- **JEI-категория** — JEI в моде вообще не подключён (`build.gradle` без
-  зависимости, `src/client/java/.../jei/` пустой). Это инфраструктурная
-  задача, не специфичная для дистилляции.
 - **Ponder-сцена** — `.nbt`-схематику нельзя собрать без запуска игры, а
   запуск игры запрещён правилами репозитория (см. CLAUDE.md).
 - **Готовые рецепты и сами жидкости** (`ethanol`, `stillage` и т.п.) —

@@ -19,7 +19,7 @@
 - [Spirit Burner](plans/spirit-burner.md) — 0/26 ☐
 - [Combustion Engine](plans/combustion-engine.md) — 0/22 ☐
 - [Stamping Press](plans/stamping-press.md) — 25/27 ⏳
-- [Condenser Coil](plans/condenser-coil.md) — 25/28 ⏳ (блок + модель + логика + тип рецепта `tfc_aeronautics:distillation` + миксин блокировки бака + ресурсы — готово; JEI/ponder и готовые рецепты/жидкости — в следующей итерации)
+- [Condenser Coil](plans/condenser-coil.md) — 26/28 ⏳ (блок + модель + логика + тип рецепта `tfc_aeronautics:distillation` + миксин блокировки бака + ресурсы + JEI-категория — готово; ponder и готовые рецепты/жидкости — в следующей итерации)
 - [Spout / Casting](plans/spout-casting.md) — 3/3 ✓
 - [Quern / Millstone Sync](plans/quern-millstone-sync.md) — 9/9 ✓
 - [Shaft Damage](plans/shaft-damage.md) — 6/7 ⏳

@@ -1,6 +1,6 @@
 # Condenser Coil
 
-**Прогресс:** 25/28 ⏳
+**Прогресс:** 26/28 ⏳
 
 Змеевик — блок, перегоняющий жидкость из `create:fluid_tank`, который стоит над
 нагревательным элементом. Паровая ось (вход/выход паров и дистиллята) всегда
@@ -228,7 +228,7 @@ HeatDealer.findTemperature(level, tankControllerPos.below(), belowState)
 - [x] Доставка дистиллята в result-face: прямой `IFluidHandler.fill` + BFS `pushAlongPipeNetwork` (≤3 трубы) кладёт жидкость в каждый IFluidHandler по пути и в output-бак; pipe-граф Create не задействован (давление/addPressure не работает из-за cross-flow); BFS вызывается даже когда первый сосед — Create-труба (`IFluidHandler.BLOCK` у трубы всегда `null`, ранний return на этом был основным багом ранних итераций)
 - [x] BFS-обход для детекта input-бака (≤3 трубы, разворачивается на коленах/развилках)
 - [x] Open-end на result-face: pour-частицы через `ServerLevel.sendParticles` при воздухе, silent drop при не-fluid блоке
-- [ ] Поддержка JEI для рецептов `tfc_aeronautics:distillation` (категория + отображение ингредиентов/результата/условий связки) — отложено: JEI не подключён к моду
+- [x] Поддержка JEI для рецептов `tfc_aeronautics:distillation`: категория с тремя слотами жидкостей (input / result / residue) и строкой температурного диапазона под ними; катализатор — `condenser_coil` (см. [раздел 34 DOCS.md](../DOCS.md#34-змеевик-конденсатор-condenser-coil))
 
 ## Блокировка бака
 - [x] `mixin/FluidTankBlockEntityMixin` на `handlerForCapability()` (`@At("RETURN")` → `CallbackInfoReturnable<IFluidHandler>`)
