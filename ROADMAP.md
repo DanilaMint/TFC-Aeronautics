@@ -3,7 +3,7 @@
 Статус механик мода. Каждая подсистема — отдельный файл в [`plans/`](plans/).
 Прогресс = выполнено / всего задач. ✓ — закрыто, ⏳ — в работе, ☐ — не начато.
 
-**Итого:** 252 / 345 (≈ 73 %).
+**Итого:** 279 / 355 (≈ 79 %).
 
 - [Metal Powders](plans/metal-powders.md) — 10/10 ✓
 - [Industrial Composite](plans/industrial-composite.md) — 13/13 ✓
@@ -15,11 +15,11 @@
 - [Wrench Head](plans/wrench-head.md) — 7/8 ⏳ (texturing остаётся placeholder)
 - [Impregnated Burlap Cloth](plans/impregnated-burlap-cloth.md) — 6/6 ✓
 - [Heater](plans/heater.md) — 22/26 ⏳
-- [Heat Dealers](plans/update-heaters.md) — 19/28 ⏳
+- [Heat Dealers](plans/update-heaters.md) — 21/28 ⏳
 - [Spirit Burner](plans/spirit-burner.md) — 0/26 ☐
 - [Combustion Engine](plans/combustion-engine.md) — 0/22 ☐
 - [Stamping Press](plans/stamping-press.md) — 25/27 ⏳
-- [Condenser Coil](plans/condenser-coil.md) — 0/18
+- [Condenser Coil](plans/condenser-coil.md) — 25/28 ⏳ (блок + модель + логика + тип рецепта `tfc_aeronautics:distillation` + миксин блокировки бака + ресурсы — готово; JEI/ponder и готовые рецепты/жидкости — в следующей итерации)
 - [Spout / Casting](plans/spout-casting.md) — 3/3 ✓
 - [Quern / Millstone Sync](plans/quern-millstone-sync.md) — 9/9 ✓
 - [Shaft Damage](plans/shaft-damage.md) — 6/7 ⏳

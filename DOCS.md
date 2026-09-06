@@ -41,6 +41,7 @@
 31. [Редстоун-пластина (Redstone Plate)](#31-редстоун-пластина-redstone-plate)
 32. [Лезвие харвестера через TFC-наковальню (Harvester Blade)](#32-лезвие-харвестера-через-tfc-наковальню-harvester-blade)
 33. [Сохранение тепла в `create:pressing` (RecipeApplierHeatMixin)](#33-сохранение-тепла-в-createpressing-recipeapplierheatmixin)
+34. [Змеевик-конденсатор (Condenser Coil)](#34-змеевик-конденсатор-condenser-coil)
 
 ---
 
@@ -3645,3 +3646,347 @@ Mixin на `RecipeApplier.applyRecipeOn` — единая точка перех�
 `HeatCapability` и `IHeat` — обычные TFC-классы, не mixin-ы, поэтому
 памятки `feedback_mixin_cross_target_access.md` и
 `feedback_mixin_lvt_hierarchy_check.md` не актуальны.
+
+---
+
+## 34. Змеевик-конденсатор (Condenser Coil)
+
+Блок-труба, перегоняющий жидкость из `create:fluid_tank`, стоящего над
+нагревательным элементом, в две другие жидкости: `result` уходит через
+выходную грань в трубную сеть Create, `residue` остаётся в баке. Это первый
+потребитель шины `HeatDealer` помимо басина Create и парового котла — то
+есть «дистилляция» в моде делается не отдельной интеграцией с TFC-источниками
+тепла, а через ту же общую шину, что описана в
+[разделе 16](#16-нагревательные-элементы-heat-dealers).
+
+```
+[источник тепла] ──> [create:fluid_tank] ──> [condenser_coil] ──> [труба → result]
+                          (input)             (water: ───►)
+```
+
+Терминология полей рецепта (`input` / `temperature_range` / `result` /
+`residue` / `result_percent` / `rate`) и чеклист реализации — в
+[`plans/condenser-coil.md`](../plans/condenser-coil.md). Здесь — дизайн и
+особенности, которые стоит проговорить подробно.
+
+### Связка в мире
+
+Змеевик не «знает» про конкретные нагреватели — он идёт по шине
+`HeatDealer.REGISTRY`, как и басин в `BasinBlockEntityMixin`. На каждом
+тике `CondenserCoilBlockEntity#readHeatSourceTemperature` спрашивает
+`HeatDealer.findTemperature(level, tankControllerPos.below(), state)` и
+получает градусы Цельсия напрямую. Дальше идёт сравнение
+`recipe.temperature_range().min() <= t && t <=
+recipe.temperature_range().max()`.
+
+Это **не** шкала `BoilerHeater` из Create: `HeatDealers.toBoilerHeat`
+переводит °C в ступени SU (`0..7` шагом 200 °C) для парового котла и
+применяется только там. Дистилляция сравнивает сырые °C — у рецепта может
+быть, например, `[60, 110]`, что в шкале SU схлопнулось бы в ноль.
+Физически разница осмысленная: рецепту важно попадание в температурное
+окно, а не «как много SU набралось».
+
+### Две оси змеевика и `canHaveFlowToward`
+
+Змеевик хостит собственный `FluidTransportBehaviour`
+(`CondenserCoilFluidBehaviour extends FluidTransportBehaviour`), у которого
+`canHaveFlowToward(state, face)` возвращает `true` **только** для двух
+граней **водяной оси**. Для Create это выглядит как прямая труба вдоль
+этой оси — вода течёт штатной логикой Create, свой код потока не пишется.
+
+- **Паровая ось** (X или Z через blockstate `AXIS`) — это не жидкостное
+  соединение вообще. Змеевик просто идёт по линии блоков от «паровой
+  грани» в сторону `create:fluid_tank`. Вход и выход взаимозаменяемы:
+  входом считается та грань, с которой нашёлся нагреваемый бак, выходом —
+  противоположная. Blockstate-свойства для этого отдельного не нужно.
+- **Водяная ось** (Y или вторая горизонталь через `WATER_VERTICAL`) —
+  жидкостное соединение, вода идёт сквозь змеевик.
+
+Грани на паровой оси **намеренно закрыты** для pipe-сети Create. Если бы
+`result-face` возвращал `true` в `canHaveFlowToward`, Create связал бы
+водяную и паровую оси в одну сеть через общий
+`interfaces: Map<Direction, PipeConnection>` — и охлаждающая вода
+утекала бы в бак результата, загрязняя дистиллят. Изоляция контуров —
+это и есть главное архитектурное решение змеевика.
+
+Поскольку грани паровой оси не в pipe-сети coil'а, дистиллят в
+output-бак доставляется **прямым `IFluidHandler.fill`** в каждый блок
+по пути — через `CondenserCoilBlockEntity.pushAlongPipeNetwork`. Это
+BFS-обход от coil'а по Create-трубам (≤3 трубы, как для входного
+детекта), который кладёт жидкость в `IFluidHandler.BLOCK` каждой
+трубы и в первый найденный бак (output). Никакого давления,
+никакого `addPressure` — мы не используем pipe-граф Create вообще.
+
+### Blockstate
+
+| Свойство | Тип | Значения | Назначение |
+|----------|-----|----------|------------|
+| `AXIS` | `EnumProperty<Direction.Axis>` | `X`, `Z` | Паровая ось (вход/выход). Y исключён сознательно. |
+| `WATER_VERTICAL` | `BooleanProperty` | `true`/`false` | `true` → водяная ось Y; `false` → вторая горизонталь. |
+
+Итого 4 комбинации. Ось воды выводится как
+`WATER_VERTICAL ? Y : (AXIS == Z ? X : Z)`. Цикл поворота ключом сначала
+флипает `WATER_VERTICAL`, при повторном цикле — меняет `AXIS` и сбрасывает
+`WATER_VERTICAL` в `false`.
+
+### Машина состояний: IDLE → WARMUP → RUNNING
+
+```text
+                 ┌──────────┐
+                 │   IDLE   │◄───────────────────────────────┐
+                 └────┬─────┘                                │
+       (tank has input matching recipe,                     │
+        heat within temperature_range,                      │
+        coolant flowing)                                    │
+                      ▼                                     │
+                 ┌──────────┐                                │
+                 │  WARMUP  │  warmupTicks: 200 default     │
+                 └────┬─────┘  (config: distillationWarmupTicks)
+       (warmup timer expires)                               │
+                      ▼                                     │
+                 ┌──────────┐                                │
+                 │ RUNNING  │  snapshotVolume locked,       │
+                 └────┬─────┘  target = snapshot * pct/100   │
+                      │                                     │
+       (produced >= target)                                 │
+                      └─────────────────────────────────────┘
+```
+
+`PAUSED` — не отдельное состояние, а ситуация в `RUNNING`, когда тик не
+может продвинуться: температура вне `temperature_range`, нет протока
+хладагента, или внутренний бак результата полон. Прогресс и блокировка
+бака сохраняются — следующий тик снова проверка условий. Это сделано
+сознательно: отдельное состояние потребовало бы персистить флаг и
+усложнило бы NBT-схему без выигрыша (всё равно при паузе нужно
+сохранить ровно тот же набор полей).
+
+`WARMUP` нужен, чтобы игрок мог долить жидкость в бак перед стартом:
+любое изменение объёма в баке сбрасывает счётчик обратно на полное
+значение. После входа в `RUNNING` долив блокируется миксином.
+
+### Снапшот-арифметика
+
+```text
+snapshotVolume = tankVolume на момент входа в RUNNING
+targetVolume   = snapshotVolume * result_percent / 100
+residueVol     = snapshotVolume - targetVolume
+```
+
+Пример: `snapshotVolume = 1000`, `result_percent = 41` →
+`targetVolume = 410`, `residueVol = 590`. В конце `RUNNING` бак
+осушается полностью и заливается `590 mB residue` — независимо от того,
+что там ещё оставалось. Долив сверх снапшота в `RUNNING` невозможен:
+миксин на `FluidTankBlockEntity.handlerForCapability` подменяет
+возвращаемый `IFluidHandler` на drain-only обёртку. Это UX-уровень
+блокировки; учётный уровень (просто снапшот totalVolume) — это всё, что
+реально нужно для корректной математики.
+
+Тик обработки идёт по простой формуле дробного потока:
+`progress += rate; int whole = (int) progress; progress -= whole;` — затем
+сливаем `whole` mB из бака и столько же кладём во внутренний бак
+результата ёмкостью `4000 mB`. При `rate = 0.2` это 1 mB раз в 5 тиков,
+410 mB за 2050 тиков.
+
+### Доставка дистиллята в result-face
+
+`CondenserCoilBlockEntity.ejectThroughResultFace` пушит
+`toInsert` в соседний блок через прямой `IFluidHandler.fill`, затем —
+если сосед оказался Create-трубой — вызывает
+`pushAlongPipeNetwork`, BFS-обход, который кладёт жидкость
+напрямую в `IFluidHandler.BLOCK` каждой трубы по пути и в первый
+найденный бак (output-tank). Лимит BFS — столько же труб, сколько
+для входного детекта (≤3); за пределы труб обход не выходит.
+
+**BFS вызывается всегда, когда сосед — pipe.** Первая реализация
+имела early-return на `handler == null`: для трубы
+`IFluidHandler.BLOCK` всегда `null` (жидкость в трубе живёт в
+`PipeConnection.flow`, не в tank'е), и `pushAlongPipeNetwork`
+никогда не запускался. Сейчас `ejectThroughResultFace` отдельно
+проверяет `FluidPropagator.getPipe(level, neighborPos) != null` и
+вызывает BFS для pipe-соседа в любом случае — независимо от того,
+есть ли у него `IFluidHandler`. Это разделяет две вещи: «куда
+положить жидкость в первом блоке» (через `handler.fill`, если
+есть) и «пройти по цепочке до конечного бака» (через BFS).
+
+**Почему BFS+`handler.fill`, а не давление.** В Create `addPressure`
+работает только на гранях, где у behaviour'а есть PipeConnection.
+Для соседней трубы на стороне coil'а такой PipeConnection создаётся
+только когда `FluidPipeBlock.canConnectTo` вернёт true, а он
+возвращает false если у соседа (`transport.canHaveFlowToward(...)`
+== false). У coil'а result-face **намеренно** закрыт в
+`canHaveFlowToward` (иначе cross-flow с водяной осью), значит
+`addPressure` на neighbour-трубе — silent no-op. Попытки обойти
+через открытие result-face ломают изоляцию водяного контура.
+
+**Почему BFS сходится.** Каждая Create fluid_pipe экспортирует
+`IFluidHandler.BLOCK` (на сторонах с открытым `PROPERTY_BY_DIRECTION`
+— это, как минимум, обе торцевые стороны трубы вдоль её оси), а
+`create:fluid_tank` экспортирует на всех 6 направлениях. `handler.fill`
+принимает жидкость в любом случае; остаток (`remaining`) уменьшается
+на каждом успешном fill'е и идёт дальше по BFS. Когда BFS доходит
+до output-бака, `handler.fill` кладёт туда остаток дистиллята.
+
+**Открытый конец (air):** если на пути BFS встречает воздух, обход
+просто его пропускает и идёт по другим веткам. Если воздух прямо
+перед coil'ом — `spawnOpenEndParticles` спавнит pour-частицы ещё до
+BFS (в `ejectThroughResultFace`), жидкость «вытекает в воздух» как
+из открытого торца трубы.
+
+**T-стыки и ветвления:** если на пути есть разветвление, BFS идёт по
+обоим направлениям и кладёт жидкость в первый IFluidHandler каждой
+ветви. Это **намеренно** — «тупиковая» раскладка труб (одна ветка
+от coil до output-бака) рекомендуется в дизайне дистиллятора.
+
+**Trade-off.** BFS+fill не использует pipe-граф Create: жидкость
+появляется во всех трубах по пути **в один тик** (а не постепенно
+через давление). Это нормально для типового `rate = 0.2` дистилляции
+(трубы не успевают наполниться), но если игрок поставит ёмкость
+output меньше, чем суммарный объём труб по пути, дистилляция может
+застрять на заполненных трубах. Для штатной структуры (1–3 трубы
+по 500 mB, output-бак 1000+ mB) это не блокер.
+
+**Производительность:** для типичной структуры (3 трубы + бак) это
+3–4 `handler.fill`'а в тик — незначительно. Create pipe-граф в этом
+процессе не задействован, никакой синхронизации с соседними
+трубами.
+
+### Конфигурация push'а — отменена
+
+Ключ `distillationOutputPressure` (давление на result-стороне) больше
+не существует: давления на result-сети нет, жидкость доставляется
+через прямой `IFluidHandler.fill`. Если в будущем понадобится
+конфигурируемая величина (например, лимит BFS), ключ можно вернуть.
+
+### Детект input-бака — BFS по трубам
+
+`DistillationStructure.walkOneDirection` ищет `create:fluid_tank` от
+змеевика по паровой оси. Это **BFS** по Create-трубам через
+`FluidPropagator.getPipeConnections` с лимитом `MAX_PIPE_BLOCKS = 3`
+трубы между coil и баком (сам бак в лимит не входит — это цель обхода).
+
+Лимит в 3 трубы выбран из соображений «структура дистиллятора компактная»:
+более длинная цепочка труб уже не имеет физического смысла — игрок
+вряд ли будет тянуть input-бак через 5+ труб от coil, и BFS-обход
+должен отсекать такие «случайные совпадения» с соседними баками.
+
+BFS корректно разворачивается на развилках и коленах:
+`heatFace → pipe → pipe → pipe → T-junction → tank_below`. Раньше
+линейный walk проходил 4 шага строго вдоль face и не находил бак, потому
+что бак стоял в перпендикулярном направлении. С BFS — находится.
+
+`traceWalk` тоже BFS — heartbeat-диагностика показывает развилки, повороты
+и причину остановки (`stop=TANK` / `stop=non-pipe block` / `stop=budget exhausted`).
+
+### Open-end при воздухе спереди
+
+Если перед result-face воздух (то есть нет `IFluidHandler`),
+`CondenserCoilBlockEntity.spawnOpenEndParticles` шлёт на сервере
+`ServerLevel.sendParticles` с particle data из `FluidFX.getFluidParticle`
+— pour-частицы из воздушного блока перед coil, как при вытекании жидкости
+из открытого торца трубы. Количество частиц пропорционально объёму
+(1 на ~10 mB, cap 8 за тик). Если перед result-face не-fluid блок (камень,
+бедрок) — silent drop, без частиц: открытого торца там нет.
+
+### Блокировка бака — два уровня
+
+1. **Учётный** (обязательный, всегда работает). Снапшот `totalVolume` на
+   входе в `RUNNING` — всё, что игрок долил сверх снапшота, в расчёт не
+   идёт.
+2. **UX (mixin)**. `mixin/FluidTankBlockEntityMixin` инжектится в
+   `FluidTankBlockEntity.handlerForCapability()` (`@At("RETURN")`,
+   `CallbackInfoReturnable<IFluidHandler>`). Если контроллер бака помечен
+   как занятый, возвращаемый `IFluidHandler` подменяется на drain-only
+   обёртку. На lock/unlock вызывается `invalidateCapabilities()` на баке.
+
+Состояние блокировки (какие баки заблокированы какими змеевиками)
+хранится в **обычном (не-mixin) helper-классе**
+`condenser_coil/DistillationTankLock` с `Map<GlobalPos, BlockPos>`. Это
+продолжение проектного правила из `feedback_mixin_cross_target_access.md`
+и `feedback_mixin_standard_not_loadable.md`: держать кросс-таргетное
+состояние в Standard mixin-классе нельзя (класс просто не classloadable),
+а держать его в helper-классе — единственный надёжный вариант.
+
+Если mixin окажется хрупким и отвалится в рантайме — механика остаётся
+корректной за счёт учётного уровня, просто без визуального запрета залива
+жидкости в заблокированный бак.
+
+### Детект протока хладагента
+
+Читаем собственный `FluidTransportBehaviour`:
+
+- для каждой из двух граней водяной оси берём `getConnection(face)`;
+- проток есть, если у одной грани `flow.hasFlow() &&
+  flow.get().complete && flow.get().inbound`, у другой —
+  `flow.get().outbound`;
+- `flow.get().fluid` должен быть в теге `#tfc_aeronautics:coolant`
+  (сейчас там один `minecraft:water`).
+
+Стоячая вода без насоса flow не создаёт — поэтому требование «не стоячая,
+а текущая» обеспечивается самой логикой Create, без отдельной проверки
+«двигается ли вода».
+
+### Формат рецепта `tfc_aeronautics:distillation`
+
+```json
+{
+  "type": "tfc_aeronautics:distillation",
+  "input": { "id": "tfc:vodka" },
+  "temperature_range": [60, 110],
+  "result": "tfc_aeronautics:ethanol",
+  "residue": "tfc_aeronautics:stillage",
+  "result_percent": 41,
+  "rate": 0.2
+}
+```
+
+| Поле | Тип | Семантика |
+|------|-----|-----------|
+| `input` | `Either<{ id }, { tag }>` | Что должно быть в баке. Тег — `TagKey<Fluid>`, собственный кодек. |
+| `temperature_range` | `[min, max]` °C, int | Закрытый интервал, валидация размера = 2 и `min <= max`. |
+| `result` | `<fluid_id>` (строка) | Жидкость на выходной грани змеевика. Объём вычисляется, в JSON не пишется. |
+| `residue` | `<fluid_id>` (строка) | Жидкость-остаток, заливается в бак по завершении. |
+| `result_percent` | int 0..100 | `target = snapshot * result_percent / 100`. |
+| `rate` | float mB/тик | Дробный поток, аккумулируется через `progress`. |
+
+NeoForge'овский `SizedFluidIngredient.FLAT_CODEC` для `input` не подходит:
+у него ключи `fluid`/`fluid_tag` и обязательный `amount`. Свой кодек —
+`Codec.mapEither(BuiltInRegistries.FLUID.byNameCodec().fieldOf("id"),
+TagKey.codec(Registries.FLUID).fieldOf("tag"))`.
+
+Поиск рецепта — `RecipeManager.getAllRecipesFor(TYPE)` + фильтр по
+`FluidStack` в баке (контейнера для `getRecipeFor` тут нет, контейнер —
+это сам бак). Результат кэшируется на BE, инвалидируется при изменении
+жидкости в баке.
+
+### Конфигурация
+
+| Ключ | Тип | Диапазон | Назначение |
+|------|-----|----------|------------|
+| `distillationWarmupTicks` | int | 0…72000 | Длительность `WARMUP` (200 = 10 с при 20 тик/с). |
+
+### Что НЕ сделано в этой итерации
+
+- **JEI-категория** — JEI в моде вообще не подключён (`build.gradle` без
+  зависимости, `src/client/java/.../jei/` пустой). Это инфраструктурная
+  задача, не специфичная для дистилляции.
+- **Ponder-сцена** — `.nbt`-схематику нельзя собрать без запуска игры, а
+  запуск игры запрещён правилами репозитория (см. CLAUDE.md).
+- **Готовые рецепты и сами жидкости** (`ethanol`, `stillage` и т.п.) —
+  формат и загрузчик рецептов работают, но чтобы проверить механику в
+  Prism-лаунчере, нужен отдельный шаг с одной жидкостью и одним
+  рецептом. Без этого блок ставится, но дистилляция не запускается.
+
+### Связь с шиной нагрева
+
+Змеевик — второй потребитель `HeatDealer.REGISTRY` после
+`BasinBlockEntityMixin` и парового котла. Это сознательное решение:
+дистилляция могла бы иметь собственную интеграцию с TFC-источниками
+тепла, но тогда при добавлении нового нагревателя пришлось бы
+дописывать его сразу в трёх местах. Через шину достаточно одной строки
+`HeatDealer.REGISTRY.register(...)` — и блок сразу работает и с басином, и
+с паровым котлом, и со змеевиком.
+
+Точка подключения змеевика — `CondenserCoilBlockEntity#readHeatSourceTemperature`,
+резолв позиции нагревателя — `DistillationStructure`. Шина подробнее — в
+[разделе 16](#16-нагревательные-элементы-heat-dealers); статус-таблица
+консьюмеров — в [`plans/update-heaters.md`](../plans/update-heaters.md).

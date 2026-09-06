@@ -60,6 +60,7 @@
   "tfc_aeronautics.heater.max_temperature": "Максимальная температура",
   "block.tfc_aeronautics.stamping_press": "Штамповочный пресс",
   "block.tfc_aeronautics.chain_conveyor": "Цепной конвейер",
+  "block.tfc_aeronautics.condenser_coil": "Змеевик",
   "block.tfc_aeronautics.wood.bracket.acacia": "Акациевая скоба",
   "block.tfc_aeronautics.wood.bracket.ash": "Ясеневая скоба",
   "block.tfc_aeronautics.wood.bracket.aspen": "Осиновая скоба",

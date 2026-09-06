@@ -14,6 +14,7 @@ import ru.tfc_aeronautics.bracket.WoodenBracketRegistration;
 import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.chain.ChainConveyorRegistration;
 import ru.tfc_aeronautics.ceramic.CeramicRegistration;
+import ru.tfc_aeronautics.condenser_coil.CondenserCoilRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
 import ru.tfc_aeronautics.drill_head.DrillHeadRegistration;
 import ru.tfc_aeronautics.fluid.FluidItems;
@@ -48,6 +49,7 @@ public final class CreativeTabs
                 output.accept(CompositeRegistration.COMPOSITE.get());
                 TightSheetRegistration.TIGHT_SHEETS.values().forEach(s -> output.accept(s.get()));
                 output.accept(HeaterRegistration.HEATER_ITEM.get());
+                output.accept(CondenserCoilRegistration.CONDENSER_COIL_ITEM.get());
                 output.accept(StampingPressRegistration.STAMPING_PRESS_ITEM.get());
                 AnvilRegistration.ANVIL_ITEMS.values().forEach(i -> output.accept(i.get()));
                 output.accept(ResinRegistration.RESIN_CLUMP.get());
