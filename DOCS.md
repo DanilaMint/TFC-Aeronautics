@@ -3741,7 +3741,7 @@ BFS-обход от coil'а по Create-трубам (≤3 трубы, как д
                       ▼                                     │
                  ┌──────────┐                                │
                  │  WARMUP  │  warmupTicks: 200 default     │
-                 └────┬─────┘  (config: distillationWarmupTicks)
+                 └────┬─────┘  (config: distillatingWarmupTicks)
        (warmup timer expires)                               │
                       ▼                                     │
                  ┌──────────┐                                │
@@ -3852,14 +3852,14 @@ output меньше, чем суммарный объём труб по пути
 
 ### Конфигурация push'а — отменена
 
-Ключ `distillationOutputPressure` (давление на result-стороне) больше
+Ключ `distillatingOutputPressure` (давление на result-стороне) больше
 не существует: давления на result-сети нет, жидкость доставляется
 через прямой `IFluidHandler.fill`. Если в будущем понадобится
 конфигурируемая величина (например, лимит BFS), ключ можно вернуть.
 
 ### Детект input-бака — BFS по трубам
 
-`DistillationStructure.walkOneDirection` ищет `create:fluid_tank` от
+`DistillatingStructure.walkOneDirection` ищет `create:fluid_tank` от
 змеевика по паровой оси. Это **BFS** по Create-трубам через
 `FluidPropagator.getPipeConnections` с лимитом `MAX_PIPE_BLOCKS = 3`
 трубы между coil и баком (сам бак в лимит не входит — это цель обхода).
@@ -3900,7 +3900,7 @@ BFS корректно разворачивается на развилках и
 
 Состояние блокировки (какие баки заблокированы какими змеевиками)
 хранится в **обычном (не-mixin) helper-классе**
-`condenser_coil/DistillationTankLock` с `Map<GlobalPos, BlockPos>`. Это
+`condenser_coil/DistillatingTankLock` с `Map<GlobalPos, BlockPos>`. Это
 продолжение проектного правила из `feedback_mixin_cross_target_access.md`
 и `feedback_mixin_standard_not_loadable.md`: держать кросс-таргетное
 состояние в Standard mixin-классе нельзя (класс просто не classloadable),
@@ -3925,11 +3925,11 @@ BFS корректно разворачивается на развилках и
 а текущая» обеспечивается самой логикой Create, без отдельной проверки
 «двигается ли вода».
 
-### Формат рецепта `tfc_aeronautics:distillation`
+### Формат рецепта `tfc_aeronautics:distillating`
 
 ```json
 {
-  "type": "tfc_aeronautics:distillation",
+  "type": "tfc_aeronautics:distillating",
   "input": { "id": "tfc:vodka" },
   "temperature_range": [60, 110],
   "result": "tfc_aeronautics:ethanol",
@@ -3962,12 +3962,12 @@ TagKey.codec(Registries.FLUID).fieldOf("tag"))`.
 
 | Ключ | Тип | Диапазон | Назначение |
 |------|-----|----------|------------|
-| `distillationWarmupTicks` | int | 0…72000 | Длительность `WARMUP` (200 = 10 с при 20 тик/с). |
+| `distillatingWarmupTicks` | int | 0…72000 | Длительность `WARMUP` (200 = 10 с при 20 тик/с). |
 
 ### JEI-категория
 
 Дистилляция зарегистрирована в JEI через плагин
-`ru.aeronautics.client.jei.DistillationJeiPlugin` (`@JeiPlugin`). Категория
+`ru.aeronautics.client.jei.DistillatingJeiPlugin` (`@JeiPlugin`). Категория
 одна, отображает три слота жидкостей по горизонтали:
 
 ```text
@@ -4000,8 +4000,8 @@ TagKey.codec(Registries.FLUID).fieldOf("tag"))`.
 
 | Ключ | en_us | ru_ru |
 |------|-------|-------|
-| `jei.tfc_aeronautics.distillation` | `Distillation` | `Дистилляция` |
-| `jei.tfc_aeronautics.distillation.temp` | `Temp: %1$d°C – %2$d°C` | `Температура: %1$d°C – %2$d°C` |
+| `jei.tfc_aeronautics.distillating` | `Distillation` | `Дистилляция` |
+| `jei.tfc_aeronautics.distillating.temp` | `Temp: %1$d°C – %2$d°C` | `Температура: %1$d°C – %2$d°C` |
 
 ### Что НЕ сделано в этой итерации
 
@@ -4023,6 +4023,6 @@ TagKey.codec(Registries.FLUID).fieldOf("tag"))`.
 с паровым котлом, и со змеевиком.
 
 Точка подключения змеевика — `CondenserCoilBlockEntity#readHeatSourceTemperature`,
-резолв позиции нагревателя — `DistillationStructure`. Шина подробнее — в
+резолв позиции нагревателя — `DistillatingStructure`. Шина подробнее — в
 [разделе 16](#16-нагревательные-элементы-heat-dealers); статус-таблица
 консьюмеров — в [`plans/update-heaters.md`](../plans/update-heaters.md).

@@ -23,7 +23,7 @@ import com.mojang.serialization.MapCodec;
 /**
  * Recipe consumed by the {@code condenser_coil} block entity.
  *
- * <p>Each recipe describes a single distillation step:
+ * <p>Each recipe describes a single distillating step:
  * <ul>
  *   <li>{@link #input} — the fluid being distilled, either a single
  *       {@link ResourceLocation} (resolved through {@link BuiltInRegistries#FLUID})
@@ -31,7 +31,7 @@ import com.mojang.serialization.MapCodec;
  *       {@link FluidStack}). The {@link Either} shape is what the JSON codec
  *       enforces with {@code Codec.mapEither}.</li>
  *   <li>{@link #temperature_range} — closed interval {@code [min, max]} in
- *       degrees Celsius. Distillation only progresses while the BE temperature
+ *       degrees Celsius. Distillating only progresses while the BE temperature
  *       lies inside the interval; outside, the BE idles (matches returns true
  *       but production does not advance).</li>
  *   <li>{@link #result} / {@link #residue} — the two output fluids. Volumes
@@ -49,7 +49,7 @@ import com.mojang.serialization.MapCodec;
  * need Create's output-roll mechanics. Keeping it lightweight also avoids pulling
  * in Create-recipe mixin surface that is specific to the millstone pathway.
  */
-public record DistillationRecipe(
+public record DistillatingRecipe(
     Either<ResourceLocation, TagKey<Fluid>> input,
     IntPair temperature_range,
     Fluid result,
@@ -62,7 +62,7 @@ public record DistillationRecipe(
      * Two-element {@code int} tuple used for {@code temperature_range}. A dedicated
      * type (rather than {@code int[]}) keeps codecs and getters well-typed and
      * makes the JSON "exactly two ints" constraint explicit via
-     * {@link DistillationRecipeSerializer}.
+     * {@link DistillatingRecipeSerializer}.
      */
     public record IntPair(int min, int max)
     {
@@ -81,8 +81,8 @@ public record DistillationRecipe(
      * "either id or tag" semantics declared in the recipe JSON.
      *
      * <p>Wraps the two branches in {@link Codec#mapEither}: left is the bare
-     * fluid id (registered in {@link BuiltInRegistries#FLUID}), right is a
-     * fluid {@link TagKey}. The recipe author picks one in the JSON; mixing
+     * fluid id (registered in {@link BuiltInRegistries#FLUID}), right is a fluid
+     * {@link TagKey}. The recipe author picks one in the JSON; mixing
      * both produces a decode error. Note that {@code Codec.mapEither} returns
      * a {@link MapCodec} (it operates on object-keyed fields, not bare values),
      * which is exactly what {@code RecordCodecBuilder.fieldOf} expects.
@@ -133,7 +133,7 @@ public record DistillationRecipe(
      * here we sanity-check the percent range and rate because they have no
      * natural home otherwise.
      */
-    public DistillationRecipe
+    public DistillatingRecipe
     {
         if (result_percent < 0 || result_percent > 100)
         {
@@ -144,7 +144,7 @@ public record DistillationRecipe(
             throw new IllegalArgumentException("rate must be non-negative, got " + rate);
         }
         ru.tfc_aeronautics.TFCAeronautics.LOGGER.info(
-            "[diag] DistillationRecipe constructed: input={}, temp_range=[{},{}], result={}, residue={}, result_percent={}, rate={}",
+            "[diag] DistillatingRecipe constructed: input={}, temp_range=[{},{}], result={}, residue={}, result_percent={}, rate={}",
             input, temperature_range.min(), temperature_range.max(), result, residue, result_percent, rate);
     }
 
@@ -232,7 +232,7 @@ public record DistillationRecipe(
     // Recipe<RecipeInput> plumbing
     //
     // The vanilla RecipeManager requires recipes to implement Recipe<?> so they
-    // can be looked up by type via getAllRecipesFor(). Distillation has no
+    // can be looked up by type via getAllRecipesFor(). Distillating has no
     // item-based "crafting grid" semantics — inputs are fluids inside the
     // condenser_coil's tank, not items in an inventory — so the standard
     // RecipeInput-based matching/assembly methods are no-ops for our purposes.
@@ -243,7 +243,7 @@ public record DistillationRecipe(
     @Override
     public boolean matches(RecipeInput inv, Level level)
     {
-        // Item-grid matching is meaningless for distillation; the BE does the
+        // Item-grid matching is meaningless for distillating; the BE does the
         // real (fluid-tank) matching through the other matches() overload.
         return false;
     }
@@ -264,19 +264,19 @@ public record DistillationRecipe(
     @Override
     public net.minecraft.world.item.ItemStack getResultItem(net.minecraft.core.HolderLookup.Provider registries)
     {
-        // Distillation does not produce an item, only fluids.
+        // Distillating does not produce an item, only fluids.
         return net.minecraft.world.item.ItemStack.EMPTY;
     }
 
     @Override
     public RecipeSerializer<?> getSerializer()
     {
-        return DistillationRecipeType.SERIALIZER.value();
+        return DistillatingRecipeType.SERIALIZER.value();
     }
 
     @Override
     public RecipeType<?> getType()
     {
-        return DistillationRecipeType.TYPE.value();
+        return DistillatingRecipeType.TYPE.value();
     }
 }

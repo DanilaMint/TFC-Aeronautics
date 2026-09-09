@@ -73,8 +73,8 @@ waterAxis = WATER_VERTICAL ? Y : (AXIS == Z ? X : Z)
 
 | Состояние | Что происходит | Переход |
 |-----------|----------------|---------|
-| `IDLE` | Начальное. Каждый тик — попытка войти в `WARMUP`, если связка валидна и в баке есть жидкость под какой-нибудь `distillation`-рецепт. | → `WARMUP` при совпадении условий |
-| `WARMUP` | Счётчик `distillationWarmupTicks` (200 = 10 с). Любое изменение объёма в баке сбрасывает счётчик на полное значение — это и есть «можно долить». | → `RUNNING` по истечении счётчика; → `IDLE` если связка сломалась |
+| `IDLE` | Начальное. Каждый тик — попытка войти в `WARMUP`, если связка валидна и в баке есть жидкость под какой-нибудь `distillating`-рецепт. | → `WARMUP` при совпадении условий |
+| `WARMUP` | Счётчик `distillatingWarmupTicks` (200 = 10 с). Любое изменение объёма в баке сбрасывает счётчик на полное значение — это и есть «можно долить». | → `RUNNING` по истечении счётчика; → `IDLE` если связка сломалась |
 | `RUNNING` | Снят снапшот `total_volume`, бак заблокирован, `target_volume = total_volume * result_percent / 100`, `produced = 0f`. Каждый тик: `progress += rate; int whole = (int) progress; progress -= whole` — сливаем `whole` mB из бака, столько же кладём во внутренний бак результата. | → `IDLE` при `produced >= target_volume`: содержимое бака заменяется на `residue` объёмом `total_volume - target_volume`, unlock, сброс давления |
 | пропуск тика | Не состояние, а ситуация в `RUNNING`: температура вне `temperature_range`, нет протока хладагента, или внутренний бак результата полон. Прогресс и блокировка сохраняются. | следующий тик снова проверка условий |
 
@@ -169,7 +169,7 @@ HeatDealer.findTemperature(level, tankControllerPos.below(), belowState)
    `handlerForCapability()` (`FluidTankBlockEntity.java:374`) — при
    `@At("RETURN")`, если контроллер бака помечен как занятый, подменяет
    возврат на drain-only обёртку. Состояние блокировки хранится в **обычном
-   (не-mixin) helper-классе** `DistillationTankLock` с `Map<GlobalPos,
+   (не-mixin) helper-классе** `DistillatingTankLock` с `Map<GlobalPos,
    BlockPos>` (позиция змеевика-владельца) — по опыту проекта
    кросс-таргетное состояние в самих mixin-классах ломается. На lock/unlock
    вызывается `invalidateCapabilities()` на баке.
@@ -177,11 +177,11 @@ HeatDealer.findTemperature(level, tankControllerPos.below(), belowState)
 Если mixin окажется хрупким — механика остаётся корректной за счёт (1),
 просто без визуального запрета залива.
 
-## Формат рецепта `tfc_aeronautics:distillation`
+## Формат рецепта `tfc_aeronautics:distillating`
 
 ```json
 {
-  "type": "tfc_aeronautics:distillation",
+  "type": "tfc_aeronautics:distillating",
   "input": { "id": "tfc:vodka" },
   "temperature_range": [60, 110],
   "result": "tfc_aeronautics:ethanol",
@@ -216,9 +216,9 @@ HeatDealer.findTemperature(level, tankControllerPos.below(), belowState)
 - [x] item-модель `assets/tfc_aeronautics/models/item/condenser_coil.json`
 
 ## Логика
-- [x] Тип рецептов `tfc_aeronautics:distillation` — `DistillationRecipe` + `DistillationRecipeSerializer` + `DistillationRecipeType` (без наследования от Create-овского `ProcessingRecipe`, без `RecipeParams`)
+- [x] Тип рецептов `tfc_aeronautics:distillating` — `DistillatingRecipe` + `DistillatingRecipeSerializer` + `DistillatingRecipeType` (без наследования от Create-овского `ProcessingRecipe`, без `RecipeParams`)
 - [x] Собственный кодек `input` (`Either<id, tag>`), собственный кодек `temperature_range` (`[min, max]` int-pair с валидацией)
-- [x] Валидация структуры дистиллятора: источник нагрева → жидкостный бак → логическая связь → змеевик (`DistillationStructure`)
+- [x] Валидация структуры дистиллятора: источник нагрева → жидкостный бак → логическая связь → змеевик (`DistillatingStructure`)
 - [x] Детект нагрева через `HeatDealer.findTemperature(level, controllerPos.below(), state)` — температура в °C сравнивается с `temperature_range` напрямую (НЕ через `HeatDealers.toBoilerHeat`)
 - [x] Детект протока хладагента в перпендикулярной оси (`PipeConnection.flow` + проверка `Fluid` в теге `#tfc_aeronautics:coolant`)
 - [x] `CondenserCoilFluidBehaviour extends FluidTransportBehaviour` с `canHaveFlowToward` только для двух граней водяной оси
@@ -228,21 +228,21 @@ HeatDealer.findTemperature(level, tankControllerPos.below(), belowState)
 - [x] Доставка дистиллята в result-face: прямой `IFluidHandler.fill` + BFS `pushAlongPipeNetwork` (≤3 трубы) кладёт жидкость в каждый IFluidHandler по пути и в output-бак; pipe-граф Create не задействован (давление/addPressure не работает из-за cross-flow); BFS вызывается даже когда первый сосед — Create-труба (`IFluidHandler.BLOCK` у трубы всегда `null`, ранний return на этом был основным багом ранних итераций)
 - [x] BFS-обход для детекта input-бака (≤3 трубы, разворачивается на коленах/развилках)
 - [x] Open-end на result-face: pour-частицы через `ServerLevel.sendParticles` при воздухе, silent drop при не-fluid блоке
-- [x] Поддержка JEI для рецептов `tfc_aeronautics:distillation`: категория с тремя слотами жидкостей (input / result / residue) и строкой температурного диапазона под ними; катализатор — `condenser_coil` (см. [раздел 34 DOCS.md](../DOCS.md#34-змеевик-конденсатор-condenser-coil))
+- [x] Поддержка JEI для рецептов `tfc_aeronautics:distillating`: категория с тремя слотами жидкостей (input / result / residue) и строкой температурного диапазона под ними; катализатор — `condenser_coil` (см. [раздел 34 DOCS.md](../DOCS.md#34-змеевик-конденсатор-condenser-coil))
 
 ## Блокировка бака
 - [x] `mixin/FluidTankBlockEntityMixin` на `handlerForCapability()` (`@At("RETURN")` → `CallbackInfoReturnable<IFluidHandler>`)
-- [x] Состояние блокировки в `condenser_coil/DistillationTankLock` (plain class, `Map<GlobalPos, BlockPos>` — не в самом mixin'е)
+- [x] Состояние блокировки в `condenser_coil/DistillatingTankLock` (plain class, `Map<GlobalPos, BlockPos>` — не в самом mixin'е)
 - [x] Регистрация миксина в `tfc_aeronautics.mixins.json`
 
 ## Конфигурация (`Config.java`)
-- [x] `distillationWarmupTicks` — `IntValue`, 200, `[0, 72000]`
-- [ ] `distillationOutputRange` — не реализован: BFS-сеть Create наследует радиус от `FluidPropagator.getPumpRange()` (= 16), отдельный ключ не нужен
-- [ ] `distillationOutputPressure` — не реализован: давление не используется (push через прямой `handler.fill` + BFS)
+- [x] `distillatingWarmupTicks` — `IntValue`, 200, `[0, 72000]`
+- [ ] `distillatingOutputRange` — не реализован: BFS-сеть Create наследует радиус от `FluidPropagator.getPumpRange()` (= 16), отдельный ключ не нужен
+- [ ] `distillatingOutputPressure` — не реализован: давление не используется (push через прямой `handler.fill` + BFS)
 
 ## Рецепты
 - [ ] Готовые рецепты и жидкости (`ethanol`/`stillage` и т.п.) — отложено до следующей итерации
-- [x] Формат `tfc_aeronautics:distillation` реализован и валидируется кодеком
+- [x] Формат `tfc_aeronautics:distillating` реализован и валидируется кодеком
 
 ## Ponder-сцены
 - [ ] Сцена о работе дистиллятора — отложено: `.nbt`-схематику нельзя собрать без запуска игры

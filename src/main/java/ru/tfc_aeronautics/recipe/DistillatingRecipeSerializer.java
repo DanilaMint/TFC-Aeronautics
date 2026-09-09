@@ -11,15 +11,15 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.material.Fluid;
 
-import ru.tfc_aeronautics.recipe.DistillationRecipe.IntPair;
+import ru.tfc_aeronautics.recipe.DistillatingRecipe.IntPair;
 
 /**
- * JSON + network codec for {@link DistillationRecipe}.
+ * JSON + network codec for {@link DistillatingRecipe}.
  *
  * <p>The JSON shape is:
  * <pre>{@code
  * {
- *   "type": "tfc_aeronautics:distillation",
+ *   "type": "tfc_aeronautics:distillating",
  *   "input": { "id": "<fluid>" } | { "tag": "<fluid_tag>" },
  *   "temperature_range": [min, max],
  *   "result":  "<fluid>",
@@ -41,7 +41,7 @@ import ru.tfc_aeronautics.recipe.DistillationRecipe.IntPair;
  * <p>The {@code temperature_range} field is encoded as a JSON array of exactly
  * two ints (closed interval). The codec enforces the arity via
  * {@code Codec.INT.listOf().comapFlatMap(...)} in
- * {@link DistillationRecipe#INT_PAIR_CODEC}; values outside {@code [min, max]}
+ * {@link DistillatingRecipe#INT_PAIR_CODEC}; values outside {@code [min, max]}
  * orderings are rejected by {@link IntPair}'s compact constructor.
  *
  * <p>The {@link StreamCodec} is symmetric to the JSON codec for the simple
@@ -53,18 +53,18 @@ import ru.tfc_aeronautics.recipe.DistillationRecipe.IntPair;
  * registry is {@link net.minecraft.core.registries.Registries#FLUID} in both
  * branches.
  */
-public final class DistillationRecipeSerializer implements RecipeSerializer<DistillationRecipe>
+public final class DistillatingRecipeSerializer implements RecipeSerializer<DistillatingRecipe>
 {
-    public static final DistillationRecipeSerializer INSTANCE = new DistillationRecipeSerializer();
+    public static final DistillatingRecipeSerializer INSTANCE = new DistillatingRecipeSerializer();
 
-    private static final MapCodec<DistillationRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-        DistillationRecipe.INPUT_CODEC.fieldOf("input").forGetter(DistillationRecipe::input),
-        DistillationRecipe.INT_PAIR_CODEC.fieldOf("temperature_range").forGetter(DistillationRecipe::temperature_range),
-        DistillationRecipe.FLUID_CODEC.fieldOf("result").forGetter(DistillationRecipe::result),
-        DistillationRecipe.FLUID_CODEC.fieldOf("residue").forGetter(DistillationRecipe::residue),
-        com.mojang.serialization.Codec.INT.fieldOf("result_percent").forGetter(DistillationRecipe::result_percent),
-        com.mojang.serialization.Codec.FLOAT.fieldOf("rate").forGetter(DistillationRecipe::rate)
-    ).apply(i, DistillationRecipe::new));
+    private static final MapCodec<DistillatingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+        DistillatingRecipe.INPUT_CODEC.fieldOf("input").forGetter(DistillatingRecipe::input),
+        DistillatingRecipe.INT_PAIR_CODEC.fieldOf("temperature_range").forGetter(DistillatingRecipe::temperature_range),
+        DistillatingRecipe.FLUID_CODEC.fieldOf("result").forGetter(DistillatingRecipe::result),
+        DistillatingRecipe.FLUID_CODEC.fieldOf("residue").forGetter(DistillatingRecipe::residue),
+        com.mojang.serialization.Codec.INT.fieldOf("result_percent").forGetter(DistillatingRecipe::result_percent),
+        com.mojang.serialization.Codec.FLOAT.fieldOf("rate").forGetter(DistillatingRecipe::rate)
+    ).apply(i, DistillatingRecipe::new));
 
     /**
      * Network codec.
@@ -77,14 +77,14 @@ public final class DistillationRecipeSerializer implements RecipeSerializer<Dist
      * {@link ByteBufCodecs#registry} (vanilla idiom; {@code Fluid} itself
      * does not expose a {@code STREAM_CODEC}).
      */
-    private static final StreamCodec<RegistryFriendlyByteBuf, DistillationRecipe> STREAM_CODEC =
+    private static final StreamCodec<RegistryFriendlyByteBuf, DistillatingRecipe> STREAM_CODEC =
         new StreamCodec<>()
         {
             private static final StreamCodec<RegistryFriendlyByteBuf, Fluid> FLUID_STREAM_CODEC =
                 ByteBufCodecs.registry(net.minecraft.core.registries.Registries.FLUID);
 
             @Override
-            public DistillationRecipe decode(RegistryFriendlyByteBuf buf)
+            public DistillatingRecipe decode(RegistryFriendlyByteBuf buf)
             {
                 boolean isTag = buf.readBoolean();
                 Either<ResourceLocation, TagKey<Fluid>> input;
@@ -103,11 +103,11 @@ public final class DistillationRecipeSerializer implements RecipeSerializer<Dist
                 Fluid residue = FLUID_STREAM_CODEC.decode(buf);
                 int percent = buf.readInt();
                 float rate = buf.readFloat();
-                return new DistillationRecipe(input, temps, result, residue, percent, rate);
+                return new DistillatingRecipe(input, temps, result, residue, percent, rate);
             }
 
             @Override
-            public void encode(RegistryFriendlyByteBuf buf, DistillationRecipe recipe)
+            public void encode(RegistryFriendlyByteBuf buf, DistillatingRecipe recipe)
             {
                 Either<ResourceLocation, TagKey<Fluid>> input = recipe.input();
                 if (input.right().isPresent())
@@ -129,16 +129,16 @@ public final class DistillationRecipeSerializer implements RecipeSerializer<Dist
             }
         };
 
-    private DistillationRecipeSerializer() {}
+    private DistillatingRecipeSerializer() {}
 
     @Override
-    public MapCodec<DistillationRecipe> codec()
+    public MapCodec<DistillatingRecipe> codec()
     {
         return CODEC;
     }
 
     @Override
-    public StreamCodec<RegistryFriendlyByteBuf, DistillationRecipe> streamCodec()
+    public StreamCodec<RegistryFriendlyByteBuf, DistillatingRecipe> streamCodec()
     {
         return STREAM_CODEC;
     }

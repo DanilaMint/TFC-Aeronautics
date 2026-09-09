@@ -37,12 +37,12 @@ import org.jetbrains.annotations.Nullable;
 import ru.tfc_aeronautics.Config;
 import ru.tfc_aeronautics.TFCAeronautics;
 import ru.tfc_aeronautics.heat.HeatDealer;
-import ru.tfc_aeronautics.recipe.DistillationRecipe;
-import ru.tfc_aeronautics.recipe.DistillationRecipeType;
+import ru.tfc_aeronautics.recipe.DistillatingRecipe;
+import ru.tfc_aeronautics.recipe.DistillatingRecipeType;
 
 /**
  * The condenser coil's brain: tracks the heat source underneath the fluid tank,
- * the input tank snapshot, the active distillation recipe, and the warmup timer.
+ * the input tank snapshot, the active distillating recipe, and the warmup timer.
  *
  * <p>The state machine is intentionally small: {@code IDLE → WARMUP → RUNNING →
  * IDLE}. {@code PAUSED} is not a separate state — when the coil cannot advance
@@ -103,7 +103,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
     // --- persistent state ---------------------------------------------------
 
     private State state = State.IDLE;
-    @Nullable private DistillationRecipe activeRecipe;
+    @Nullable private DistillatingRecipe activeRecipe;
     @Nullable private BlockPos tankControllerPos;
     /**
      * The face of the coil along the steam axis where the resolved input tank
@@ -184,7 +184,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
 
         // Always watch the result-side neighbour: when a pipe breaks or is
         // rebuilt, or when the input tank swaps sides after a wrench rotation,
-        // we want to re-prime the pump on the next distillation start.
+        // we want to re-prime the pump on the next distillating start.
         // Note: this uses the static blockstate-derived result face, not the
         // dynamic getResultFace(), because at this point inputFace has not been
         // re-resolved yet for this tick. The next tick will pick up the change
@@ -198,12 +198,12 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
         }
 
         // 1. Resolve structure.
-        DistillationStructure.Resolved resolved = DistillationStructure.findTank(level, worldPosition, getBlockState());
+        DistillatingStructure.Resolved resolved = DistillatingStructure.findTank(level, worldPosition, getBlockState());
         BlockPos controllerPos = resolved != null ? resolved.controller() : null;
         inputFace = resolved != null ? resolved.inputFace() : null;
         tankControllerPos = controllerPos;
         FluidTankBlockEntity controller = controllerPos != null
-            ? DistillationStructure.findTankControllerBE(level, worldPosition, getBlockState())
+            ? DistillatingStructure.findTankControllerBE(level, worldPosition, getBlockState())
             : null;
         boolean hasCoolantFlow = hasCoolantFlow();
         Float heatTempC = controller != null ? readHeatSourceTemperature(level, controllerPos) : null;
@@ -250,8 +250,8 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
                 BlockPos heatPos = worldPosition.relative(heat);
                 BlockPos resultPos = worldPosition.relative(result);
                 BlockPos perpPos = worldPosition.relative(perp);
-                String heatWalk = DistillationStructure.traceWalk(level, worldPosition, heat);
-                String resultWalk = DistillationStructure.traceWalk(level, worldPosition, result);
+                String heatWalk = DistillatingStructure.traceWalk(level, worldPosition, heat);
+                String resultWalk = DistillatingStructure.traceWalk(level, worldPosition, result);
                 String heatSourceInfo = controllerPos != null
                     ? describeHeatSource(level, controllerPos)
                     : "<no controller>";
@@ -289,7 +289,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
                     worldPosition, reason);
             }
             if (state == State.RUNNING && controllerPos != null) {
-                DistillationTankLock.unlock(level, controllerPos);
+                DistillatingTankLock.unlock(level, controllerPos);
             }
             state = State.IDLE;
             activeRecipe = null;
@@ -299,10 +299,10 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
         // 3. IDLE → try to enter WARMUP.
         if (state == State.IDLE) {
             FluidStack tankFluid = readTankFluid(controller);
-            Optional<DistillationRecipe> match = findMatchingRecipe(tankFluid);
+            Optional<DistillatingRecipe> match = findMatchingRecipe(tankFluid);
             if (match.isPresent() && match.get().temperatureInRange(heatTempC) && tankFluid.getAmount() > 0) {
                 activeRecipe = match.get();
-                warmupTicks = Config.DISTILLATION_WARMUP_TICKS.get();
+                warmupTicks = Config.DISTILLATING_WARMUP_TICKS.get();
                 lastObservedTankVolume = tankFluid.getAmount();
                 state = State.WARMUP;
                 TFCAeronautics.LOGGER.info(
@@ -328,7 +328,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
                 TFCAeronautics.LOGGER.debug(
                     "condenser_coil: WARMUP timer reset at {}: tankVol {} -> {} (recipe={})",
                     worldPosition, lastObservedTankVolume, observed, activeRecipe.input());
-                warmupTicks = Config.DISTILLATION_WARMUP_TICKS.get();
+                warmupTicks = Config.DISTILLATING_WARMUP_TICKS.get();
                 lastObservedTankVolume = observed;
             }
             if (!hasCoolantFlow || !activeRecipe.temperatureInRange(heatTempC) || observed <= 0) {
@@ -372,7 +372,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
             targetVolume = target;
             produced = 0;
             progress = 0f;
-            DistillationTankLock.lock(level, controllerPos, worldPosition);
+            DistillatingTankLock.lock(level, controllerPos, worldPosition);
             state = State.RUNNING;
             TFCAeronautics.LOGGER.info(
                 "condenser_coil: WARMUP -> RUNNING at {}: snapshotVol={}, targetVol={}, residueVol={}, "
@@ -684,7 +684,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
             worldPosition, activeRecipe, currentVol, produced, activeRecipe != null ? activeRecipe.result() : "<none>",
             residueVol, activeRecipe != null ? activeRecipe.residue() : "<none>", residueVol);
 
-        DistillationTankLock.unlock(level, tankControllerPos);
+        DistillatingTankLock.unlock(level, tankControllerPos);
         state = State.IDLE;
         activeRecipe = null;
         produced = 0;
@@ -701,20 +701,20 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
         return controller.getTankInventory().getFluid();
     }
 
-    private Optional<DistillationRecipe> findMatchingRecipe(FluidStack stack) {
+    private Optional<DistillatingRecipe> findMatchingRecipe(FluidStack stack) {
         if (stack == null || stack.isEmpty()) {
             return Optional.empty();
         }
-        List<net.minecraft.world.item.crafting.RecipeHolder<DistillationRecipe>> all =
-            level.getRecipeManager().getAllRecipesFor(DistillationRecipeType.TYPE.value());
+        List<net.minecraft.world.item.crafting.RecipeHolder<DistillatingRecipe>> all =
+            level.getRecipeManager().getAllRecipesFor(DistillatingRecipeType.TYPE.value());
         TFCAeronautics.LOGGER.trace(
-            "condenser_coil: scanning {} distillation recipes at {} for tank fluid={}",
+            "condenser_coil: scanning {} distillating recipes at {} for tank fluid={}",
             all.size(), worldPosition, stack.getFluid());
-        for (net.minecraft.world.item.crafting.RecipeHolder<DistillationRecipe> holder : all) {
-            DistillationRecipe r = holder.value();
+        for (net.minecraft.world.item.crafting.RecipeHolder<DistillatingRecipe> holder : all) {
+            DistillatingRecipe r = holder.value();
             if (r.matches(stack)) {
                 TFCAeronautics.LOGGER.debug(
-                    "condenser_coil: matched distillation recipe at {}: input={}, result={}, residue={}, "
+                    "condenser_coil: matched distillating recipe at {}: input={}, result={}, residue={}, "
                         + "result_percent={}, rate={}, temp_range={}",
                     worldPosition, r.input(), r.result(), r.residue(), r.result_percent(), r.rate(),
                     r.temperature_range());
@@ -742,7 +742,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
             return true;
         }
         FluidStack tankFluid = readTankFluid(controller);
-        Optional<DistillationRecipe> match = findMatchingRecipe(tankFluid);
+        Optional<DistillatingRecipe> match = findMatchingRecipe(tankFluid);
         if (match.isEmpty()) {
             TFCAeronautics.LOGGER.info(
                 "condenser_coil: post-load recipe re-resolution failed at {}: no recipe for tank fluid={} — aborting to IDLE",
@@ -845,7 +845,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
     }
 
     /** Public read-only access to the active recipe (used for goggle info etc). */
-    public Optional<DistillationRecipe> getActiveRecipe() {
+    public Optional<DistillatingRecipe> getActiveRecipe() {
         return Optional.ofNullable(activeRecipe);
     }
 

@@ -1,7 +1,7 @@
 # Condenser Coil — план реализации
 
 > План исполнения для механики `tfc_aeronautics:condenser_coil` и нового типа рецепта
-> `tfc_aeronautics:distillation`. Дизайн (терминология, архитектура, формат рецепта) —
+> `tfc_aeronautics:distillating`. Дизайн (терминология, архитектура, формат рецепта) —
 > здесь. Прогресс чеклистов — в [`condenser-coil.md`](condenser-coil.md), который будет
 > переписан под финальную схему по результатам этой итерации.
 
@@ -14,7 +14,7 @@
 
 Задача: добавить блок `tfc_aeronautics:condenser_coil`, распознавание связки
 «HeatDealer → create:fluid_tank → труба Create → змеевик → труба с хладагентом» и новый тип
-рецепта `tfc_aeronautics:distillation`, по которому из жидкости в баке получается `result`
+рецепта `tfc_aeronautics:distillating`, по которому из жидкости в баке получается `result`
 на выходе змеевика и `residue` в баке.
 
 Термин `distillage` из старого плана переименовывается в `residue`, `stillage_percent` →
@@ -64,7 +64,7 @@ Create, своего кода потока писать не нужно. Пар�
 
 ### Детект input-бака — BFS по трубам
 
-`DistillationStructure.walkOneDirection` — BFS-обход по Create-трубам через
+`DistillatingStructure.walkOneDirection` — BFS-обход по Create-трубам через
 `FluidPropagator.getPipeConnections`. Лимит — `MAX_PIPE_BLOCKS = 3` трубы между
 coil и баком (совпадает с радиусом эффективного давления на result-face).
 Развилки и колена теперь разворачиваются: 3 трубы в линию + T-стык + бак под
@@ -135,7 +135,7 @@ Create.
 2. **UX (mixin).** `FluidTankBlockEntityMixin` на `handlerForCapability()`
    (`FluidTankBlockEntity.java:374`) — при `@At("RETURN")`, если контроллер бака помечен как
    занятый, подменить возврат на drain-only обёртку. Состояние блокировки хранить в **обычном
-   (не-mixin) helper-классе** `DistillationTankLock` с `Map<GlobalPos, BlockPos>` (позиция
+   (не-mixin) helper-классе** `DistillatingTankLock` с `Map<GlobalPos, BlockPos>` (позиция
    змеевика-владельца) — по опыту проекта кросс-таргетное состояние в самих mixin-классах
    ломается. На lock/unlock вызывать `invalidateCapabilities()` на баке.
 
@@ -147,7 +147,7 @@ Create.
 `IDLE → WARMUP → RUNNING → (PAUSED) → RUNNING → IDLE`
 
 - **WARMUP** входим, когда связка валидна и в баке есть жидкость, подходящая под какой-нибудь
-  `distillation`-рецепт. Счётчик `distillationWarmupTicks` (200 = 10 с). Любое изменение
+  `distillating`-рецепт. Счётчик `distillatingWarmupTicks` (200 = 10 с). Любое изменение
   объёма в баке сбрасывает счётчик обратно на полный — это и есть «можно долить».
 - **RUNNING**: снапшот `total_volume`, lock бака, `target_volume = total_volume * result_percent / 100`,
   `produced = 0f`.
@@ -222,7 +222,7 @@ Item-модель — `parent` на `block/condenser_coil` + блок `display`,
 
 ```json
 {
-  "type": "tfc_aeronautics:distillation",
+  "type": "tfc_aeronautics:distillating",
   "input": { "id": "tfc:vodka" },
   "temperature_range": [60, 110],
   "result": { "id": "tfc_aeronautics:ethanol" },
@@ -255,13 +255,13 @@ Item-модель — `parent` на `block/condenser_coil` + блок `display`,
 | `CondenserCoilBlockEntity.java` | `SmartBlockEntity`; внутренний `SmartFluidTank` результата; машина состояний; тик процесса |
 | `CondenserCoilFluidBehaviour.java` | `extends FluidTransportBehaviour`, `canHaveFlowToward` = только водяные грани |
 | `CondenserCoilCapabilities.java` | `RegisterCapabilitiesEvent` — `FluidHandler.BLOCK` только на выходной грани, по образцу `heater/HeaterCapabilities.java:31-43` |
-| `DistillationStructure.java` | обход трубной линии от паровой грани до `create:fluid_tank`, резолв контроллера, чтение `HeatDealer` |
+| `DistillatingStructure.java` | обход трубной линии от паровой грани до `create:fluid_tank`, резолв контроллера, чтение `HeatDealer` |
 | `CondenserOutputPump.java` | упрощённый `distributePressureTo` с дальностью из конфига |
-| `DistillationTankLock.java` | обычный класс, `Map<GlobalPos, BlockPos>` — состояние блокировки для mixin'а |
+| `DistillatingTankLock.java` | обычный класс, `Map<GlobalPos, BlockPos>` — состояние блокировки для mixin'а |
 
 ### Новые — `src/main/java/ru/tfc_aeronautics/recipe/`
 
-`DistillationRecipe.java`, `DistillationRecipeSerializer.java`, `DistillationRecipeType.java` —
+`DistillatingRecipe.java`, `DistillatingRecipeSerializer.java`, `DistillatingRecipeType.java` —
 по образцу `QuernMillingRecipe*.java` (но **без** наследования от Create-овского
 `ProcessingRecipe` и без `RecipeParams` — процесс идёт в нашем BE).
 
@@ -274,9 +274,9 @@ CallbackInfo — `CallbackInfoReturnable<IFluidHandler>` (метод не void).
 ### Правки существующих
 
 - `TFCAeronautics.java` — `CondenserCoilRegistration.register(modEventBus)` рядом с `HeaterRegistration` (~строка 64)
-- `recipe/RecipeRegistration.java` — регистрация `DistillationRecipeType.RECIPE_TYPES` / `RECIPE_SERIALIZERS`
+- `recipe/RecipeRegistration.java` — регистрация `DistillatingRecipeType.RECIPE_TYPES` / `RECIPE_SERIALIZERS`
 - `Config.java` — три значения рядом с `HEATER_SPEED_MULTIPLIER`:
-  - `distillationWarmupTicks` — IntValue, 200, [0, 72000]
+  - `distillatingWarmupTicks` — IntValue, 200, [0, 72000]
 - `CreativeTabs.java` — добавить `condenser_coil` в `MAIN`
 
 ### Ресурсы (все руками в `src/main/resources/`, датаген не нужен — блок один)
@@ -320,7 +320,7 @@ CallbackInfo — `CallbackInfoReturnable<IFluidHandler>` (метод не void).
 |---|---|---|
 | **После A1** | JSON парсится; UV совпадают с bbmodel; `condenser_coil.bbmodel` и `condenser_coil_vertical.bbmodel` не удалены; item-`display` скопирован из `heater.json`; PNG-текстура извлечена | `Read` каждого созданного файла + `python3 -c "import json; json.load(open('.../blockstates/condenser_coil.json'))"` для каждого JSON |
 | **После A2** | Сериализатор использует `MapCodec`/`StreamCodec` правильно; рецепт-тип зарегистрирован; JSON-формат совпадает с разделом выше | `Read` 3 новых файлов + diff `RecipeRegistration.java`; проверка, что `RECIPE_TYPES`/`RECIPE_SERIALIZERS` — правильные registry names |
-| **После A3** | `CallbackInfoReturnable<IFluidHandler>` (не `CallbackInfo`); lock-состояние в `DistillationTankLock` (plain class), не в самом mixin'е; `Config.java` новые значения с правильными диапазонами; mixin-имя добавлено в `tfc_aeronautics.mixins.json` | `Read` всех 4 файлов; перепроверить каждый пункт чеклиста выше |
+| **После A3** | `CallbackInfoReturnable<IFluidHandler>` (не `CallbackInfo`); lock-состояние в `DistillatingTankLock` (plain class), не в самом mixin'е; `Config.java` новые значения с правильными диапазонами; mixin-имя добавлено в `tfc_aeronautics.mixins.json` | `Read` всех 4 файлов; перепроверить каждый пункт чеклиста выше |
 | **После волны 1** | Все три агента не наступили друг другу на файлы; общий билд проходит | `./gradlew compileJava` |
 | **После A4** | Ссылки на типы из A2/A3 корректные; `AXIS`/`WATER_VERTICAL` объявлены правильно; `canHaveFlowToward` возвращает `true` только для водяных граней; машина состояний соответствует разделу «Состояния змеевика»; снапшот-арифметика 1000 → 410 + 590 | `Read` всех файлов пакета `condenser_coil/` + diff `TFCAeronautics.java` и `CreativeTabs.java`; пройти по чеклисту глазами |
 | **После волны 2** | Билд + клиентский сорс-сет | `./gradlew compileJava` + `./gradlew compileClientJava` |
@@ -336,8 +336,8 @@ CallbackInfo — `CallbackInfoReturnable<IFluidHandler>` (метод не void).
 | Агент | Тип | Файлы (не пересекаются) |
 |---|---|---|
 | **A1. Ресурсы** | `coder` | `assets/.../blockstates/condenser_coil.json`, `models/block/condenser_coil{,_vertical}.json`, `models/item/condenser_coil.json`, `textures/block/condenser_coil.png`, `lang/{en_us,ru_ru}.json`, `data/.../tags/fluid/coolant.json` |
-| **A2. Тип рецепта** | `coder` | `recipe/DistillationRecipe.java`, `DistillationRecipeSerializer.java`, `DistillationRecipeType.java`, правка `recipe/RecipeRegistration.java` |
-| **A3. Конфиг + блокировка бака** | `coder` | правка `Config.java`, `condenser_coil/DistillationTankLock.java`, `mixin/FluidTankBlockEntityMixin.java`, правка `tfc_aeronautics.mixins.json` |
+| **A2. Тип рецепта** | `coder` | `recipe/DistillatingRecipe.java`, `DistillatingRecipeSerializer.java`, `DistillatingRecipeType.java`, правка `recipe/RecipeRegistration.java` |
+| **A3. Конфиг + блокировка бака** | `coder` | правка `Config.java`, `condenser_coil/DistillatingTankLock.java`, `mixin/FluidTankBlockEntityMixin.java`, правка `tfc_aeronautics.mixins.json` |
 
 Что каждому агенту дать в промпте:
 - A1 — читать **оба** `.bbmodel` напрямую (не по чужому пересказу), UV копировать verbatim,
@@ -352,7 +352,7 @@ CallbackInfo — `CallbackInfoReturnable<IFluidHandler>` (метод не void).
 ### Волна 2 — ядро, один агент
 
 **A4. Блок + BE + логика** (`coder`): весь пакет `condenser_coil/` кроме
-`DistillationTankLock.java`. Зависит от типов, созданных в A2 и A3, поэтому параллелить
+`DistillatingTankLock.java`. Зависит от типов, созданных в A2 и A3, поэтому параллелить
 нельзя. Плюс правки `TFCAeronautics.java` и `CreativeTabs.java`.
 
 В промпт: разделение осей через `canHaveFlowToward`, детект протока через `PipeConnection.flow`,

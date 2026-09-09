@@ -31,7 +31,7 @@ import ru.tfc_aeronautics.heat.HeatDealer;
  * the controller's {@link BlockEntity#getBlockPos()} via
  * {@link FluidTankBlockEntity#getController()}.
  */
-public final class DistillationStructure {
+public final class DistillatingStructure {
 
     /**
      * Maximum number of Create fluid-pipe blocks the BFS may traverse between
@@ -43,7 +43,7 @@ public final class DistillationStructure {
      */
     private static final int MAX_PIPE_BLOCKS = 3;
 
-    private DistillationStructure() {
+    private DistillatingStructure() {
         // utility class — no instances
     }
 

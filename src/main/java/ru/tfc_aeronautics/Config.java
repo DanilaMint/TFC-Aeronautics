@@ -63,11 +63,11 @@ public class Config {
                     + "required temperature for the recipe to fire.")
             .defineInRange("heaterSpeedMultiplier", 1.0, 0.0, 10.0);
 
-    public static final ModConfigSpec.IntValue DISTILLATION_WARMUP_TICKS = BUILDER
+    public static final ModConfigSpec.IntValue DISTILLATING_WARMUP_TICKS = BUILDER
             .comment("Ticks the condenser coil spends in WARMUP before locking the tank and starting the run. "
                     + "Any change to the tank's fluid contents while warming up restarts the timer. "
                     + "Default 200 = 10 seconds at 20 tps.")
-            .defineInRange("distillationWarmupTicks", 200, 0, 72000);
+            .defineInRange("distillatingWarmupTicks", 200, 0, 72000);
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 

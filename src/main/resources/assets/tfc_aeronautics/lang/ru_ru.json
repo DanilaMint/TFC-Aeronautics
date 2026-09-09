@@ -106,6 +106,6 @@
   "item.tfc_aeronautics.wood.bracket.sycamore": "Платановая скоба",
   "item.tfc_aeronautics.wood.bracket.white_cedar": "Белокедровая скоба",
   "item.tfc_aeronautics.wood.bracket.willow": "Ивовая скоба",
-  "jei.tfc_aeronautics.distillation": "Дистилляция",
-  "jei.tfc_aeronautics.distillation.temp": "Температура: %1$d°C – %2$d°C"
+  "jei.tfc_aeronautics.distillating": "Дистилляция",
+  "jei.tfc_aeronautics.distillating.temp": "Температура: %1$d°C – %2$d°C"
 }

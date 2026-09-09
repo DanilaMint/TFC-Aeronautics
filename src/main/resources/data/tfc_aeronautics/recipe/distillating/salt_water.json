@@ -1,5 +1,5 @@
 {
-    "type": "tfc_aeronautics:distillation",
+    "type": "tfc_aeronautics:distillating",
     "input": { "id": "tfc:salt_water" },
     "temperature_range": [0, 1600],
     "result": "tfc:vinegar",

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import ru.tfc_aeronautics.condenser_coil.DistillationTankLock;
+import ru.tfc_aeronautics.condenser_coil.DistillatingTankLock;
 
 /**
  * Locks a {@code create:fluid_tank} controller for the duration of a condenser
@@ -36,7 +36,7 @@ import ru.tfc_aeronautics.condenser_coil.DistillationTankLock;
  * stays consistent.
  *
  * <p>The lock state itself lives in
- * {@link DistillationTankLock}, not on the mixin — Standard mixin classes are
+ * {@link DistillatingTankLock}, not on the mixin — Standard mixin classes are
  * not loadable from outside (see
  * {@code feedback_standard_mixin_not_loadable.md}), so the only safe place for
  * cross-target state is a plain helper class.
@@ -50,7 +50,7 @@ import ru.tfc_aeronautics.condenser_coil.DistillationTankLock;
 public abstract class FluidTankBlockEntityMixin
 {
     @Inject(method = "handlerForCapability", at = @At("RETURN"), cancellable = true)
-    private void aeronautics$lockHandlerIfDistilling(CallbackInfoReturnable<IFluidHandler> cir)
+    private void aeronautics$lockHandlerIfDistillating(CallbackInfoReturnable<IFluidHandler> cir)
     {
         FluidTankBlockEntity self = (FluidTankBlockEntity) (Object) this;
         if (!self.isController())
@@ -62,7 +62,7 @@ public abstract class FluidTankBlockEntityMixin
         {
             return;
         }
-        if (!DistillationTankLock.isLocked(level, self.getBlockPos()))
+        if (!DistillatingTankLock.isLocked(level, self.getBlockPos()))
         {
             return;
         }

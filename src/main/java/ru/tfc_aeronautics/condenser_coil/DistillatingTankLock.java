@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>When a controller is locked, {@link #isLocked(Level, BlockPos)} returns
  * {@code true} and
- * {@code ru.tfc_aeronautics.mixin.FluidTankBlockEntityMixin#aeronautics$lockHandlerIfDistilling}
+ * {@code ru.tfc_aeronautics.mixin.FluidTankBlockEntityMixin#aeronautics$lockHandlerIfDistillating}
  * swaps {@code FluidTankBlockEntity.handlerForCapability()} for a drain-only
  * wrapper, preventing the player (or a Create pump) from adding more fluid while
  * the coil is mid-distillation.
@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * any cross-tick interaction (e.g. a future scheduled task) don't need a
  * separate lock.
  */
-public final class DistillationTankLock
+public final class DistillatingTankLock
 {
     /**
      * Pure data key: which (dimension, position) the lock refers to.
@@ -49,7 +49,7 @@ public final class DistillationTankLock
     /** Active locks, keyed by (dimension, controller-pos). */
     private static final Map<GlobalPos, BlockPos> LOCKED = new ConcurrentHashMap<>();
 
-    private DistillationTankLock()
+    private DistillatingTankLock()
     {
         // utility class — no instances
     }
