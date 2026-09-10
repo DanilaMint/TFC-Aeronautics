@@ -1,9 +1,0 @@
-{
-    "type": "tfc_aeronautics:distillating",
-    "input": { "id": "tfc:salt_water" },
-    "temperature_range": [0, 1600],
-    "result": "tfc:vinegar",
-    "residue": "tfc:limewater",
-    "result_percent": 30,
-    "rate": 1.0
-}

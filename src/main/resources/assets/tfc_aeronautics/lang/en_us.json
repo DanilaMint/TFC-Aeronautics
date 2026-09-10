@@ -27,6 +27,10 @@
   "fluid.tfc_aeronautics.rosin": "Rosin",
   "item.tfc_aeronautics.rosin_bucket": "Rosin Bucket",
   "tfc.recipe.barrel.tfc_aeronautics.barrel.rosin": "Rosin",
+  "fluid.tfc_aeronautics.ethanol": "Ethanol",
+  "item.tfc_aeronautics.ethanol_bucket": "Ethanol Bucket",
+  "fluid.tfc_aeronautics.stillage": "Stillage",
+  "item.tfc_aeronautics.stillage_bucket": "Stillage Bucket",
   "tfc.recipe.barrel.tfc_aeronautics.barrel.impregnated_burlap_cloth": "Impregnated Burlap Cloth",
   "item.tfc_aeronautics.metal.tight_sheet.copper": "Copper Tight Sheet",
   "item.tfc_aeronautics.metal.tight_sheet.wrought_iron": "Wrought Iron Tight Sheet",
@@ -106,5 +110,7 @@
   "item.tfc_aeronautics.wood.bracket.sycamore": "Sycamore Bracket",
   "item.tfc_aeronautics.wood.bracket.white_cedar": "White Cedar Bracket",
   "item.tfc_aeronautics.wood.bracket.willow": "Willow Bracket",
-  "jei.tfc_aeronautics.distillating": "Distillating"
+  "jei.tfc_aeronautics.distillating": "Distillating",
+  "tfc_aeronautics.ponder.condenser_coil/distillating.header": "Condensing distillate with the Condenser Coil",
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_1": "The Condenser Coil cools hot distillate from a Distillator and pushes the product out the result face"
 }

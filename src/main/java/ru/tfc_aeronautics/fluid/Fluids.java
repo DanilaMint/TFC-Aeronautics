@@ -40,6 +40,32 @@ public final class Fluids
             MixingFluid.Source::new,
             MixingFluid.Flowing::new);
 
+    public static final FluidHolder<BaseFlowingFluid> ETHANOL =
+        RegistrationHelpers.registerFluid(
+            FLUID_TYPES, FLUIDS,
+            "ethanol",
+            "ethanol",
+            "flowing_ethanol",
+            properties -> properties
+                .block(FluidBlocks.ETHANOL)
+                .bucket(FluidItems.ETHANOL_BUCKET),
+            () -> new FluidType(waterLikeRosin().descriptionId("fluid.tfc_aeronautics.ethanol")),
+            MixingFluid.Source::new,
+            MixingFluid.Flowing::new);
+
+    public static final FluidHolder<BaseFlowingFluid> STILLAGE =
+        RegistrationHelpers.registerFluid(
+            FLUID_TYPES, FLUIDS,
+            "stillage",
+            "stillage",
+            "flowing_stillage",
+            properties -> properties
+                .block(FluidBlocks.STILLAGE)
+                .bucket(FluidItems.STILLAGE_BUCKET),
+            () -> new FluidType(waterLikeRosin().descriptionId("fluid.tfc_aeronautics.stillage")),
+            MixingFluid.Source::new,
+            MixingFluid.Flowing::new);
+
     private Fluids() {}
 
     /** Water-like FluidType properties copied from {@code TFCFluids.waterLike()} for rosin. */

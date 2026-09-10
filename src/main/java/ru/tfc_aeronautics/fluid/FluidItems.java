@@ -25,6 +25,16 @@ public final class FluidItems
             Fluids.ROSIN.getSource(),
             new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
 
+    public static final DeferredHolder<Item, BucketItem> ETHANOL_BUCKET =
+        ITEMS.register("ethanol_bucket", () -> new BucketItem(
+            Fluids.ETHANOL.getSource(),
+            new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
+
+    public static final DeferredHolder<Item, BucketItem> STILLAGE_BUCKET =
+        ITEMS.register("stillage_bucket", () -> new BucketItem(
+            Fluids.STILLAGE.getSource(),
+            new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
+
     private FluidItems() {}
 
     public static void register(IEventBus bus)

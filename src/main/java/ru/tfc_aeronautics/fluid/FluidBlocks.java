@@ -23,6 +23,16 @@ public final class FluidBlocks
             Fluids.ROSIN.getSource(),
             Block.Properties.ofFullCopy(Blocks.WATER).noLootTable()));
 
+    public static final DeferredHolder<Block, LiquidBlock> ETHANOL =
+        BLOCKS.register("fluid/ethanol", () -> new LiquidBlock(
+            Fluids.ETHANOL.getSource(),
+            Block.Properties.ofFullCopy(Blocks.WATER).noLootTable()));
+
+    public static final DeferredHolder<Block, LiquidBlock> STILLAGE =
+        BLOCKS.register("fluid/stillage", () -> new LiquidBlock(
+            Fluids.STILLAGE.getSource(),
+            Block.Properties.ofFullCopy(Blocks.WATER).noLootTable()));
+
     private FluidBlocks() {}
 
     public static void register(IEventBus bus)

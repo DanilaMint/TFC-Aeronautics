@@ -37,5 +37,23 @@ public final class FluidClientExtensions
                 ResourceLocation.withDefaultNamespace("block/water_flow"),
                 null, null),
             Fluids.ROSIN.getType());
+
+        // Ethanol — slightly more transparent than vodka (0xDCDCDC); same vanilla water sprite
+        event.registerFluidType(
+            new FluidRendererExtension(
+                TFCFluids.ALPHA_MASK | 0xE8E8E8,
+                ResourceLocation.withDefaultNamespace("block/water_still"),
+                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                null, null),
+            Fluids.ETHANOL.getType());
+
+        // Stillage — pale-yellow tint; same vanilla water sprite
+        event.registerFluidType(
+            new FluidRendererExtension(
+                TFCFluids.ALPHA_MASK | 0xC8C0A0,
+                ResourceLocation.withDefaultNamespace("block/water_still"),
+                ResourceLocation.withDefaultNamespace("block/water_flow"),
+                null, null),
+            Fluids.STILLAGE.getType());
     }
 }
