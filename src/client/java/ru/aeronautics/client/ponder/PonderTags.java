@@ -6,6 +6,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
 
 import ru.tfc_aeronautics.TFCAeronautics;
+import ru.tfc_aeronautics.condenser_coil.CondenserCoilRegistration;
 import ru.tfc_aeronautics.heater.HeaterRegistration;
 import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
 
@@ -21,8 +22,8 @@ import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
  */
 public final class PonderTags {
 
-    public static final ResourceLocation KINETICS =
-        ResourceLocation.fromNamespaceAndPath(TFCAeronautics.MOD_ID, "kinetics");
+    public static final ResourceLocation KINETIC_APPLIANCES = ResourceLocation.fromNamespaceAndPath("create", "kinetic_appliances");
+    public static final ResourceLocation FLUIDS = ResourceLocation.fromNamespaceAndPath("create", "fluids");
 
     private PonderTags() {}
 
@@ -30,15 +31,10 @@ public final class PonderTags {
         PonderTagRegistrationHelper<DeferredHolder<?, ?>> blockHelper =
             helper.withKeyFunction(h -> h.getKey().location());
 
-        helper.registerTag(KINETICS)
-            .addToIndex()
-            .item(HeaterRegistration.HEATER.get(), true, false)
-            .title("Kinetics")
-            .description("Components built around Create's kinetic system")
-            .register();
+        blockHelper.addToTag(FLUIDS)
+            .add(CondenserCoilRegistration.CONDENSER_COIL);
 
-        blockHelper.addToTag(KINETICS)
-            .add(HeaterRegistration.HEATER)
+        blockHelper.addToTag(KINETIC_APPLIANCES)
             .add(StampingPressRegistration.STAMPING_PRESS);
     }
 }

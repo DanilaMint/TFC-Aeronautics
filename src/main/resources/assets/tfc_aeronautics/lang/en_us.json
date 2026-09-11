@@ -112,5 +112,9 @@
   "item.tfc_aeronautics.wood.bracket.willow": "Willow Bracket",
   "jei.tfc_aeronautics.distillating": "Distillating",
   "tfc_aeronautics.ponder.condenser_coil/distillating.header": "Condensing distillate with the Condenser Coil",
-  "tfc_aeronautics.ponder.condenser_coil/distillating.text_1": "The Condenser Coil cools hot distillate from a Distillator and pushes the product out the result face"
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_1": "The coil is needed to build a distillator. Inside, the substance's vapors cool down and collect on the other side.",
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_2": "Distillable liquid is poured into the tank; there must be a heat source below.",
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_3": "Coolant flows through the coil.",
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_4": "When all conditions are met, liquid forms on the opposite side of the coil.",
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_5": "When the process finishes, residue remains in the original tank."
 }

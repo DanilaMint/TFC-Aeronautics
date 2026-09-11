@@ -112,5 +112,9 @@
   "item.tfc_aeronautics.wood.bracket.willow": "Ивовая скоба",
   "jei.tfc_aeronautics.distillating": "Дистилляция",
   "tfc_aeronautics.ponder.condenser_coil/distillating.header": "Конденсация дистиллята в змеевике",
-  "tfc_aeronautics.ponder.condenser_coil/distillating.text_1": "Змеевик-конденсатор охлаждает горячий дистиллят от дистиллятора и выводит готовый продукт через result-грань"
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_1": "Змеевик нужен для постройки дистиллятора. В нем пары вещества остывают и собираются с другой стороны.",
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_2": "В бак заливается дистиллируемая жидкость, снизу должен быть источник тепла.",
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_3": "Через змеевик протекает хладагент.",
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_4": "Когда все условия соблюдаются, с противоположной стороны змеевика образуется жидкость.",
+  "tfc_aeronautics.ponder.condenser_coil/distillating.text_5": "После окончания процесса в исходном баке образуется остаток."
 }

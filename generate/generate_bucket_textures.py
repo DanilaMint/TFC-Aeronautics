@@ -62,7 +62,7 @@ TEXTURE_DIR = (
 FLUIDS: list[tuple[str, tuple[int, int, int]]] = [
     ("rosin",    (0xC6, 0x8A, 0x3A)),  # honey-amber, mirrors rosin
     ("ethanol",  (0xE8, 0xE8, 0xE8)),  # near-transparent, slightly more than vodka
-    ("stillage", (0xC8, 0xC0, 0xA0)),  # pale yellow
+    ("stillage", (0xB5, 0x9A, 0x73)),  # pale yellow
 ]
 
 # Sum-of-channel-difference threshold (0..765). Anything above this means the

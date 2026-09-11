@@ -3664,7 +3664,7 @@ Mixin на `RecipeApplier.applyRecipeOn` — единая точка перех�
                           (input)             (water: ───►)
 ```
 
-Терминология полей рецепта (`input` / `temperature_range` / `result` /
+Терминология полей рецепта (`input` / `min_temperature` / `result` /
 `residue` / `result_percent` / `rate`) и чеклист реализации — в
 [`plans/condenser-coil.md`](../plans/condenser-coil.md). Здесь — дизайн и
 особенности, которые стоит проговорить подробно.
@@ -3676,15 +3676,15 @@ Mixin на `RecipeApplier.applyRecipeOn` — единая точка перех�
 тике `CondenserCoilBlockEntity#readHeatSourceTemperature` спрашивает
 `HeatDealer.findTemperature(level, tankControllerPos.below(), state)` и
 получает градусы Цельсия напрямую. Дальше идёт сравнение
-`recipe.temperature_range().min() <= t && t <=
-recipe.temperature_range().max()`.
+`recipe.minTemperature() <= t`.
 
 Это **не** шкала `BoilerHeater` из Create: `HeatDealers.toBoilerHeat`
 переводит °C в ступени SU (`0..7` шагом 200 °C) для парового котла и
-применяется только там. Дистилляция сравнивает сырые °C — у рецепта может
-быть, например, `[60, 110]`, что в шкале SU схлопнулось бы в ноль.
-Физически разница осмысленная: рецепту важно попадание в температурное
-окно, а не «как много SU набралось».
+применяется только там. Дистилляция сравнивает сырые °C — у рецепта
+есть только нижняя граница (например, `min_temperature: 60`), выше
+которой прогресс идёт без ограничений. В шкале SU это всё, что выше
+соответствующей ступени, схлопывать нечего. Физически разница
+осмысленная: рецепту важен нижний порог, а не «как много SU набралось».
 
 ### Две оси змеевика и `canHaveFlowToward`
 
@@ -3736,7 +3736,7 @@ BFS-обход от coil'а по Create-трубам (≤3 трубы, как д
                  │   IDLE   │◄───────────────────────────────┐
                  └────┬─────┘                                │
        (tank has input matching recipe,                     │
-        heat within temperature_range,                      │
+        heat >= min_temperature,                            │
         coolant flowing)                                    │
                       ▼                                     │
                  ┌──────────┐                                │
@@ -3753,7 +3753,7 @@ BFS-обход от coil'а по Create-трубам (≤3 трубы, как д
 ```
 
 `PAUSED` — не отдельное состояние, а ситуация в `RUNNING`, когда тик не
-может продвинуться: температура вне `temperature_range`, нет протока
+может продвинуться: температура ниже `min_temperature`, нет протока
 хладагента, или внутренний бак результата полон. Прогресс и блокировка
 бака сохраняются — следующий тик снова проверка условий. Это сделано
 сознательно: отдельное состояние потребовало бы персистить флаг и
@@ -3931,7 +3931,7 @@ BFS корректно разворачивается на развилках и
 {
   "type": "tfc_aeronautics:distillating",
   "input": { "id": "tfc:vodka" },
-  "temperature_range": [60, 110],
+  "min_temperature": 60,
   "result": "tfc_aeronautics:ethanol",
   "residue": "tfc_aeronautics:stillage",
   "result_percent": 41,
@@ -3942,7 +3942,7 @@ BFS корректно разворачивается на развилках и
 | Поле | Тип | Семантика |
 |------|-----|-----------|
 | `input` | `Either<{ id }, { tag }>` | Что должно быть в баке. Тег — `TagKey<Fluid>`, собственный кодек. |
-| `temperature_range` | `[min, max]` °C, int | Закрытый интервал, валидация размера = 2 и `min <= max`. |
+| `min_temperature` | int, °C | Нижняя граница; рецепт активен при `t >= min_temperature`, верхней границы нет. |
 | `result` | `<fluid_id>` (строка) | Жидкость на выходной грани змеевика. Объём вычисляется, в JSON не пишется. |
 | `residue` | `<fluid_id>` (строка) | Жидкость-остаток, заливается в бак по завершении. |
 | `result_percent` | int 0..100 | `target = snapshot * result_percent / 100`. |
@@ -3972,7 +3972,7 @@ TagKey.codec(Registries.FLUID).fieldOf("tag"))`.
 
 ```text
 [ input fluid ] → [ result fluid ] [ residue fluid ]
-                       Temp: %1$d°C – %2$d°C
+                       Temp: %1$d°C
 ```
 
 Реализация:
@@ -3987,10 +3987,11 @@ TagKey.codec(Registries.FLUID).fieldOf("tag"))`.
   слот вмещает **все** жидкости тега, JEI сам листает их по фокусу.
   Резолв — `level.registryAccess().lookupOrThrow(Registries.FLUID)
   .getTag(tag)`.
-- **Температурный текст** — через `createRecipeExtras(builder, recipe,
-  focuses) → builder.addText(translated, x, y)`. Не через `draw(...)` —
-  текстовый widget знает свой Z-order и не ломается при будущих
-  изменениях фона.
+- **Температурный текст** — рендерится напрямую через
+  `guiGraphics.drawString(font, Component.literal(recipe.minTemperature() + "°C"), ...)`
+  с ручным центрированием в рамке `TEMP_FRAME_*`. Не через JEI-widget —
+  документ рассчитан на произвольный layout, а температура прибита к
+  фиксированной позиции внутри рамки.
 
 Зависимость `compileOnly files('libs/jei-1.21.1-neoforge-19.27.0.343.jar')`
 в `build.gradle` (рядом с TFC/Create). Если JEI отсутствует в модпаке,
@@ -4001,7 +4002,8 @@ TagKey.codec(Registries.FLUID).fieldOf("tag"))`.
 | Ключ | en_us | ru_ru |
 |------|-------|-------|
 | `jei.tfc_aeronautics.distillating` | `Distillation` | `Дистилляция` |
-| `jei.tfc_aeronautics.distillating.temp` | `Temp: %1$d°C – %2$d°C` | `Температура: %1$d°C – %2$d°C` |
+
+(Температурный текст рисуется литералом в Java и локализации не подлежит — отдельного ключа нет.)
 
 ### Что НЕ сделано в этой итерации
 

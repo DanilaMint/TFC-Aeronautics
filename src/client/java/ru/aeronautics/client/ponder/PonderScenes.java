@@ -2,11 +2,10 @@ package ru.aeronautics.client.ponder;
 
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 import net.neoforged.neoforge.registries.DeferredHolder;
-
-import ru.tfc_aeronautics.heater.HeaterRegistration;
-import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
-import ru.aeronautics.client.ponder.scenes.HeaterScenes;
+import ru.aeronautics.client.ponder.scenes.CondenserCoilScenes;
 import ru.aeronautics.client.ponder.scenes.StampingPressScenes;
+import ru.tfc_aeronautics.condenser_coil.CondenserCoilRegistration;
+import ru.tfc_aeronautics.stamping_press.StampingPressRegistration;
 
 /**
  * Binds storyboards (scene methods) to the blocks they describe.
@@ -23,12 +22,12 @@ public final class PonderScenes {
     private PonderScenes() {}
 
     public static void register(PonderSceneRegistrationHelper<DeferredHolder<?, ?>> helper) {
-        helper.forComponents(HeaterRegistration.HEATER)
-            .addStoryBoard("heater/intro", HeaterScenes::intro,
-                PonderTags.KINETICS);
+        helper.forComponents(CondenserCoilRegistration.CONDENSER_COIL)
+            .addStoryBoard("condenser_coil/distillating", CondenserCoilScenes::distillating,
+                PonderTags.FLUIDS);
 
         helper.forComponents(StampingPressRegistration.STAMPING_PRESS)
             .addStoryBoard("stamping_press/pressing", StampingPressScenes::pressing,
-                PonderTags.KINETICS);
+                PonderTags.KINETIC_APPLIANCES);
     }
 }

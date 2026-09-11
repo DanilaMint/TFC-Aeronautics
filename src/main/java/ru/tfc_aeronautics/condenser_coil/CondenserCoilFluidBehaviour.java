@@ -67,6 +67,10 @@ public class CondenserCoilFluidBehaviour extends FluidTransportBehaviour {
      */
     @Override
     public boolean canHaveFlowToward(BlockState state, Direction direction) {
+        // Create's PipeAttachmentModel passes every neighbour state here (incl. minecraft:air) — guard non-coil blocks to avoid IllegalArgumentException on WATER_VERTICAL.
+        if (!state.hasProperty(CondenserCoilBlock.WATER_VERTICAL)) {
+            return false;
+        }
         return direction.getAxis() == waterAxis(state);
     }
 
