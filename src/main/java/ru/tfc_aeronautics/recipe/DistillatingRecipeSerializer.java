@@ -11,8 +11,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.material.Fluid;
 
-import ru.tfc_aeronautics.recipe.DistillatingRecipe.IntPair;
-
 /**
  * JSON + network codec for {@link DistillatingRecipe}.
  *
@@ -21,7 +19,7 @@ import ru.tfc_aeronautics.recipe.DistillatingRecipe.IntPair;
  * {
  *   "type": "tfc_aeronautics:distillating",
  *   "input": { "id": "<fluid>" } | { "tag": "<fluid_tag>" },
- *   "temperature_range": [min, max],
+ *   "min_temperature": 50,
  *   "result":  "<fluid>",
  *   "residue": "<fluid>",
  *   "result_percent": 41,
@@ -38,14 +36,13 @@ import ru.tfc_aeronautics.recipe.DistillatingRecipe.IntPair;
  * {@code amount}, which is incompatible with our "compute volume at runtime"
  * semantics.
  *
- * <p>The {@code temperature_range} field is encoded as a JSON array of exactly
- * two ints (closed interval). The codec enforces the arity via
- * {@code Codec.INT.listOf().comapFlatMap(...)} in
- * {@link DistillatingRecipe#INT_PAIR_CODEC}; values outside {@code [min, max]}
- * orderings are rejected by {@link IntPair}'s compact constructor.
+ * <p>The {@code min_temperature} field is a single int — the lower bound in
+ * degrees Celsius. The recipe is active for any tank temperature
+ * {@code t >= min_temperature}; there is no upper bound (overheat no longer
+ * pauses production).
  *
  * <p>The {@link StreamCodec} is symmetric to the JSON codec for the simple
- * scalar fields (fluid, percent, rate, temperature pair). For the
+ * scalar fields (fluid, percent, rate, min_temperature). For the
  * {@code input} selector the network form is a one-byte discriminator
  * ({@code false = id branch, true = tag branch}) followed by either a
  * {@link ResourceLocation} or the tag's {@link ResourceLocation} location —
@@ -59,7 +56,7 @@ public final class DistillatingRecipeSerializer implements RecipeSerializer<Dist
 
     private static final MapCodec<DistillatingRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
         DistillatingRecipe.INPUT_CODEC.fieldOf("input").forGetter(DistillatingRecipe::input),
-        DistillatingRecipe.INT_PAIR_CODEC.fieldOf("temperature_range").forGetter(DistillatingRecipe::temperature_range),
+        com.mojang.serialization.Codec.INT.fieldOf("min_temperature").forGetter(DistillatingRecipe::minTemperature),
         DistillatingRecipe.FLUID_CODEC.fieldOf("result").forGetter(DistillatingRecipe::result),
         DistillatingRecipe.FLUID_CODEC.fieldOf("residue").forGetter(DistillatingRecipe::residue),
         com.mojang.serialization.Codec.INT.fieldOf("result_percent").forGetter(DistillatingRecipe::result_percent),
@@ -98,12 +95,12 @@ public final class DistillatingRecipeSerializer implements RecipeSerializer<Dist
                     ResourceLocation id = ResourceLocation.STREAM_CODEC.decode(buf);
                     input = Either.left(id);
                 }
-                IntPair temps = new IntPair(buf.readInt(), buf.readInt());
+                int minTemp = buf.readInt();
                 Fluid result = FLUID_STREAM_CODEC.decode(buf);
                 Fluid residue = FLUID_STREAM_CODEC.decode(buf);
                 int percent = buf.readInt();
                 float rate = buf.readFloat();
-                return new DistillatingRecipe(input, temps, result, residue, percent, rate);
+                return new DistillatingRecipe(input, minTemp, result, residue, percent, rate);
             }
 
             @Override
@@ -120,8 +117,7 @@ public final class DistillatingRecipeSerializer implements RecipeSerializer<Dist
                     buf.writeBoolean(false);
                     ResourceLocation.STREAM_CODEC.encode(buf, input.left().get());
                 }
-                buf.writeInt(recipe.temperature_range().min());
-                buf.writeInt(recipe.temperature_range().max());
+                buf.writeInt(recipe.minTemperature());
                 FLUID_STREAM_CODEC.encode(buf, recipe.result());
                 FLUID_STREAM_CODEC.encode(buf, recipe.residue());
                 buf.writeInt(recipe.result_percent());

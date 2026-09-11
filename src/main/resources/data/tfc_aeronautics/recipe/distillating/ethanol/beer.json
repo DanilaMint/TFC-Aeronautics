@@ -1,8 +1,8 @@
 {
     "type": "tfc_aeronautics:distillating",
     "input": { "id": "tfc:beer" },
-    "temperature_range": [50, 110],
-    "result": "tfc_aeronautics:vodka",
+    "min_temperature": 80,
+    "result": "tfc:vodka",
     "residue": "tfc_aeronautics:stillage",
     "result_percent": 15,
     "rate": 0.5

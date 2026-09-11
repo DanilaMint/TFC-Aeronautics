@@ -50,7 +50,7 @@ public final class FluidClientExtensions
         // Stillage — pale-yellow tint; same vanilla water sprite
         event.registerFluidType(
             new FluidRendererExtension(
-                TFCFluids.ALPHA_MASK | 0xC8C0A0,
+                TFCFluids.ALPHA_MASK | 0xB59A73,
                 ResourceLocation.withDefaultNamespace("block/water_still"),
                 ResourceLocation.withDefaultNamespace("block/water_flow"),
                 null, null),

@@ -1,6 +1,5 @@
 package ru.tfc_aeronautics.recipe;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.mojang.datafixers.util.Either;
@@ -17,7 +16,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 
 /**
@@ -30,10 +28,9 @@ import com.mojang.serialization.MapCodec;
  *       or a {@link TagKey} of fluids (matched against the tank's current
  *       {@link FluidStack}). The {@link Either} shape is what the JSON codec
  *       enforces with {@code Codec.mapEither}.</li>
- *   <li>{@link #temperature_range} — closed interval {@code [min, max]} in
- *       degrees Celsius. Distillating only progresses while the BE temperature
- *       lies inside the interval; outside, the BE idles (matches returns true
- *       but production does not advance).</li>
+ *   <li>{@link #minTemperature} — нижняя граница в градусах Цельсия.
+ *       Дистилляция идёт при любой температуре {@code t >= minTemperature};
+ *       ниже порога — BE простаивает (matches возвращает true, но прогресс не двигается).</li>
  *   <li>{@link #result} / {@link #residue} — the two output fluids. Volumes
  *       are <em>not</em> declared on the recipe: the BE computes them at run-time
  *       as {@code total * result_percent / 100} and {@code total - result}.</li>
@@ -51,30 +48,13 @@ import com.mojang.serialization.MapCodec;
  */
 public record DistillatingRecipe(
     Either<ResourceLocation, TagKey<Fluid>> input,
-    IntPair temperature_range,
+    int minTemperature,
     Fluid result,
     Fluid residue,
     int result_percent,
     float rate
 ) implements Recipe<RecipeInput>
 {
-    /**
-     * Two-element {@code int} tuple used for {@code temperature_range}. A dedicated
-     * type (rather than {@code int[]}) keeps codecs and getters well-typed and
-     * makes the JSON "exactly two ints" constraint explicit via
-     * {@link DistillatingRecipeSerializer}.
-     */
-    public record IntPair(int min, int max)
-    {
-        public IntPair
-        {
-            if (min > max)
-            {
-                throw new IllegalArgumentException("temperature_range min (" + min + ") > max (" + max + ")");
-            }
-        }
-    }
-
     /**
      * Codec for the {@code input} field, exposed so the serializer and any
      * ad-hoc callers (e.g. tests, the BE during lookup) can share the exact
@@ -92,31 +72,6 @@ public record DistillatingRecipe(
             ResourceLocation.CODEC.fieldOf("id"),
             TagKey.codec(Registries.FLUID).fieldOf("tag")
         );
-
-    /**
-     * Codec for {@link IntPair}: requires a list of exactly two ints.
-     * Used by the serializer for the JSON {@code temperature_range} array.
-     */
-    public static final Codec<IntPair> INT_PAIR_CODEC = Codec.INT.listOf().comapFlatMap(
-        list ->
-        {
-            if (list.size() != 2)
-            {
-                return DataResult.error(() -> "temperature_range must be a list of exactly 2 ints, got " + list.size());
-            }
-            int lo = list.get(0);
-            int hi = list.get(1);
-            try
-            {
-                return DataResult.success(new IntPair(lo, hi));
-            }
-            catch (IllegalArgumentException ex)
-            {
-                return DataResult.error(ex::getMessage);
-            }
-        },
-        pair -> List.of(pair.min(), pair.max())
-    );
 
     /**
      * Codec for {@link Fluid} restricted to fluids registered in
@@ -144,8 +99,8 @@ public record DistillatingRecipe(
             throw new IllegalArgumentException("rate must be non-negative, got " + rate);
         }
         ru.tfc_aeronautics.TFCAeronautics.LOGGER.info(
-            "[diag] DistillatingRecipe constructed: input={}, temp_range=[{},{}], result={}, residue={}, result_percent={}, rate={}",
-            input, temperature_range.min(), temperature_range.max(), result, residue, result_percent, rate);
+            "[diag] DistillatingRecipe constructed: input={}, min_temperature={}, result={}, residue={}, result_percent={}, rate={}",
+            input, minTemperature, result, residue, result_percent, rate);
     }
 
     /**
@@ -173,13 +128,12 @@ public record DistillatingRecipe(
     }
 
     /**
-     * Closed-interval check: returns true iff {@code celsius} lies between
-     * {@link IntPair#min()} and {@link IntPair#max()} (inclusive). Used by
-     * the BE to decide whether to advance production this tick.
+     * Lower-bound check: returns true iff {@code celsius >= minTemperature}.
+     * Used by the BE to decide whether to advance production this tick.
      */
     public boolean temperatureInRange(float celsius)
     {
-        return celsius >= temperature_range.min() && celsius <= temperature_range.max();
+        return celsius >= minTemperature;
     }
 
     /**
@@ -198,24 +152,6 @@ public record DistillatingRecipe(
     public Optional<TagKey<Fluid>> inputTag()
     {
         return input.right();
-    }
-
-    /**
-     * Lower bound of the temperature interval. Convenience over
-     * {@code temperature_range.min()}.
-     */
-    public int minTemperature()
-    {
-        return temperature_range.min();
-    }
-
-    /**
-     * Upper bound of the temperature interval. Convenience over
-     * {@code temperature_range.max()}.
-     */
-    public int maxTemperature()
-    {
-        return temperature_range.max();
     }
 
     /**

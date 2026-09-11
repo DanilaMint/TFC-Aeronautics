@@ -37,7 +37,7 @@ import ru.tfc_aeronautics.recipe.DistillatingRecipe;
  *
  * <pre>
  *   [input 100mB]   [bubbles]   [output XmB]
- *           [X..Y°C]
+ *           [X°C]
  *               V
  *           [residue YmB]
  * </pre>
@@ -186,7 +186,7 @@ public final class DistillatingRecipeCategory extends AbstractRecipeCategory<Rec
 
         // Temperature label, red, centered inside the frame.
         DistillatingRecipe recipe = holder.value();
-        Component tempText = Component.literal(recipe.minTemperature() + ".." + recipe.maxTemperature() + "°C");
+        Component tempText = Component.literal(recipe.minTemperature() + "°C");
         Font font = Minecraft.getInstance().font;
         int textWidth = font.width(tempText);
         int textX = TEMP_FRAME_X + (TEMP_FRAME_W - textWidth) / 2;

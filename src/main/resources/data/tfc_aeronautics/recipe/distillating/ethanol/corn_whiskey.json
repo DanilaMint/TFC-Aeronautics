@@ -1,7 +1,7 @@
 {
     "type": "tfc_aeronautics:distillating",
     "input": { "id": "tfc:corn_whiskey" },
-    "temperature_range": [50, 110],
+    "min_temperature": 50,
     "result": "tfc_aeronautics:ethanol",
     "residue": "tfc_aeronautics:stillage",
     "result_percent": 44,

@@ -211,9 +211,9 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
         // Diff-log external inputs (heat, coolant). Only fires when something
         // actually changes — keeps the log readable in long sessions.
         if (!Objects.equals(heatTempC, lastLoggedHeatTemp)) {
-            TFCAeronautics.LOGGER.debug("condenser_coil: heat at {} changed: {} -> {} (recipe range={})",
+            TFCAeronautics.LOGGER.debug("condenser_coil: heat at {} changed: {} -> {} (recipe min_temp={})",
                 worldPosition, lastLoggedHeatTemp, heatTempC,
-                activeRecipe != null ? activeRecipe.temperature_range() : "<none>");
+                activeRecipe != null ? String.valueOf(activeRecipe.minTemperature()) : "<none>");
             lastLoggedHeatTemp = heatTempC;
         }
         if (hasCoolantFlow != lastLoggedCoolantFlow) {
@@ -306,8 +306,8 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
                 lastObservedTankVolume = tankFluid.getAmount();
                 state = State.WARMUP;
                 TFCAeronautics.LOGGER.info(
-                    "condenser_coil: IDLE -> WARMUP at {}: recipe={} (input={}, temp_range={}), tankVol={}, heat={}°C, warmupTicks={}",
-                    worldPosition, activeRecipe, activeRecipe.input(), activeRecipe.temperature_range(),
+                    "condenser_coil: IDLE -> WARMUP at {}: recipe={} (input={}, min_temperature={}), tankVol={}, heat={}°C, warmupTicks={}",
+                    worldPosition, activeRecipe, activeRecipe.input(), activeRecipe.minTemperature(),
                     tankFluid.getAmount(), heatTempC, warmupTicks);
             } else if (tankFluid.getAmount() > 0) {
                 TFCAeronautics.LOGGER.trace(
@@ -335,7 +335,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
                 // Abort: lost the prerequisites.
                 if (!hasCoolantFlow || !activeRecipe.temperatureInRange(heatTempC)) {
                     String reason = !hasCoolantFlow ? "no coolant flow"
-                        : "temp " + heatTempC + " outside " + activeRecipe.temperature_range();
+                        : "temp " + heatTempC + " below min " + activeRecipe.minTemperature();
                     TFCAeronautics.LOGGER.debug(
                         "condenser_coil: WARMUP waiting at {}: {} (will resume when fixed)",
                         worldPosition, reason);
@@ -393,7 +393,7 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
             }
             if (!hasCoolantFlow || !activeRecipe.temperatureInRange(heatTempC)) {
                 String reason = !hasCoolantFlow ? "no coolant flow"
-                    : "temp " + heatTempC + " outside " + activeRecipe.temperature_range();
+                    : "temp " + heatTempC + " below min " + activeRecipe.minTemperature();
                 TFCAeronautics.LOGGER.debug(
                     "condenser_coil: RUNNING paused at {}: produced={}/{}, reason={}",
                     worldPosition, produced, targetVolume, reason);
@@ -715,9 +715,9 @@ public class CondenserCoilBlockEntity extends SmartBlockEntity {
             if (r.matches(stack)) {
                 TFCAeronautics.LOGGER.debug(
                     "condenser_coil: matched distillating recipe at {}: input={}, result={}, residue={}, "
-                        + "result_percent={}, rate={}, temp_range={}",
+                        + "result_percent={}, rate={}, min_temperature={}",
                     worldPosition, r.input(), r.result(), r.residue(), r.result_percent(), r.rate(),
-                    r.temperature_range());
+                    r.minTemperature());
                 return Optional.of(r);
             }
         }
