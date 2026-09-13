@@ -43,9 +43,10 @@ public final class CondenserCoilRegistration {
         BLOCKS.register("condenser_coil", () -> new CondenserCoilBlock(
             BlockBehaviour.Properties.of()
                 .mapColor(MapColor.METAL)
-                .strength(3.0F, 8.0F)
+                .strength(3.0F, 6.0F)
                 .sound(SoundType.METAL)
                 .pushReaction(PushReaction.BLOCK)
+                .requiresCorrectToolForDrops()
                 .noOcclusion()));
 
     public static final DeferredHolder<Item, BlockItem> CONDENSER_COIL_ITEM =
