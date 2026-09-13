@@ -1,0 +1,11 @@
+{
+  "values": [
+    "tfc_aeronautics:stamping_press",
+    "tfc_aeronautics:heater",
+    "tfc_aeronautics:metal/welding_depot/wrought_iron",
+    "tfc_aeronautics:metal/welding_depot/steel",
+    "tfc_aeronautics:metal/welding_depot/black_steel",
+    "tfc_aeronautics:metal/welding_depot/blue_steel",
+    "tfc_aeronautics:metal/welding_depot/red_steel"
+  ]
+}
