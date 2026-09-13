@@ -1,6 +1,5 @@
 {
   "values": [
-    "tfc_aeronautics:condenser_coil",
     "tfc_aeronautics:stamping_press",
     "tfc_aeronautics:heater",
     "tfc_aeronautics:metal/welding_depot/wrought_iron",

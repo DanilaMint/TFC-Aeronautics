@@ -37,10 +37,11 @@ public final class StampingPressRegistration {
         BLOCKS.register("stamping_press", () -> new StampingPressBlock(
             BlockBehaviour.Properties.of()
                 .mapColor(MapColor.PODZOL)
-                .strength(2.0F, 6.0F)
+                .strength(1.5F, 6.0F)
                 .sound(SoundType.STONE)
                 .noOcclusion()
-                .pushReaction(PushReaction.BLOCK)));
+                .pushReaction(PushReaction.BLOCK)
+                .requiresCorrectToolForDrops()));
 
     public static final DeferredHolder<Item, BlockItem> STAMPING_PRESS_ITEM =
         ITEMS.register("stamping_press", () -> new AssemblyOperatorBlockItem(STAMPING_PRESS.get(), new Item.Properties()));
