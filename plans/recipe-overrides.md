@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 33/? ✓ (overrides + 31 envelope)
+**Прогресс:** 34/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -730,6 +730,14 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id остаётся `simulated:directional_linked_receiver`, advancement `data/simulated/advancement/recipes/misc/directional_linked_receiver.json` (recipe-trigger) ссылается на тот же id — засчитывается без правок
 - [x] `data/simulated/recipe/redstone_magnet.json`
   - `create:copper_sheet` → `tfc_aeronautics:metal/tight_sheet/copper`
+- [x] `data/tfc/tags/fluid/usable_in_jug.json` (tag-override, не recipe)
+  - оригинал TFC pull'ит `#tfc:drinkables` (транзитивно `#tfc:alcohols` — TFC-водка/виски/ром и т.д.) — это whitelist для `JugItem` (`code_references/TerraFirmaCraft/.../JugItem.java:36`) и 4-х glass bottles (`code_references/TerraFirmaCraft/.../TFCItems.java:201-204`); если fluid в нём, `FluidContainerItem.canContainFluid()` пропускает pickup/pour
+  - новый: тот же pull + `tfc_aeronautics:ethanol` (прямой fluid-id). Ethanol попадает в whitelist jug/бутылок, но **не** в `tfc:drinkables` (а значит, не триггерит `Drinkable.get(...)` → не пьётся; правый клик по воздуху с наполненным jug — no-op, только shift+ПКМ для опустошения)
+  - мотивация: ethanol (`src/main/java/ru/tfc_aeronautics/fluid/Fluids.java:43-54`, `FluidBlocks.java`, `FluidItems.java:28-31`) уже в `tfc:ingredients` (`src/main/resources/data/tfc/tags/fluid/ingredients.json`), и потому barrel/wooden_bucket/blue_steel_bucket/red_steel_bucket/pot его принимают (все pull'ят `#tfc:ingredients`). Но jug и 4 glass bottles идут через `tfc:usable_in_jug` — другую ветку. Запрос пользователя: «возможность налить» (не пить). Ethanol как химикат, не напиток; `Drinkable` JSON не создаём, теги `tfc:drinkables` / `tfc:alcohols` не трогаем (иначе запустится alcohol-механика)
+  - структурно — sub-tag override, аналогично тому, как `data/create/recipe/...` шейдит оригинальный TFC-recipe; shadow-файл в namespace источника (`tfc`) с тем же путём затеняет оригинальный тег автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - шейдинг-тегов не требуется: `tfc_aeronautics:ethanol` — прямой fluid-id, никаких вспомогательных тегов создавать не надо
+  - `BANNED_RECIPES` не используется (override тега, не рецепта)
+  - подробный план: `/home/danila/.claude/plans/ethanol-spicy-dijkstra.md`. В §19 DOCS.md — запись в табличке «Актуальный список»
 
 ## TODO (новые добавлять сюда)
 
