@@ -4,7 +4,7 @@
   "show_notification": false,
   "key": {
     "S": {
-      "item": "tfc_aeronautics:metal/tight_sheet/wrought_iron"
+      "tag": "tfc_aeronautics:iron_sheet"
     },
     "R": {
       "item": "tfc:metal/rod/wrought_iron"

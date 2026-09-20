@@ -3,7 +3,7 @@
   "category": "misc",
   "show_notification": false,
   "key": {
-    "S": { "item": "tfc:metal/sheet/wrought_iron" },
+    "S": { "tag": "tfc_aeronautics:iron_sheet" },
     "C": { "item": "create:cardboard_block" },
     "R": { "item": "minecraft:redstone" }
   },

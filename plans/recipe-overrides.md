@@ -35,9 +35,9 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
 - [x] `data/create/recipe/crafting/logistics/andesite_tunnel.json`
   - `minecraft:dried_kelp` → `tfc:cloths`
 - [x] `data/create/recipe/crafting/logistics/item_hatch.json`
-  - `create:andesite_alloy` → array `[tfc_aeronautics:metal/tight_sheet/steel, tfc:metal/sheet/wrought_iron]` (любой из двух)
-  - `minecraft:iron_trapdoor` → array из 9 TFC металлических люков (bismuth_bronze / black_bronze / black_steel / blue_steel / bronze / copper / red_steel / steel / wrought_iron)
-  - inline-array ingredients (vanilla 1.21.1 синтаксис «любой из»). Recipe-id и advancement Create сохраняются без правок
+  - бывший array `[tfc_aeronautics:metal/tight_sheet/steel, tfc:metal/sheet/wrought_iron]` → единый `#tfc_aeronautics:iron_sheet` (покрывает оба варианта плюс `create:iron_sheet` — игрок принимает любой из трёх)
+  - `minecraft:iron_trapdoor` → array из 9 TFC металлических люков (bismuth_bronze / black_bronze / black_steel / blue_steel / bronze / copper / red_steel / steel / wrought_iron) — оставлен как был (тег люков не затрагивается)
+  - Recipe-id `create:crafting/logistics/item_hatch` сохраняется, advancement Create засчитывается без правок
 - [x] `data/create/recipe/crafting/kinetics/water_wheel.json`
   - pattern Create `["SSS","SCS","SSS"]` (8× `#minecraft:planks` + 1× `create:shaft`) → TFC-style `["LPL","PAP","LPL"]` (4× `#tfc:lumber` + 4× `#minecraft:planks` + 1× `create:shaft`): lumber по углам, planks на боках, вал в центре
   - ключ `A` = `create:shaft` (центр; в оригинале это был ключ `C` — заменили только букву, предмет тот же)
@@ -68,13 +68,11 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (structural reshape, как у `rope_pulley.json`)
   - шейдинг-тегов не требуется: `tfc:metal/rod/wrought_iron` — прямой item-id (single item), shadow-тег не нужен
   - recipe-id остаётся `create:crafting/kinetics/whisk`, поэтому advancement `data/create/advancement/recipes/misc/crafting/kinetics/whisk.json` зачтётся без правок (см. §19 DOCS.md про recipe-id в namespace источника)
-- [x] `data/create/recipe/crafting/kinetics/propeller.json`
+- [x] `data/create/recipe/crafting/kinetics/propeller.json` (merged с удалённым `data/tfc_aeronautics/recipe/crafting/kinetics/steel_propeller.json`)
   - оригинал Create shaped `[" S ","SCS"," S "]` с `create:andesite_alloy` + `#c:plates/iron` — невозможен в TFC (andesite_alloy нет, `c:plates/iron` пуст)
-  - TFC-style `["S S"," R ","S S"]`: 4× `tfc_aeronautics:metal/tight_sheet/wrought_iron` (углы) + 1× `tfc:metal/rod/wrought_iron` (центр) → 1 `create:propeller`. Мотивация: пропеллер — кованое механическое изделие; тонкий лист и стержень кованого железа — естественный результат TFC-кузнечного пути. `show_notification: false` (structural reshape). Шейдинг-тегов не требуется. recipe-id остаётся `create:crafting/kinetics/propeller`, advancement Create засчитывается без правок
-- [x] `data/tfc_aeronautics/recipe/crafting/kinetics/steel_propeller.json`
-  - параллельный вариант под сталь: те же 4× `tfc_aeronautics:metal/tight_sheet/steel` (углы) + 1× `tfc:metal/rod/steel` (центр) → 1 `create:propeller`
-  - recipe-id `tfc_aeronautics:crafting/kinetics/steel_propeller` — даёт игроку выбор металла (wrought_iron через override, сталь через этот рецепт)
-  - не требует `BANNED_RECIPES`: исходный Create-рецепт уже замещён первым override'ом
+  - TFC-style `["S S"," R ","S S"]`: 4× `#tfc_aeronautics:iron_sheet` (углы) + 1× `tfc:metal/rod/wrought_iron` (центр) → 2 `create:propeller`. Тег `tfc_aeronautics:iron_sheet` (см. отдельную запись ниже) покрывает все 3 валидных листовых варианта: `create:iron_sheet`, `tfc:metal/sheet/wrought_iron`, `tfc_aeronautics:metal/tight_sheet/steel` — игрок выбирает любой. Раньше для стали был отдельный рецепт `steel_propeller.json` (с `tight_sheet/steel` + `rod/steel`); этот файл удалён, и теперь стальной пропеллер доступен через тот же `propeller.json` (с wrought_iron rod + любым листом из тега). `show_notification: false` (structural reshape). Шейдинг-тегов не требуется. recipe-id остаётся `create:crafting/kinetics/propeller`, advancement Create засчитывается без правок
+  - **осознанный trade-off**: исходный wrought-iron tight_sheet (`tfc_aeronautics:metal/tight_sheet/wrought_iron`) в тег НЕ входит — после merge пропеллер из него собрать нельзя; компенсируется тремя другими вариантами (create:iron_sheet, tfc:metal/sheet/wrought_iron, tight_sheet/steel). Это решение по спеке пользователя
+- [x] `data/tfc_aeronautics/recipe/crafting/kinetics/steel_propeller.json` — **удалён** (см. merge выше)
 - [x] `data/create/recipe/crafting/kinetics/goggles.json`
   - оригинал Create shaped `[" S ","GPG"]` с `c:glass_blocks` + `c:plates/gold` + 1× `c:strings` → 1 `create:goggles`
   - TFC-style шлем 3×3 `["SSS","S S","LPL"]`: 5× `c:strings` (контур шлема: 3 в ободе купола сверху + 2 по бокам, центр пуст — отверстие под линзы) + 2× `tfc:lens` (глаза) + 1× `tfc:metal/sheet/gold` (переносица) → 1 `create:goggles`
@@ -225,9 +223,9 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id'ы **новые** (`tfc_aeronautics:crafting/kinetics/mechanical_plough/wrought_iron` и `.../steel`), не override существующего. Advancement Create `data/create/advancement/recipes/misc/crafting/kinetics/mechanical_plough.json` ссылается на старый `create:crafting/kinetics/mechanical_plough` — обычный trade-off ветки 2 (см. `clutch.json` / `copper_valve_handle.json` для той же конструкции)
   - оригинал `create:crafting/kinetics/mechanical_plough` (recipe-id из пути `data/create/recipe/crafting/kinetics/mechanical_plough.json`) добавлен в `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK × 2), `./gradlew compileJava` BUILD SUCCESSFUL
-- [x] `data/create/recipe/crafting/kinetics/item_vault.json`
+- [x] `data/create/recipe/crafting/kinetics/item_vault.json` (merged с удалённым `data/tfc_aeronautics/recipe/crafting/kinetics/item_vault_steel_tight.json`)
   - оригинал Create shaped 3×1 `B/C/B` с `#c:plates/iron` (B) + `#c:barrels/wooden` (C) → 1 `create:item_vault`
-  - новый: тот же pattern, ключи `B = tfc:metal/sheet/wrought_iron` + `C = #c:chests/wooden` → 1 `create:item_vault`
+  - новый: тот же pattern, ключи `B = #tfc_aeronautics:iron_sheet` + `C = #c:chests/wooden` → 1 `create:item_vault`. Тег `tfc_aeronautics:iron_sheet` покрывает оба ранее разнесённых варианта (wrought iron через `tfc:metal/sheet/wrought_iron` и сталь через `tight_sheet/steel`) плюс `create:iron_sheet` — игрок выбирает любой из трёх
   - мотивация: `#c:plates/iron` в TFC-сборке пуст, `#c:barrels/wooden` содержит только ванильную `minecraft:barrel` — а по запросу пользователя нужен именно «любой сундук из TFC». `#c:chests/wooden` — готовый common-тег с 20 TFC chest + 20 TFC trapped chest; shadow не требуется
   - структурно — простой sub-recipe override (как `rope_pulley.json` / `propeller.json`): pattern и аутпут неизменны, поменялись только ингредиенты
   - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`): файл по тому же пути, что оригинал, затеняет Create'овский рецепт автоматически (конвенция: см. `feedback_recipe_override_convention.md`)
@@ -235,14 +233,7 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `tfc:metal/sheet/wrought_iron` — прямой item-id (TFC sheet), `#c:chests/wooden` — common-тег (включает 40 TFC chest/trapped_chest)
   - recipe-id остаётся `create:crafting/kinetics/item_vault`, advancement Create засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
-- [x] `data/tfc_aeronautics/recipe/crafting/kinetics/item_vault_steel_tight.json`
-  - параллельный вариант под сталь: те же 3×1 `B/C/B`, ключи `B = tfc_aeronautics:metal/tight_sheet/steel` + `C = #c:chests/wooden` → 1 `create:item_vault`
-  - мотивация: дать игроку выбор металла — wrought iron через override в `create`, сталь через этот рецепт в `tfc_aeronautics` (по запросу пользователя — наш namespace). tight_sheet/steel производится через TFC-наковальню или pressing (`data/tfc_aeronautics/recipe/pressing/tight_sheet_steel.json`)
-  - структурно — sub-recipe override, файл в `tfc_aeronautics` (recipe-id **новый**). Ветка 2 по форме (recipe-id не из namespace источника), но без `BANNED_RECIPES` — банить нечего: новый recipe-id не пересекается ни с одним существующим, а оригинал уже перебит первым файлом
-  - `show_notification: false` (конвенция)
-  - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/steel` — прямой item-id из `metal/TightSheet.java:33`, `#c:chests/wooden` — common-тег
-  - recipe-id `tfc_aeronautics:crafting/kinetics/item_vault_steel_tight` **не** из Create-овского namespace, поэтому advancement Create `data/create/advancement/recipes/misc/crafting/kinetics/item_vault.json` (привязан к `create:crafting/kinetics/item_vault`) по этому пути **не** засчитывается — компромисс Datapack: один item, два recipe-id, advancement привязан к одному. Игрок получает предмет в обоих случаях, но ачивка — только за wrought iron вариант
-  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
+- [x] `data/tfc_aeronautics/recipe/crafting/kinetics/item_vault_steel_tight.json` — **удалён** (см. merge выше)
 - [x] `data/create/recipe/crafting/kinetics/nozzle.json`
   - оригинал Create shaped `[" S "," C ","SSS"]` с `create:andesite_alloy` + `#minecraft:wool` → 1 `create:nozzle`
   - TFC-style shaped 3×3 `["CCC","CCC","SSS"]`: 6× `#tfc:cloths` (2 верхних ряда) + 3× `tfc:metal/sheet/wrought_iron` (нижний ряд) → 3 `create:nozzle`
@@ -457,7 +448,7 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` UP-TO-DATE
 - [x] `data/aeronautics/recipe/adjustable_burner.json`
   - оригинал Simulated/Aeronautics shaped `["S S","SCS","ARA"]` с `create:iron_sheet` (S) + `aeronautics:burner_fire` (C) + `create:andesite_alloy` (A) + `minecraft:redstone` (R) → 1 `aeronautics:adjustable_burner`. В TFC-сборке мёртв: `create:iron_sheet` и `create:andesite_alloy` — Create-only металл/сплав, циклически требует mechanical mixer
-  - новый: shaped 3×2 `["ScS","CRC"]`: ключ `S` = `[tfc:metal/sheet/wrought_iron, tfc_aeronautics:metal/tight_sheet/steel]` (массив alternatives — оба кованых листа, даёт игроку выбор металла) + `c` = `#minecraft:coals` (ванильный тег угля; в TFC ForgeFuel — прецедент `code_references/TerraFirmaCraft/.../tfc/tags/item/forge_fuel.json`) + `C` = `tfc_aeronautics:composite` (Industrial Composite, наш аналог андезитового сплава — barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`) + `R` = `minecraft:redstone` → 1 `aeronautics:adjustable_burner`
+  - новый: shaped 3×2 `["ScS","CRC"]`: ключ `S` = `#tfc_aeronautics:iron_sheet` (тег из 3 вариантов — `create:iron_sheet`, `tfc:metal/sheet/wrought_iron`, `tfc_aeronautics:metal/tight_sheet/steel`; раньше был inline-array из 2 элементов, теперь — единый тег) + `c` = `#minecraft:coals` (ванильный тег угля; в TFC ForgeFuel — прецедент `code_references/TerraFirmaCraft/.../tfc/tags/item/forge_fuel.json`) + `C` = `tfc_aeronautics:composite` (Industrial Composite, наш аналог андезитового сплава — barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`) + `R` = `minecraft:redstone` → 1 `aeronautics:adjustable_burner`
   - мотивация: hot air burner — TFC-style нагреватель с редстоун-управлением (`HotAirBurnerBlock.updateSignal` в code_references). Уголь — топливо для нагревателя (TFC forge_fuel), композит — корпус/рама (тот же свап, что у `hand_crank.json` / `piston_extension_pole.json` / `linear_chassis.json` / `radial_chassis.json` / `crushing_wheel.json`), кованый лист — каркас камеры сгорания (тот же подход, что у `rope_pulley.json` / `chute.json`)
   - **ветка 1** скилла `recipe-override` (recipe-id в namespace `aeronautics`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Simulated/Aeronautics рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
   - `show_notification: false` (конвенция проекта, memory `feedback_show_notification_false.md`)
@@ -594,24 +585,29 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `#c:chests/wooden` — common-тег из датапака TFC (включает 40 TFC chest'ов), `c:dyes/<color>` — common-теги красок, `tfc_aeronautics:composite` — прямой item-id из `composite/CompositeRegistration.java`
   - recipe-id'ы `create:crafting/logistics/<color>_postbox` сохраняются, advancement Create (если есть для postbox'ов) ссылается на те же id — засчитывается без правок
   - shapeless-варианты `<color>_postbox_from_other_postbox.json` (16 файлов) **не трогаем** — там нет ни barrel, ни andesite, ингредиенты только `c:dyes/<color>` + tag `create:postboxes`
-- [x] `data/create/recipe/crafting/logistics/packager.json`
+- [x] `data/create/recipe/crafting/logistics/packager.json` (merged с удалённым `data/tfc_aeronautics/recipe/crafting/logistics/packager_steel_tight.json`)
   - оригинал Create shaped 3×3 `[" C ","CAC","RCR"]`: A=`create:cardboard_block` (центр, 1×) + C=`#c:ingots/iron` (4× — крестом вокруг центра) + R=`#c:dusts/redstone` (2× — нижние углы) → 1 `create:packager` (recipe-id `create:crafting/logistics/packager`)
-  - новый shaped 3×2 `["SCS","R R"]`: S=`tfc:metal/sheet/wrought_iron` (2× — верхние углы) + C=`create:cardboard_block` (центр) + R=`minecraft:redstone` (2× — нижние углы) → 1 `create:packager`
-  - мотивация: `#c:ingots/iron` в TFC-сборке мёртв для sheet'ов (TFC хранит металлы в отдельном namespace `tfc:metal/<form>/<type>` и не регистрирует их в common-тегах `c:plates/*` / `c:ingots/*`); `#c:dusts/redstone` для `minecraft:redstone` — шире, чем надо, тянет любые модовые «dust» аналоги redstone. Фиксируем: ровно `cardboard_block` (1×) + ровно TFC-wrought_iron_sheet (2×) + ровно ванильный redstone (2×) в TFC-стиле решётки 3×2. Pattern тоже компактнее — основание packager'а собирается из двух листов, не из пяти iron-пластин
+  - новый shaped 3×2 `["SCS","R R"]`: S=`#tfc_aeronautics:iron_sheet` (2× — верхние углы) + C=`create:cardboard_block` (центр) + R=`minecraft:redstone` (2× — нижние углы) → 1 `create:packager`. Тег `tfc_aeronautics:iron_sheet` покрывает оба ранее разнесённых варианта (wrought iron и стальной tight_sheet) плюс `create:iron_sheet` — игрок выбирает любой из трёх
+  - мотивация: `#c:ingots/iron` в TFC-сборке мёртв для sheet'ов (TFC хранит металлы в отдельном namespace `tfc:metal/<form>/<type>` и не регистрирует их в common-тегах `c:plates/*` / `c:ingots/*`); `#c:dusts/redstone` для `minecraft:redstone` — шире, чем надо, тянет любые модовые «dust» аналоги redstone. Фиксируем: ровно `cardboard_block` (1×) + ровно TFC-стиль железный/стальной лист через тег `tfc_aeronautics:iron_sheet` (2×) + ровно ванильный redstone (2×) в TFC-стиле решётки 3×2. Pattern тоже компактнее — основание packager'а собирается из двух листов, не из пяти iron-пластин
   - структурно — простой sub-recipe override (как `rope_pulley.json` / `item_vault.json`): ингредиенты подменены, pattern сжат с 3×3 до 3×2 (один из двух pattern-вариантов, которые Create оставляет в `code_references/Create/src/main/resources/data/create/recipe/crafting/logistics/` для своих shaped-рецептов)
   - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Create-овский рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
   - `show_notification: false` (конвенция проекта для всех override-рецептов — memory `feedback_show_notification_false.md`)
   - шейдинг-тегов не требуется: `tfc:metal/sheet/wrought_iron`, `create:cardboard_block`, `minecraft:redstone` — прямые item-id
   - recipe-id остаётся `create:crafting/logistics/packager`, advancement `data/create/advancement/recipes/misc/crafting/logistics/packager.json` ссылается на тот же id — засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
-- [x] `data/tfc_aeronautics/recipe/crafting/logistics/packager_steel_tight.json`
-  - параллельный вариант под сталь: тот же shaped 3×2 `["SCS","R R"]`, ключи `S = tfc_aeronautics:metal/tight_sheet/steel` (2×) + `C = create:cardboard_block` (центр) + `R = minecraft:redstone` (2×) → 1 `create:packager`
-  - мотивация: дать игроку выбор металла — wrought iron через override в `create`, сталь через этот рецепт в `tfc_aeronautics` (по запросу пользователя — наш namespace). tight_sheet/steel производится через TFC-наковальню/welding/pressing (`data/tfc_aeronautics/recipe/anvil/tight_sheet_steel.json`, `data/tfc_aeronautics/recipe/pressing/tight_sheet_steel.json`), чем отличается от обычного wrought_iron_sheet (базовый TFC sheet без tight-цикла)
-  - структурно — sub-recipe override, файл в `tfc_aeronautics` (recipe-id **новый**). Ветка 2 по форме (recipe-id не из namespace источника), но без `BANNED_RECIPES` — банить нечего: новый recipe-id не пересекается ни с одним существующим, а оригинал уже перебит первым файлом
-  - `show_notification: false` (конвенция; прецедент — `data/tfc_aeronautics/recipe/crafting/kinetics/item_vault_steel_tight.json` для параллельных tight_sheet-вариантов)
-  - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/steel` — прямой item-id из `metal/TightSheetRegistration.java:23`, `create:cardboard_block` и `minecraft:redstone` — прямые item-id
-  - recipe-id `tfc_aeronautics:crafting/logistics/packager_steel_tight` **не** из Create-овского namespace, поэтому advancement Create `data/create/advancement/recipes/misc/crafting/logistics/packager.json` (привязан к `create:crafting/logistics/packager`) по этому пути **не** засчитывается — компромисс Datapack: один item, два recipe-id, advancement привязан к одному. Игрок получает предмет в обоих случаях, но ачивка — только за wrought iron вариант
-  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/tfc_aeronautics/recipe/crafting/logistics/packager_steel_tight.json` — **удалён** (см. merge выше)
+- [x] **Новый тег `tfc_aeronautics:iron_sheet`** (`data/tfc_aeronautics/tags/item/iron_sheet.json`)
+  - состав: `create:iron_sheet` + `tfc:metal/sheet/wrought_iron` + `tfc_aeronautics:metal/tight_sheet/steel` (3 item-id, по алфавиту)
+  - формат — копия существующего `bars.json` (2-space indent, `"values": [...]`, без `"replace"`)
+  - мотивация: до сих пор многие recipe-override'ы существовали в виде **пары** (source-mod iron-вариант + `data/tfc_aeronautics/...` steel-вариант) — одна машина, два файла, ручная синхронизация при любом изменении. Тег склеивает такую пару в один файл в namespace источника, ссылаясь на тег как на «любой валидный железный/стальной лист». Заодно даёт игроку выбор из 3 вариантов вместо 2 (где это применимо)
+  - применён в 5 override-файлах (3 merge'а + 2 single-file swap, см. записи выше): `propeller.json`, `item_vault.json`, `packager.json`, `item_hatch.json`, `adjustable_burner.json`. 3 параллельных `*_steel_tight.json` / `steel_propeller.json` файла в `tfc_aeronautics` удалены
+  - **НЕ применять**:
+    - TFC-наковальня / `tfc:welding` — tier-логика TFC требует конкретного металла в ингедиенте
+    - `tfc:heating` рецепты — `result_fluid` хардкоден по metal-id, замена на тег даст другой расплав
+    - production-рецепты листов (`pressing/tight_sheet_*.json`) — input = `c:ingots/<metal>`, output = tight_sheet, тег здесь не нужен
+    - медные / латунные листы (`tight_sheet/copper`, `tfc:metal/sheet/brass`) — не входят в семантику «железо / сталь»
+  - осознанный trade-off: исходный `tfc_aeronautics:metal/tight_sheet/wrought_iron` (tight_sheet из кованого железа, отдельная позиция в нашей регистрации) в тег **не входит** по спеке пользователя. После merge `propeller.json` теряет возможность быть собранным именно из tight_sheet/wrought_iron, но получает 3 других варианта (`create:iron_sheet`, `tfc:metal/sheet/wrought_iron`, `tight_sheet/steel`)
+  - подробный дизайн — в `DOCS.md` §35
 
 ## Новые рецепты
 
