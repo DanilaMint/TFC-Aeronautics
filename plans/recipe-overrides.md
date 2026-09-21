@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 34/? ✓ (overrides + 31 envelope)
+**Прогресс:** 39/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -734,6 +734,38 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: `tfc_aeronautics:ethanol` — прямой fluid-id, никаких вспомогательных тегов создавать не надо
   - `BANNED_RECIPES` не используется (override тега, не рецепта)
   - подробный план: `/home/danila/.claude/plans/ethanol-spicy-dijkstra.md`. В §19 DOCS.md — запись в табличке «Актуальный список»
+
+- [x] **Блиц по 8 предметам из `list.md` (2026-09-21)** — пять override-рецептов в namespace `create`, ветка 1 (recipe-id сохранён, `BANNED_RECIPES` не трогается). Skip/«оставить как есть»: `hose_pulley`, `stock_ticker`, `stock_link`. `_clear`-варианты (`clipboard_clear`, `stock_ticker_clear`, `stock_link_clear`, `redstone_requester_clear`) не трогаем — стандартный shapeless «1× → 1×» для снятия красителя, не зависит от основного recipe-id
+  - `data/create/recipe/crafting/kinetics/weighted_ejector.json`
+    - оригинал Create shaped `["A","D","I"]`: `c:plates/gold` (A) + `create:depot` (D) + `create:cogwheel` (I) → 1 `create:weighted_ejector`. В TFC-сборке `c:plates/gold` фактически сводится к `create:golden_sheet` (Create-only золотой лист, требует mechanical press) — недостижимо в TFC
+    - новый: тот же pattern, ключ `A = tfc:metal/sheet/brass` → 1 `create:weighted_ejector`. Латунный лист — через TFC anvil (`data/tfc/recipe/anvil/metal/sheet/brass.json`); ключи `D`/`I` без изменений
+    - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`); `show_notification: false` (конвенция проекта, memory `feedback_show_notification_false.md`)
+    - recipe-id `create:crafting/kinetics/weighted_ejector` сохраняется, advancement `data/create/advancement/recipes/misc/crafting/kinetics/weighted_ejector.json` засчитывается без правок
+  - `data/create/recipe/crafting/curiosities/peculiar_bell.json`
+    - оригинал Create shaped 2×1 `["I","P"]`: `c:storage_blocks/brass` (I) + `c:plates/brass` (P) → 1 `create:peculiar_bell`. В TFC-сборке оба тега дают Create-only варианты (`create:brass_block` через mechanical mixing, `create:brass_sheet` через mechanical press)
+    - новый: shaped 2×1 `["S","S"]`, ключ `S = tfc:metal/sheet/brass` → 1 `create:peculiar_bell`. Двойной латунный лист через TFC-металлургию; storage_blocks+plates заменены на 2 листа той же природы
+    - структурно — TFC-style reshape (другой pattern), без `BANNED_RECIPES`. **Ветка 1** скилла `recipe-override`
+    - `show_notification: false` (конвенция, как у `whisk.json` / `propeller.json`)
+    - recipe-id `create:crafting/curiosities/peculiar_bell` сохраняется, advancement `data/create/advancement/recipes/misc/crafting/curiosities/peculiar_bell.json` засчитывается без правок
+  - `data/create/recipe/crafting/appliances/clipboard.json`
+    - оригинал Create shaped 3×1 `["A","P","G"]`: `create:andesite_alloy` (A) + `minecraft:paper` (P) + `#minecraft:planks` (G) → 1 `create:clipboard`. В TFC-сборке `andesite_alloy` — Create-only сплав, циклически требует mechanical mixer
+    - новый: shaped 2×1 `["P","L"]`, ключ `P = minecraft:paper` + `L = #tfc:lumber` → 1 `create:clipboard`. Сжатие 3×1 → 2×1: `andesite_alloy` убран, `#minecraft:planks` заменены на TFC-обработанные доски (тег из 20 пород, прецедент `clutch.json` / `water_wheel.json`)
+    - структурно — TFC-style reshape (3×1 → 2×1). **Ветка 1** скилла `recipe-override`
+    - `show_notification: false`; шейдинг-тегов не требуется (`#tfc:lumber` — нативный тег TFC, 20 пород)
+    - recipe-id `create:crafting/appliances/clipboard` сохраняется, advancement `data/create/advancement/recipes/misc/crafting/appliances/clipboard.json` засчитывается без правок
+  - `data/create/recipe/crafting/logistics/redstone_requester.json`
+    - оригинал Create shaped `["C","A","B"]`: `create:stock_link` (C) + `#c:ingots/iron` (A) + `#c:dusts/redstone` (B) → 1 `create:redstone_requester`. В TFC-сборке `#c:ingots/iron` пуст по TFC-конвенции (металл через per-metal subtag)
+    - новый: тот же pattern, ключ `A` — массив из 2-х вариантов: `tfc:metal/double_ingot/wrought_iron` ИЛИ `tfc:metal/ingot/steel` → 1 `create:redstone_requester`. Шейп-recipe принимает массив в ключе (синтаксис `[{item:...},{item:...}]`, прецедент `item_hatch.json` для shapeless и стандартный vanilla-формат для shaped)
+    - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`); `show_notification: false` (конвенция)
+    - мотивация: wrought_iron double ingot — кованый железный полуфабрикат (tier 3, через TFC welding); steel ingot — стальной слиток (tier 4). Оба дают рабочий redstone_requester; bronze/copper намеренно не включены (у них нет механической семантики редстоун-контакта)
+    - recipe-id `create:crafting/logistics/redstone_requester` сохраняется, advancement `data/create/advancement/recipes/misc/crafting/logistics/redstone_requester.json` засчитывается без правок
+  - `data/create/recipe/crafting/appliances/crafting_blueprint.json`
+    - оригинал Create shapeless: `minecraft:painting` + `minecraft:crafting_table` → 1 `create:crafting_blueprint`. В TFC-сборке работает (painting и crafting_table ванильные), но семантически не связан с TFC-лором: blueprint — «чертёж», а в TFC-мире чертежи = бумага + рабочий стол
+    - новый: shaped 3×3 `["PPP","PWP","PPP"]`, ключ `P = minecraft:paper` + `W = #tfc:workbenches` → 1 `create:crafting_blueprint`. 8 бумаг по периметру + 1 рабочий стол TFC в центре — семантически точный «бумажный чертёж на верстаке». `#tfc:workbenches` — нативный тег TFC из 20 пород (`code_references/TerraFirmaCraft/src/generated/resources/data/tfc/tags/item/workbenches.json`)
+    - структурно — TFC-style reshape (shapeless → shaped 3×3). **Ветка 1** скилла `recipe-override`
+    - `show_notification: false`; шейдинг-тегов не требуется (`#tfc:workbenches` — нативный тег TFC)
+    - recipe-id `create:crafting/appliances/crafting_blueprint` сохраняется, advancement `data/create/advancement/recipes/misc/crafting/appliances/crafting_blueprint.json` засчитывается без правок
+  - **проверено**: JSON валиден × 5 (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
 
 ## TODO (новые добавлять сюда)
 

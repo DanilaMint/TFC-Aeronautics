@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "L": {
+      "tag": "tfc:lumber"
+    }
+  },
+  "pattern": [
+    "P",
+    "L"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:clipboard"
+  }
+}
