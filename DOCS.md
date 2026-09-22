@@ -43,6 +43,7 @@
 33. [Сохранение тепла в `create:pressing` (RecipeApplierHeatMixin)](#33-сохранение-тепла-в-createpressing-recipeapplierheatmixin)
 34. [Змеевик-конденсатор (Condenser Coil)](#34-змеевик-конденсатор-condenser-coil)
 35. [Тег `tfc_aeronautics:iron_sheet` — консолидация листов железа/стали](#35-тег-tfc_aeronauticsiron_sheet)
+36. [TFC Crucible: интеграция с belt / fluid_pipe / funnel / heat](#36-tfc-crucible-интеграция-с-belt--fluid_pipe--funnel--heat)
 
 ---
 
@@ -4140,3 +4141,134 @@ source-mod iron-вариант (`data/create/...` с `tfc:metal/sheet/wrought_ir
 - [§19 «Простые замены рецептов (Recipe overrides)》](#19-простые-замены-рецептов-recipe-overrides)
   — список конкретных применений тега в override-рецептах
 - `plans/recipe-overrides.md` — детальный changelog каждого merge'а
+
+---
+
+## 36. TFC Crucible: интеграция с belt / fluid_pipe / funnel / heat
+
+`TFC Crucible` (`tfc:crucible`) — блок TFC для плавки металла с 10 слотами: `SLOT_INPUT_START..SLOT_INPUT_END` (0..8, INPUT — руда/металл) и `SLOT_OUTPUT` (9, молд/извлечение). Внутри — fluid-танк на `FluidAlloy` (ёмкость из `TFCConfig.SERVER.crucibleCapacity`, по умолчанию 4000 мБ).
+
+По умолчанию TFC регистрирует `ITEM_HANDLER` / `FLUID_HANDLER` capability по сторонам **только при `crucibleEnableAutomation=true`**. Без этого флага блок «глухой» — никакая внешняя автоматизация не работает. Mixin в конструктор BE убирает эту зависимость: пять интеграций с Create работают независимо от TFC config.
+
+### Что включается
+
+| # | Интеграция | Как работает | Сторона |
+|---|---|---|---|
+| 1 | Drop предмета сверху → INPUT (0–8) | `serverTick` TAIL-mixin дёргает `Helpers.gatherAndConsumeItems(level, AABB(над тиглём), inventory, 0, 8)` — vanilla `ItemEntity.tick()` сам в инвентарь не вставляется (только merge с другими ItemEntity), поэтому нужен явный pickup. AABB — `0.125..0.875` × `1.0..1.5` × `0.125..0.875` относительно `pos`. То же, что делает TFC barrel (`BarrelBlockEntity.serverTick:175`) | сверху, в момент `serverTick` |
+| 2 | Belt сбоку, направленный в crucible → INPUT (0–8) | `BeltInventory.resolveEnding` возвращает `INSERT` если target имеет `ITEM_HANDLER` на `movementFacing` (через наш `@Inject RETURN + cancellable`). Дальше `@Redirect BlockEntityBehaviour.get` возвращает `CapabilityDirectBeltInputBehaviour` wrapper, который делает `getCapability(ITEM_HANDLER, side).insertItem(...)`. Crucible не `SmartBlockEntity` — без этого mixin'а `BeltInventory.tick` шёл бы в `BLOCKED` ветку (см. `BeltInventory.resolveEnding:330`) | `Direction.Plane.HORIZONTAL` (insert) |
+| 3 | Fluid pipe подключается | `FluidPropagator.hasFluidCapability` → `getCapability(FLUID_HANDLER, side)` → `PartialFluidHandler.insertOnly` (UP) / `extractOnly` (HORIZONTAL) | UP / HORIZONTAL |
+| 4 | Andesite funnel сбоку → извлекает из OUTPUT (9) | `InvManipulationBehaviour.extract()` → `IItemHandler.extractItem(slot, …)` на стороне BlockFace = `getFunnelFacing(state).getOpposite()`. Наш handler на HORIZONTAL разрешает `extract(9)` | `Direction.Plane.HORIZONTAL` (extract) |
+| 5 | HeatDealer-блоки под тиглём → греют | TFC firepit/charcoal forge/firebox/stove/grill/pot (последние два — `extends AbstractFirepitBlockEntity`, line 31/45) уже вызывают `HeatCapability.provideHeatTo(level, pos.above(), DOWN, X.temperature)`. Наш `HeaterBlockEntity.java:209` — то же. Crucible уже зарегистрирован как `IHeatConsumer` на DOWN через `BlockCapabilities.java:54` | `Direction.DOWN` (consume) |
+
+### Реализация
+
+Один файл — `src/main/java/ru/tfc_aeronautics/mixin/CrucibleBlockEntityMixin.java` — два `@Inject`:
+
+1. **TAIL на конструктор BE** — выставляет `SidedHandler`-ы сторон. `sidedInventory` объявлен в родителе `InventoryBlockEntity` (`protected final`), а `@Shadow` ищет только в target-классе, поэтому родительское поле достаём через `Field` reflection-handle, пойманный в static-init.
+2. **TAIL на `serverTick`** — `Helpers.gatherAndConsumeItems(level, AABB, inventory, 0, 8)` подбирает `ItemEntity` сверху.
+
+```java
+@Mixin(CrucibleBlockEntity.class)
+public abstract class CrucibleBlockEntityMixin {
+    private static final Field CRUCIBLE_SIDED_INVENTORY_FIELD; // InventoryBlockEntity.sidedInventory
+
+    static {
+        try {
+            CRUCIBLE_SIDED_INVENTORY_FIELD = InventoryBlockEntity.class.getDeclaredField("sidedInventory");
+            CRUCIBLE_SIDED_INVENTORY_FIELD.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            throw new IllegalStateException("...", e);
+        }
+    }
+
+    @Shadow public SidedHandler<IFluidHandler> sidedFluidInventory;
+
+    @Inject(method = "<init>(...Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V", at = @At("TAIL"))
+    private void aeronautics$ensureAutomationSidedAccess(BlockPos pos, BlockState state, CallbackInfo ci) throws IllegalAccessException {
+        CrucibleBlockEntity self = (CrucibleBlockEntity) (Object) this;
+        IItemHandlerModifiable inv = self.getInventory();
+        SidedHandler<IItemHandlerModifiable> sidedItem =
+            (SidedHandler<IItemHandlerModifiable>) CRUCIBLE_SIDED_INVENTORY_FIELD.get(self);
+
+        sidedItem
+            .on(new PartialItemHandler(inv).insert(0,1,2,3,4,5,6,7,8), Direction.UP)
+            .on(new PartialItemHandler(inv)
+                    .insert(0,1,2,3,4,5,6,7,8)
+                    .extract(CrucibleBlockEntity.SLOT_OUTPUT),
+                Direction.Plane.HORIZONTAL);
+
+        this.sidedFluidInventory
+            .on(PartialFluidHandler::insertOnly, Direction.UP)
+            .on(PartialFluidHandler::extractOnly, Direction.Plane.HORIZONTAL);
+    }
+
+    @Inject(
+        method = "serverTick(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/dries007/tfc/common/blockentities/CrucibleBlockEntity;)V",
+        at = @At("TAIL")
+    )
+    private static void aeronautics$pickupDroppedItems(Level level, BlockPos pos, BlockState state, CrucibleBlockEntity crucible) {
+        AABB bounds = new AABB(0.125, 1.0, 0.125, 0.875, 1.5, 0.875).move(pos);
+        Helpers.gatherAndConsumeItems(level, bounds, crucible.getInventory(),
+            CrucibleBlockEntity.SLOT_INPUT_START, CrucibleBlockEntity.SLOT_INPUT_END);
+    }
+}
+```
+
+`@Inject` в `TAIL` — после `super(...)` TFC-конструктора. Поля `sidedInventory` (в родителе `InventoryBlockEntity`) и `sidedFluidInventory` (в `CrucibleBlockEntity`) уже инициализированы к этому моменту; мы только мутируем их через `SidedHandler.on(...)`.
+
+### Почему belt → crucible требует ещё один mixin (BeltInventory)
+
+TFC Crucible — **не `SmartBlockEntity`** (это TFC'шный `TickableInventoryBlockEntity` → `InventoryBlockEntity` → vanilla `BlockEntity`). Create belt по умолчанию вставляет предметы только в `SmartBlockEntity`, у которого зарегистрирован `DirectBeltInputBehaviour` (`BeltInventory.resolveEnding:330`):
+
+```java
+DirectBeltInputBehaviour inputBehaviour =
+    BlockEntityBehaviour.get(world, nextPosition, DirectBeltInputBehaviour.TYPE);
+if (inputBehaviour != null) return Ending.INSERT;
+if (BlockHelper.hasBlockSolidSide(...)) return Ending.BLOCKED;
+return Ending.EJECT;
+```
+
+`BlockEntityBehaviour.get(be, type)` (`BlockEntityBehaviour.java:111`) возвращает `null` для non-SmartBlockEntity. Crucible — solid-блок, поэтому belt видит `BLOCKED` — items стоят на ленте, никогда не вставляются.
+
+Решение — capability-bridge в `src/main/java/ru/tfc_aeronautics/mixin/BeltInventoryCrucibleMixin.java`:
+
+1. **`@Inject resolveEnding` (RETURN + cancellable)**: если default вернул `BLOCKED`/`EJECT`, проверяем `getCapability(ITEM_HANDLER, movementFacing)` на target; если есть — возвращаем `INSERT`.
+2. **`@Redirect tick → BlockEntityBehaviour.get`**: если оригинал вернул `null`, а type == `DirectBeltInputBehaviour.TYPE` — возвращаем `CapabilityDirectBeltInputBehaviour` (subclass), который делает `ItemHandlerHelper.insertItemStacked(handler, stack, simulate)`.
+3. Wrapper наследует `DirectBeltInputBehaviour` с `super((SmartBlockEntity) null)` — parent constructor не NPE на null, а `tryInsert` (private field) перезаписывается через public `setInsertionHandler(...)`.
+4. `Ending.INSERT` (private enum) достаём через `Class.forName("BeltInventory$Ending").getField("INSERT").get(null)` — кешируется в static-init.
+
+### Почему именно mixin, а не `RegisterCapabilitiesEvent`
+
+`RegisterCapabilitiesEvent.registerBlockEntity(cap, type, function)` в NeoForge 21.x хранит **одну** функцию на `(capability, BE-type)`. Повторный вызов перезапишет TFC-овский handler — но порядок mod-load'а не гарантирован, и может оказаться, что TFC перезапишет наш (или наоборот). Mixin мутирует поле BE напрямую — это работает независимо от порядка регистрации capability.
+
+К тому же TFC уже регистрирует callback
+`event.registerBlockEntity(ITEM_HANDLER, TFCBlockEntities.CRUCIBLE.get(), InventoryBlockEntity::getSidedInventory)`
+(`BlockCapabilities.java:51`), который читает `sidedInventory.get(side)` на каждый capability lookup. После нашего `@Inject` обновлённый `SidedHandler` будет автоматически отдаваться — никакой собственной регистрации capability не нужно.
+
+### Что НЕ делается
+
+- **Не заменяем TFC config-флаг.** `crucibleEnableAutomation` остаётся в силе — мы только гарантируем, что сторона-логика в нашем коде настроена идентично `crucibleEnableAutomation=true` независимо от значения флага.
+- **Не добавляем собственную IHeatConsumer.** Crucible уже registered как HEAT consumer на DOWN в TFC.
+- **Не добавляем HeatDealer-регистрацию для crucible.** Crucible нагревает **другие** блоки (boiler/basin через наш `HeatDealers::boilerAdapter`), но это вне scope — задача про «нагревается снизу», а не «нагревает сверху».
+- **Не трогаем TFC `BlastFurnaceBlockEntity`.** Он тоже вызывает `provideHeatTo`, но в сторону `pos.below(), UP` — это для нагрева того, что **под** ним (например TFC fire-grate). К crucible не относится.
+
+### Краевые случаи
+
+| Случай | Поведение |
+|---|---|
+| `crucibleEnableAutomation=true` (TFC default) | TFC уже выставил те же параметры в `SidedHandler` (включая `insert(SLOT_OUTPUT)` для HORIZONTAL); наш `.on(insert(0..8))` **перезаписывает** HORIZONTAL — это и есть главная цель mixin'а (TFC default для HORIZONTAL был «вставить молд в OUTPUT» — бесполезно для belt) |
+| `crucibleEnableAutomation=false` | TFC оставил `SidedHandler` пустым (`.get(side)` → null); наш `.on(...)` заполняет |
+| Другой мод тоже патчит `CrucibleBlockEntity.<init>` через TAIL-mixin | Mixin'ы выполняются в порядке mod-load'а; «последний побеждает». Наш результат — наиболее полный (UP+HORIZONTAL+fluid), так что если другой мод перезапишет — функциональность belt/funnel сломается |
+| TFC обновит `SLOT_OUTPUT` константу или сигнатуру `sidedInventory`/`sidedFluidInventory` | CompileJava поймает — descriptor `@Inject` exact-match |
+| ItemEntity не подобрался за один тик | TFC `gatherAndConsumeItems` берёт items `Integer.MAX_VALUE`, и pickup вызывается каждый tick — пропусков быть не должно |
+| Игрок ставит Create blaze burner под crucible | **Не нагреет** — blaze burner греет только basin и boiler (см. `Create/.../BasinBlockEntity.java:795` / `BoilerHeater.REGISTRY`). Если в будущем понадобится — расширим `HeatDealer.REGISTRY` блоком с пересчётом через `HeatDealers::toHeatLevel` |
+| Существующие (уже размещённые) crucible в мире | При load chunk'а BE реконструируется через конструктор → TAIL-inject срабатывает заново; новые стороны применяются автоматически, ломать/переустанавливать не нужно |
+
+### Связь
+
+- [§4 «Нагреватель (Heater)》](#4-нагреватель-heater) — наш `HeaterBlockEntity.java:209` греет блок выше через `HeatCapability.provideHeatTo`
+- [§16 «Нагревательные элементы (Heat Dealers)》](#16-нагревательные-элементы-heat-dealers) — наш `HeatDealer.REGISTRY` (firepit/stove/stove_pot/grill/pot/heater) и мост к `BoilerHeater.REGISTRY`
+- `code_references/TerraFirmaCraft/src/main/java/net/dries007/tfc/common/blockentities/CrucibleBlockEntity.java` — целевой класс mixin
+- `code_references/Create/.../DirectBeltInputBehaviour.java:72` — стандартный belt-deposit через capability
+- `code_references/Create/.../FluidPropagator.java:202` — pipe-side capability lookup
+- `code_references/Create/.../InvManipulationBehaviour.java:65` — funnel-side extraction
