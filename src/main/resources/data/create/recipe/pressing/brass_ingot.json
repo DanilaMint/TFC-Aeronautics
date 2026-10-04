@@ -1,0 +1,14 @@
+{
+  "type": "create:pressing",
+  "ingredients": [
+    {
+      "tag": "c:ingots/brass"
+    }
+  ],
+  "results": [
+    {
+      "id": "tfc_aeronautics:metal/tight_sheet/brass"
+    }
+  ],
+  "show_notification": false
+}

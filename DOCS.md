@@ -665,6 +665,7 @@ TFC-листом: одна единица `metal/tight_sheet/<металл>` с�
 ### Варианты
 
 * `tfc_aeronautics:metal/tight_sheet/copper`
+* `tfc_aeronautics:metal/tight_sheet/brass`
 * `tfc_aeronautics:metal/tight_sheet/wrought_iron`
 * `tfc_aeronautics:metal/tight_sheet/steel`
 
@@ -680,10 +681,16 @@ TFC-листом: одна единица `metal/tight_sheet/<металл>` с�
 1. **Create-пресс.** `data/create/recipe/pressing/tight_sheet_<metal>.json`
    превращает слиток из тега `c:ingots/<metal>` в наш тонкий лист. Этот
    рецепт работает на стандартном Create `Mechanical Press`.
+   Исключение — латунь: апстрим `create:pressing/brass_ingot` шэдоуится
+   через override (`data/create/recipe/pressing/brass_ingot.json`) на
+   `tfc_aeronautics:metal/tight_sheet/brass`; recipe-id сохраняется, но
+   отдельный файл `tight_sheet_brass.json` не создаётся (см. §19).
 2. **Наковальня TFC.** `data/tfc_aeronautics/recipe/anvil/tight_sheet_<metal>.json`
    — `tfc:anvil`-рецепт «один слиток → один тонкий лист», правила
    `hit_last`, `hit_second_last`, `hit_third_last` (как у обычного
-   TFC-листа), тиры 1/3/4 для меди/железа/стали.
+   TFC-листа), тиры 1/2/3/4 для меди/латуни/железа/стали. Для латуни
+   `apply_bonus: true` (прецедент `wrench_head_brass.json` — тоже латунь
+   tier 2).
 
 ### Нагрев
 
@@ -693,6 +700,17 @@ TFC-листом: одна единица `metal/tight_sheet/<металл>` с�
 * `data/tfc_aeronautics/recipe/heating/<metal>_tight_sheet.json` —
   `tfc:heating`-рецепт: тонкий лист → 100 мB соответствующего жидкого
   металла (`tfc:metal/<metal>`) при температуре плавления.
+* Tight_sheet'ы **не** входят в common-тег `c:sheets/<metal>`:
+  TFC ванильный heating-рецепт `tfc/recipe/heating/metal/sheet/<metal>.json`
+  использует тот же тег и возвращает 200 мB (стандартный TFC-лист). Если
+  добавить tight_sheet в `c:sheets/<metal>`, оба рецепта совпадут и TFC
+  ванильный выиграет (200 мB вместо 100 мB). Вместо этого для каждого
+  металла создаётся проектный umbrella-тег
+  `data/tfc_aeronautics/tags/item/sheets/<metal>.json`, который
+  собирает все латунные листы (включая tight_sheet) для нужд мода —
+  например, `tfc_aeronautics:sheets/brass` =
+  `create:brass_sheet` + `tfc:metal/sheet/brass` +
+  `tfc_aeronautics:metal/tight_sheet/brass`.
 
 ### Регистрация
 
@@ -2073,6 +2091,7 @@ milling/pressing/квен-моста — см. `feedback_recipe_override_convent
 | `data/create/recipe/crafting/logistics/{white,light_gray,gray,black,brown,red,orange,yellow,lime,green,cyan,light_blue,blue,purple,magenta,pink}_postbox.json` (16 файлов) | Create shaped 3×1 `["D","B","A"]`: 1× `create:andesite_alloy` (A) + 1× `minecraft:barrel` (B) + tag `c:dyes/<color>` (D, 1×) → 1 `create:<color>_postbox` (recipe-id `create:crafting/logistics/<color>_postbox`). В TFC-сборке мёртв: `andesite_alloy` — Create-only сплав (требует mechanical mixer), `minecraft:barrel` — ванильная бочка вне TFC-контекста | тот же pattern `["D","B","A"]`, ключи `A = tfc_aeronautics:composite` + `B = #c:chests/wooden` (готовый common-тег: 20 TFC chest + 20 TFC trapped chest + ванильные сундуки — прецедент `item_vault.json` в нашем моде) + `D = c:dyes/<color>` → 1 `create:<color>_postbox`. Pattern, count, recipe-id, `category` не тронуты — pure ingredient swap, без reshape. Мотивация: `create:andesite_alloy` в TFC-сборке недоступен (Create-only сплав, циклически требует mechanical mixer); `minecraft:barrel` — ванильная бочка, в мире TFC естественнее TFC-суnдук как «корпус почтового ящика». Замены: `tfc_aeronautics:composite` (Industrial Composite) — аналог andesite_alloy (TFC barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`, тот же свап, что у `hand_crank.json` / `piston_extension_pole.json` / `linear_chassis.json` / `radial_chassis.json` / `crushing_wheel.json` / `cart_assembler.json`). `show_notification: false` (конвенция проекта). **Ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — 16 файлов по тому же пути затеняют Create-овские рецепты автоматически. Шейдинг-тегов не требуется: `#c:chests/wooden` и `c:dyes/<color>` — common-теги, `tfc_aeronautics:composite` — прямой item-id из `composite/CompositeRegistration.java`. Recipe-id'ы `create:crafting/logistics/<color>_postbox` сохраняются (16 шт.), advancement Create (если есть для postbox'ов) ссылается на те же id — засчитывается без правок. Shapeless-варианты `<color>_postbox_from_other_postbox.json` (16 файлов) **не трогаем** — там нет ни barrel, ни andesite |
 | `data/tfc/tags/fluid/usable_in_jug.json` (tag-override, не recipe) | TFC-тег `tfc:usable_in_jug` pull'ит `#tfc:drinkables` (транзитивно `#tfc:alcohols` — TFC-водка/виски/ром и т.д.) — это whitelist для `JugItem` (`code_references/TerraFirmaCraft/.../JugItem.java:36`) и 4-х glass bottles (`code_references/TerraFirmaCraft/.../TFCItems.java:201-204`). Ethanol в TFC-сборке не наливается в jug/бутылки — он не в этом теге | shadow-тег в namespace `tfc`: те же `values` + `tfc_aeronautics:ethanol` (прямой fluid-id). Ethanol попадает в whitelist jug/бутылок → ПКМ по источнику набирает fluid, shift+ПКМ сливает обратно. **Без drinkable-поведения:** ethanol не добавлен в `tfc:drinkables` / `tfc:alcohols`, `Drinkable` JSON не создан → правый клик по воздуху с наполненным jug — no-op, пить нельзя (jug трактует ethanol как «не-питьё» через `Drinkable.get(fluid) → null` в `JugItem.afterEmptyFailed()`). Мотивация: ethanol уже в `tfc:ingredients`, поэтому barrel/wooden_bucket/blue_steel_bucket/red_steel_bucket/pot его принимают; jug и 4 glass bottles идут через отдельную ветку `tfc:usable_in_jug`. Ethanol — химикат, не напиток (по запросу пользователя «возможность налить»); alcohol-механика не запускается. **Ветка 1** override (shadow в namespace источника `tfc`, без `BANNED_RECIPES` — это override тега, не рецепта). Шейдинг-тегов не требуется: `tfc_aeronautics:ethanol` — прямой fluid-id из `src/main/java/ru/tfc_aeronautics/fluid/Fluids.java:43-54`. Подробный план: `/home/danila/.claude/plans/ethanol-spicy-dijkstra.md`, статус прочих контейнеров — в таблице там же |
 | `data/create/recipe/mixing/brass_ingot.json` (recipe-id забанен) | Create `create:mixing` (heated): tag `c:ingots/copper` + tag `c:ingots/zinc` → 2× `create:brass_ingot` (recipe-id `create:mixing/brass_ingot`) | рецепт забанен через `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`. Pure removal — замены нет. Латунь остаётся доступной через `create:pressing/brass_ingot` и другие мод-пути (TFC anvil, TFC workings, Create crushing). Шейдинг-тегов не требуется: `c:ingots/copper` / `c:ingots/zinc` — common-теги |
+| `data/create/recipe/pressing/brass_ingot.json` | Create `create:pressing`: tag `c:ingots/brass` → 1 `create:brass_sheet` (recipe-id `create:pressing/brass_ingot`). Апстрим — стандартный путь к Create-латунной пластине (требует mechanical press, в TFC-сборке недостижимо) | тот же `create:pressing`, аутпут заменён `create:brass_sheet` → `tfc_aeronautics:metal/tight_sheet/brass`, `show_notification: false` (конвенция override'ов). Мотивация: TFC-наковальня — естественный TFC-металлургический путь к латуни (латунь tier 2 через `data/tfc_aeronautics/recipe/anvil/tight_sheet_brass.json`), а mechanical press в TFC-сборке остаётся для параллельного craft-пути; tight_sheet/brass — наш аэронавтический тонкий лист (100 мB vs 200 мБ для обычного `tfc:metal/sheet/brass`), естественно ложится в контур «создать наковальней → прокатать прессом». Параллельно введён новый предмет `tfc_aeronautics:metal/tight_sheet/brass` (enum `BRASS` в `src/main/java/ru/tfc_aeronautics/metal/TightSheet.java`) и проектный umbrella-тег `tfc_aeronautics:sheets/brass` (`data/tfc_aeronautics/tags/item/sheets/brass.json`), объединяющий `create:brass_sheet` + `tfc:metal/sheet/brass` + новый tight_sheet. **NB**: tight_sheet/brass намеренно **не** включён в common `c:sheets/brass`, потому что TFC ванильный heating-рецепт `tfc/recipe/heating/metal/sheet/brass.json` использует тот же тег и возвращает 200 мB — иначе наш 100-мB heating-reцепт `data/tfc_aeronautics/recipe/heating/brass_tight_sheet.json` проиграет, и tight_sheet будет плавиться в 200 мB (см. §6 «Нагрев»). **Ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES` — альтернативный путь через ban+новый recipe-id эквивалентен по результату, но требует лишней записи; override выбран первым по `feedback_trust_recipe_override_convention.md`). Шейдинг-тегов не требуется: `c:ingots/brass` — common-тег (в TFC-сборке включает `tfc:metal/ingot/brass` + `create:brass_ingot`). Recipe-id `create:pressing/brass_ingot` сохраняется |
 
 Для sail/funnel/tunnel потребовался shadow-тег `tfc:cloths`
 (`data/tfc/tags/item/cloths.json`): burlap + wool + silk (других cloth items TFC не имеет).
