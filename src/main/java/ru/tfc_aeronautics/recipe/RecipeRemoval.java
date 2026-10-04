@@ -78,6 +78,12 @@ public final class RecipeRemoval
      * same {@code c:ingots/copper} input, so which sheet came out depended on
      * recipe iteration order. This is a pure removal — {@code create:copper_sheet}
      * has no other production path and becomes unobtainable by design.
+     *
+     * <p>{@code create:mixing/brass_ingot} is stripped so that the mechanical
+     * mixer cannot bootstrap brass from copper and zinc in TFC builds; brass is
+     * still obtainable via {@code create:pressing/brass_ingot} and other mod
+     * paths (TFC anvil, TFC workings, Create crushing). Pure removal — no
+     * replacement recipe.
      */
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
@@ -97,7 +103,8 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("simulated", "copper_handle"),
         ResourceLocation.fromNamespaceAndPath("simulated", "iron_handle"),
         ResourceLocation.fromNamespaceAndPath("simulated", "spring"),
-        ResourceLocation.fromNamespaceAndPath("create", "industrial_iron_block_from_ingots_iron_stonecutting")
+        ResourceLocation.fromNamespaceAndPath("create", "industrial_iron_block_from_ingots_iron_stonecutting"),
+        ResourceLocation.fromNamespaceAndPath("create", "mixing/brass_ingot")
     );
 
     private RecipeRemoval() {}

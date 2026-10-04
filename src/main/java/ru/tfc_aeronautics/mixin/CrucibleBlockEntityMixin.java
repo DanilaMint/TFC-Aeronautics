@@ -1,6 +1,7 @@
 package ru.tfc_aeronautics.mixin;
 
 import java.lang.reflect.Field;
+import java.util.function.Function;
 
 import net.dries007.tfc.common.blockentities.CrucibleBlockEntity;
 import net.dries007.tfc.common.blockentities.InventoryBlockEntity;
@@ -31,7 +32,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  *   <li>Item drop from above → {@code INPUT} slots 0-8 ({@link Direction#UP}).</li>
  *   <li>Create belt from the side → {@code INPUT} slots 0-8
  *       ({@link Direction.Plane#HORIZONTAL} insert).</li>
- *   <li>Create fluid pipe → {@code UP} insert, {@code HORIZONTAL} extract.</li>
+ *   <li>Create fluid pipe → {@code UP} insert (pouring metal down),
+ *   {@code HORIZONTAL} bidirectional (insert from side pipe; drain for
+ *   casting into molds below).</li>
  *   <li>Create andesite funnel from the side → extracts from
  *   {@code SLOT_OUTPUT} (=9) ({@link Direction.Plane#HORIZONTAL} extract).</li>
  *   <li>TFC firepit/charcoal forge/firebox and our heater already heat the
@@ -131,7 +134,7 @@ public abstract class CrucibleBlockEntityMixin
 
         this.sidedFluidInventory
             .on(PartialFluidHandler::insertOnly, Direction.UP)
-            .on(PartialFluidHandler::extractOnly, Direction.Plane.HORIZONTAL);
+            .on(Function.identity(), Direction.Plane.HORIZONTAL);
     }
 
     /**

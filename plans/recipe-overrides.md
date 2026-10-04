@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 39/? ✓ (overrides + 31 envelope)
+**Прогресс:** 40/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -766,6 +766,11 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
     - `show_notification: false`; шейдинг-тегов не требуется (`#tfc:workbenches` — нативный тег TFC)
     - recipe-id `create:crafting/appliances/crafting_blueprint` сохраняется, advancement `data/create/advancement/recipes/misc/crafting/appliances/crafting_blueprint.json` засчитывается без правок
   - **проверено**: JSON валиден × 5 (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL (UP-TO-DATE)
+- [x] `create:mixing/brass_ingot` (забанен в `RecipeRemoval.BANNED_RECIPES`)
+  - оригинал Create `create:mixing` (heated): tag `c:ingots/copper` + tag `c:ingots/zinc` → 2× `create:brass_ingot` (recipe-id `create:mixing/brass_ingot`)
+  - мотивация БАНа: механический миксер как бутстрап латуни не нужен в TFC-сборке. Латунь остаётся доступной через `create:pressing/brass_ingot` и другие мод-пути (TFC anvil, TFC workings, Create crushing)
+  - структурно — pure removal (ветка recipe-override «только BAN», без замены)
+  - **проверено**: JSON существующего recipe не редактировался (он в `code_references/Create/src/generated/resources/`, не в нашем datapack); BAN работает через mixin `RecipeManager`
 
 ## TODO (новые добавлять сюда)
 

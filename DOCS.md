@@ -4156,7 +4156,7 @@ source-mod iron-вариант (`data/create/...` с `tfc:metal/sheet/wrought_ir
 |---|---|---|---|
 | 1 | Drop предмета сверху → INPUT (0–8) | `serverTick` TAIL-mixin дёргает `Helpers.gatherAndConsumeItems(level, AABB(над тиглём), inventory, 0, 8)` — vanilla `ItemEntity.tick()` сам в инвентарь не вставляется (только merge с другими ItemEntity), поэтому нужен явный pickup. AABB — `0.125..0.875` × `1.0..1.5` × `0.125..0.875` относительно `pos`. То же, что делает TFC barrel (`BarrelBlockEntity.serverTick:175`) | сверху, в момент `serverTick` |
 | 2 | Belt сбоку, направленный в crucible → INPUT (0–8) | `BeltInventory.resolveEnding` возвращает `INSERT` если target имеет `ITEM_HANDLER` на `movementFacing` (через наш `@Inject RETURN + cancellable`). Дальше `@Redirect BlockEntityBehaviour.get` возвращает `CapabilityDirectBeltInputBehaviour` wrapper, который делает `getCapability(ITEM_HANDLER, side).insertItem(...)`. Crucible не `SmartBlockEntity` — без этого mixin'а `BeltInventory.tick` шёл бы в `BLOCKED` ветку (см. `BeltInventory.resolveEnding:330`) | `Direction.Plane.HORIZONTAL` (insert) |
-| 3 | Fluid pipe подключается | `FluidPropagator.hasFluidCapability` → `getCapability(FLUID_HANDLER, side)` → `PartialFluidHandler.insertOnly` (UP) / `extractOnly` (HORIZONTAL) | UP / HORIZONTAL |
+| 3 | Fluid pipe подключается | `FluidPropagator.hasFluidCapability` → `getCapability(FLUID_HANDLER, side)` → `PartialFluidHandler.insertOnly` (UP) / `Function.identity()` (HORIZONTAL, bidirectional — позволяет лить сбоку и сливать в формы) | UP / HORIZONTAL |
 | 4 | Andesite funnel сбоку → извлекает из OUTPUT (9) | `InvManipulationBehaviour.extract()` → `IItemHandler.extractItem(slot, …)` на стороне BlockFace = `getFunnelFacing(state).getOpposite()`. Наш handler на HORIZONTAL разрешает `extract(9)` | `Direction.Plane.HORIZONTAL` (extract) |
 | 5 | HeatDealer-блоки под тиглём → греют | TFC firepit/charcoal forge/firebox/stove/grill/pot (последние два — `extends AbstractFirepitBlockEntity`, line 31/45) уже вызывают `HeatCapability.provideHeatTo(level, pos.above(), DOWN, X.temperature)`. Наш `HeaterBlockEntity.java:209` — то же. Crucible уже зарегистрирован как `IHeatConsumer` на DOWN через `BlockCapabilities.java:54` | `Direction.DOWN` (consume) |
 
@@ -4199,7 +4199,7 @@ public abstract class CrucibleBlockEntityMixin {
 
         this.sidedFluidInventory
             .on(PartialFluidHandler::insertOnly, Direction.UP)
-            .on(PartialFluidHandler::extractOnly, Direction.Plane.HORIZONTAL);
+            .on(Function.identity(), Direction.Plane.HORIZONTAL);
     }
 
     @Inject(
