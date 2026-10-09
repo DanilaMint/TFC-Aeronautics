@@ -7,7 +7,7 @@
       "tag": "minecraft:buttons"
     },
     "L": {
-      "item": "tfc:metal/sheet/brass"
+      "item": "tfc_aeronautics:metal/tight_sheet/brass"
     },
     "P": {
       "item": "create:precision_mechanism"
