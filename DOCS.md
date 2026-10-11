@@ -3787,6 +3787,21 @@ BFS-обход от coil'а по Create-трубам (≤3 трубы, как д
 флипает `WATER_VERTICAL`, при повторном цикле — меняет `AXIS` и сбрасывает
 `WATER_VERTICAL` в `false`.
 
+### Получение (крафт блока)
+
+Vanilla shaped 3×3 в обычном верстаке:
+
+```text
+   P
+  PPP     P = create:fluid_pipe
+   P
+```
+
+→ 1× `tfc_aeronautics:condenser_coil`.
+
+- recipe-id: `tfc_aeronautics:crafting/condenser_coil`
+- JSON: [`data/tfc_aeronautics/recipe/crafting/condenser_coil.json`](../src/main/resources/data/tfc_aeronautics/recipe/crafting/condenser_coil.json)
+
 ### Машина состояний: IDLE → WARMUP → RUNNING
 
 ```text

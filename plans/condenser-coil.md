@@ -1,6 +1,6 @@
 # Condenser Coil
 
-**Прогресс:** 26/28 ⏳
+**Прогресс:** 27/31 ⏳
 
 Змеевик — блок, перегоняющий жидкость из `create:fluid_tank`, который стоит над
 нагревательным элементом. Паровая ось (вход/выход паров и дистиллята) всегда
@@ -207,6 +207,7 @@ HeatDealer.findTemperature(level, tankControllerPos.below(), belowState)
 - [x] item `tfc_aeronautics:condenser_coil_item`
 - [x] `condenser_coil/CondenserCoilRegistration.java`
 - [x] blockstate `assets/tfc_aeronautics/blockstates/condenser_coil.json`
+- [x] crafting-рецепт блока: shaped 3×3, 5× `create:fluid_pipe` в крест → 1 шт, [`data/tfc_aeronautics/recipe/crafting/condenser_coil.json`](../src/main/resources/data/tfc_aeronautics/recipe/crafting/condenser_coil.json) (recipe-id `tfc_aeronautics:crafting/condenser_coil`)
 
 ## Текстурирование
 - [x] Создать текстуру для `condenser_coil` (извлечена из base64 в `blockbench/condenser_coil.bbmodel`)
