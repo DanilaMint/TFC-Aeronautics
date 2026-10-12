@@ -3,13 +3,14 @@
 Статус механик мода. Каждая подсистема — отдельный файл в [`plans/`](plans/).
 Прогресс = выполнено / всего задач. ✓ — закрыто, ⏳ — в работе, ☐ — не начато.
 
-**Итого:** 279 / 355 (≈ 79 %).
+**Итого:** 306 / 382 (≈ 80 %).
 
 - [Metal Powders](plans/metal-powders.md) — 10/10 ✓
 - [Industrial Composite](plans/industrial-composite.md) — 13/13 ✓
 - [Resin](plans/resin.md) — 8/8 ✓
 - [Rosin](plans/rosin.md) — 6/6 ✓
 - [Tight Sheets](plans/tight-sheets.md) — 10/10 ✓
+- [Press to Sheet (Create pressing double_ingot → sheet)](plans/press-to-sheet.md) — 27/27 ✓ (Python-генерация под `generate/`: `generate_pressing_double_ingot_recipes.py`; namespace `tfc_aeronautics:pressing/<metal>_double_ingot`, индустриальная альтернатива TFC-наковальне; зарегистрирован в `generate/generate.py` как leaf `pressing`)
 - [Anvils (tier-1 downgrade для остальных металлов)](plans/anvil.md) — 19/19 ✓
 - [Saw Blade](plans/saw-blade.md) — 8/8 ✓
 - [Wrench Head](plans/wrench-head.md) — 7/8 ⏳ (texturing остаётся placeholder)

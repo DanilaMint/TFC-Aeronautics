@@ -1992,7 +1992,7 @@ milling/pressing/квен-моста — см. `feedback_recipe_override_convent
 - блокировка/скрытие рецептов (раздел 18);
 - перенос recipes между namespace в рамках адаптации нового TFC-контента
   (tight sheets в Create pressing и т.п.) — это идёт в профильный plan
-  (`plans/tight-sheets.md`).
+  (`plans/tight-sheets.md`, `plans/press-to-sheet.md`).
 
 ### Актуальный список
 

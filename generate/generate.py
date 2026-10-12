@@ -19,6 +19,7 @@ import time
 from generate_bucket_textures import main as gen_buckets
 from generate_milling_recipes import main as gen_milling
 from generate_mixing_recipes import main as gen_mixing
+from generate_pressing_double_ingot_recipes import main as gen_pressing
 from generate_quern_food_recipes import main as gen_quern
 from generate_wooden_bracket_assets import main as gen_assets
 from generate_wooden_bracket_recipes import main as gen_recipes
@@ -35,6 +36,7 @@ LEAVES: list[tuple[str, callable]] = [
     ("buckets",           gen_buckets),
     ("milling",           gen_milling),
     ("mixing",            gen_mixing),
+    ("pressing",          gen_pressing),
     ("quern",             gen_quern),
 ]
 
@@ -50,7 +52,8 @@ GROUPS: dict[str, list[tuple[str, callable]]] = {
     "buckets":           [LEAVES[3]],
     "milling":           [LEAVES[4]],
     "mixing":            [LEAVES[5]],
-    "quern":             [LEAVES[6]],
+    "pressing":          [LEAVES[6]],
+    "quern":             [LEAVES[7]],
 }
 
 
