@@ -12,7 +12,7 @@ tier-1 наковальня. Это «даунгрейд»-вариант с п�
 
 ## Что сделано
 
-19/19 ✓
+19/19 ✓ 
 
 - `AnvilRegistration` (Java) — итерация по `Metal.values()`, фильтр через
   `Metal.BlockType.ANVIL.has(metal)`, hardcoded tier=1. Регистрирует 2
