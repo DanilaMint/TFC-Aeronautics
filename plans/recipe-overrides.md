@@ -89,7 +89,6 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: true` (по умолчанию; ничего особенного в получении нет)
   - шейдинг-тегов не требуется: оба ингредиента — прямые item-id
   - recipe-id остаётся `create:crafting/kinetics/gearshift`, advancement Create засчитывается без правок
-  - **проверено**: `./gradlew compileJava` UP-TO-DATE, JSON валиден (`python3 -c 'json.load(...)'` OK), сборка `./build.sh install` прошла, JAR установился в `~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/tfc-aeronautics-dev/minecraft/mods/tfc_aeronautics-0.5.0.jar`
 - [x] `data/simulated/recipe/throttle_lever.json`
   - оригинал Simulated shaped 1×2 `["S", "B"]` с `minecraft:stick` (S) + `create:brass_casing` (B) → 1 `simulated:throttle_lever`
   - новый: тот же pattern, ключ `S = #c:rods/wooden` → 1 `simulated:throttle_lever`
@@ -510,7 +509,6 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция)
   - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/brass` и `tfc:metal/sheet/gold` — прямые item-id (модели и текстуры в `code_references/TerraFirmaCraft/.../assets/tfc/models/item/metal/sheet/{brass,gold}.json`)
   - recipe-id остаётся `simulated:mechanical_crafting/linked_typewriter`
-  - **проверено**: JSON валиден (`python3 -m json.tool` OK), `./gradlew build` BUILD SUCCESSFUL, JAR установлен в `~/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/tfc-aeronautics-dev/minecraft/mods/tfc_aeronautics-0.7.0.jar`
 - [x] `data/simulated/recipe/modulating_linked_receiver.json`
   - оригинал Simulated `minecraft:crafting_shaped` 1×3 `["A","B","C"]`: 1× `create:transmitter` (A) + 1× `create:golden_sheet` (B) + 1× `create:brass_casing` (C) → 1 `simulated:modulating_linked_receiver` (recipe-id `simulated:modulating_linked_receiver`)
   - новый: тот же `crafting_shaped` 1×3 — заменён **только** ключ `B`: 1× `create:transmitter` (A) + 1× `tfc:metal/sheet/gold` (B) + 1× `create:brass_casing` (C) → 1 `simulated:modulating_linked_receiver`. Pattern, count, recipe-id, `category` не тронуты — pure ingredient swap, без reshape
