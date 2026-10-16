@@ -148,6 +148,41 @@ public class HeatTooltipGoggles
     }
 
     /**
+     * Fallback for the seven screen mixins when goggles are off. Mirrors what the
+     * mixins used to do directly via {@code style.formatColored(temperature)}, but
+     * resolved reflectively so it works on every TFC version without dragging
+     * {@code TemperatureDisplayStyle} into the mixin's bytecode.
+     *
+     * <p>Old TFC (4.2.5 and earlier): {@link java.lang.reflect.Method#invoke}
+     * finds {@code formatColored(float)} on the {@code TemperatureDisplayStyle}
+     * enum instance TFC passed in, and the returned component honors
+     * {@code TFCConfig.CLIENT.heatTooltipStyle} (Celsius / Fahrenheit / Kelvin /
+     * Rankine / Color) — identical to the original behaviour.
+     *
+     * <p>New TFC (4.2.12+): if the class or method is gone, reflection throws
+     * and we fall through to {@link #exactTemp(float)} (always Celsius with the
+     * heat category color). On those versions the {@code @Redirect} no-ops in the
+     * first place, so this fallback only ever runs when goggles are off.
+     */
+    public static MutableComponent formatFallback(@org.jetbrains.annotations.Nullable Object style, float temperature)
+    {
+        if (style != null)
+        {
+            try
+            {
+                final java.lang.reflect.Method m = style.getClass().getMethod("formatColored", float.class);
+                final Object result = m.invoke(style, temperature);
+                if (result instanceof MutableComponent mc)
+                {
+                    return mc;
+                }
+            }
+            catch (Throwable ignored) { /* fall through to exactTemp */ }
+        }
+        return exactTemp(temperature);
+    }
+
+    /**
      * Recursively rebuilds a component, replacing any nested {@link TranslatableContents}
      * whose key starts with {@code tfc.enum.heat.} (the heat-category head TFC embeds inside
      * melts_into / fuel_burns_at / etc. translatable args) with the temperature appropriate
