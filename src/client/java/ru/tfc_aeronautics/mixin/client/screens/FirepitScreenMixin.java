@@ -3,6 +3,7 @@ package ru.tfc_aeronautics.mixin.client.screens;
 import net.minecraft.network.chat.MutableComponent;
 
 import net.dries007.tfc.client.screen.FirepitScreen;
+import net.dries007.tfc.config.ItemTemperatureDisplayStyle;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,10 +20,10 @@ public abstract class FirepitScreenMixin
         require = 0,
         at = @At(
             value = "INVOKE",
-            target = "Lnet/dries007/tfc/config/TemperatureDisplayStyle;formatColored(F)Lnet/minecraft/network/chat/MutableComponent;"
+            target = "Lnet/dries007/tfc/config/ItemTemperatureDisplayStyle;formatColored(F)Lnet/minecraft/network/chat/MutableComponent;"
         )
     )
-    private MutableComponent tfcAeronautics$gogglesFormatColored(@Nullable Object style, float temperature)
+    private MutableComponent tfcAeronautics$gogglesFormatColored(@Nullable ItemTemperatureDisplayStyle style, float temperature)
     {
         final MutableComponent goggled = HeatTooltipGoggles.withGoggles(temperature);
         return goggled != null ? goggled : HeatTooltipGoggles.formatFallback(style, temperature);
