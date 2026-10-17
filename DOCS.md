@@ -44,6 +44,7 @@
 34. [Змеевик-конденсатор (Condenser Coil)](#34-змеевик-конденсатор-condenser-coil)
 35. [Тег `tfc_aeronautics:iron_sheet` — консолидация листов железа/стали](#35-тег-tfc_aeronauticsiron_sheet)
 36. [TFC Crucible: интеграция с belt / fluid_pipe / funnel / heat](#36-tfc-crucible-интеграция-с-belt--fluid_pipe--funnel--heat)
+37. [Шины offroad из резины (Rubber Tires)](#37-шины-offroad-из-резины-rubber-tires)
 
 ---
 
@@ -4307,3 +4308,82 @@ return Ending.EJECT;
 - `code_references/Create/.../DirectBeltInputBehaviour.java:72` — стандартный belt-deposit через capability
 - `code_references/Create/.../FluidPropagator.java:202` — pipe-side capability lookup
 - `code_references/Create/.../InvManipulationBehaviour.java:65` — funnel-side extraction
+
+## 37. Шины offroad из резины (Rubber Tires)
+
+Шины offroad-сабпроекта (`offroad:small_tire`, `offroad:tire`, `offroad:large_tire`,
+`offroad:monstrous_tire`) — тир-система колёс для транспорта в TFC-мире. По умолчанию в
+датапаке offroad (внутри `create-aeronautics-bundled-1.21.1-1.3.2.jar` → `META-INF/jarjar/dev.ryanhcode.offroad.offroad-neoforge-1.21.1-1.3.2.jar`)
+они крафтятся из `minecraft:dried_kelp` / `dried_kelp_block` / `create:belt_connector` +
+`create:shaft` — ингредиенты, не имеющие естественного источника в TFC (kelp-блоки требуют
+морских биомов, нестандартных для TFC; belt_connector — Create-only).
+
+Замена: 4 новых рецепта в `src/main/resources/data/tfc_aeronautics/recipe/crafting/...`
+**+** 4 записи в `BANNED_RECIPES` (`src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`)
+для `offroad:{small_tire,tire,large_tire,monstrous_tire}` (**ветка 2** скилла `recipe-override`
+— recipe-id в нашем namespace + бан upstream-рецепта).
+
+**Почему не ветка 1 (sub-recipe override).** Первая попытка — `data/offroad/recipe/<name>.json`
+с тем же путём, что у upstream — не сработала. Bundled sub-jar offroad имеет приоритет
+в datapack-merge над нашим модом (несмотря на более позднюю загрузку `tfc_aeronautics`):
+recipe count остался 9236 (как без наших файлов), наши файлы были silently проигнорированы.
+Подтверждено: `unzip -l META-INF/jarjar/dev.ryanhcode.offroad.offroad-neoforge-1.21.1-1.3.2.jar`
+показывает наличие `data/offroad/recipe/{small_tire,tire,large_tire,monstrous_tire,borehead_bearing,rockcutting_wheel,wheel_mount}.json`
+с kelp/belt-ингредиентами — наш файл по тому же пути проигрывает merge.
+
+| Рецепт | Тип | Pattern | Ингредиенты | Выход | recipe-id |
+|--------|-----|---------|-------------|-------|-----------|
+| `small_tire` | `minecraft:crafting_shapeless` | — | `tfc_aeronautics:rubber` + `create:shaft` | 1 | `tfc_aeronautics:crafting/small_tire` |
+| `tire` | `minecraft:crafting_shaped` | `[ " R ", "RSR", " R " ]` | `R` = `tfc_aeronautics:rubber`, `S` = `create:shaft` | 1 | `tfc_aeronautics:crafting/tire` |
+| `large_tire` | `minecraft:crafting_shaped` | `[ "RRR", "RSR", "RRR" ]` | `R` = `tfc_aeronautics:rubber`, `S` = `create:shaft` | 1 | `tfc_aeronautics:crafting/large_tire` |
+| `monstrous_tire` | `minecraft:crafting_shaped` | `[ "RRR", "RTR", "RRR" ]` | `R` = `tfc_aeronautics:rubber`, `T` = `offroad:large_tire` | 1 | `tfc_aeronautics:crafting/monstrous_tire` |
+
+### Мотивация
+
+- **`tfc_aeronautics:rubber`** — наша резина (`src/main/java/ru/tfc_aeronautics/rubber/RubberRegistration.java:20`),
+  получаемая через `data/tfc_aeronautics/recipe/mixing/rubber.json` (latex_clump + charcoal +
+  10 мБ vinegar через `create:mixing`). В TFC-мире естественный резиновый ингредиент; уже
+  использован в `hose_pulley.json`.
+- **`create:shaft`** — базовый вал Create (получается через `data/tfc_aeronautics/recipe/heating/composite_shaft.json`:
+  heat `tfc_aeronautics:composite` при 300°C → 1× `create:shaft`).
+- **Тир-система**: small → tire → large_tire → monstrous_tire; monstrous_tire строится вокруг
+  large_tire (как слоёный пирог — нужны обе предыдущие стадии). Это первый recipe-make
+  контур offroad, явно завязанный на собственный upgrade-tree.
+- **`offroad:large_tire` в центре `monstrous_tire`** — структурно отличается от upstream-креста
+  `[" K ","KSK"," K "]`, но recipe-id другой (`tfc_aeronautics:crafting/monstrous_tire`),
+  поэтому **ветка 2** с `BANNED_RECIPES` — единственный путь. Аналогично `large_tire.json`
+  (cross → filled).
+- **Смена recipe-id не ломает advancement'ы offroad**: upstream-advancement
+  `data/offroad/advancement/recipes/misc/small_tire.json` (и аналоги для tire/large_tire/monstrous_tire)
+  триггерится на `inventory_changed` (предмет в инвентаре), не на recipe-id — recipe-id
+  может быть любым, achievement засчитывается по наличию `offroad:small_tire` в инвентаре.
+
+### Файлы
+
+- `src/main/resources/data/tfc_aeronautics/recipe/crafting/small_tire.json`
+- `src/main/resources/data/tfc_aeronautics/recipe/crafting/tire.json`
+- `src/main/resources/data/tfc_aeronautics/recipe/crafting/large_tire.json`
+- `src/main/resources/data/tfc_aeronautics/recipe/crafting/monstrous_tire.json`
+- `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java` — 4 новые записи в `BANNED_RECIPES`
+  (`offroad:{small_tire,tire,large_tire,monstrous_tire}`)
+
+### Конвенции
+
+- `show_notification: false` (конвенция override-рецептов, memory `feedback_show_notification_false.md`)
+- пустые слоты в pattern — пробел `" "`, не `.` (1.21.1 `ShapedRecipePattern` валит JSON с
+  `JsonSyntaxException` на не-пробельном символе вне `key`; прецеденты `goggles.json` /
+  `rope_pulley.json` / `mechanical_piston.json`)
+- `category: "misc"` (как в `hose_pulley.json` и upstream offroad recipes)
+- заглавные однобуквенные ключи `R` / `S` / `T` — регистрозависимые, не пересекаются между рецептами
+- `BANNED_RECIPES` — прецеденты: `simulated:iron_handle` (RecipeRemoval.java:103),
+  `simulated:spring` (RecipeRemoval.java:105) — также были заменены через ветку 2
+
+### Связь
+
+- `plans/recipe-overrides.md` `## Новые рецепты` — записи о 4 файлах с подробной мотивацией
+- `data/create/recipe/crafting/kinetics/hose_pulley.json` — прецедент sub-recipe override
+  с `tfc_aeronautics:rubber` в ингредиентах (тот же `R` ключ)
+- `data/create/recipe/crafting/kinetics/rope_pulley.json` — прецедент shaped 3×3 с
+  центральным ключом-валом (структурно аналогично `tire.json` / `large_tire.json`)
+- `code_references/Simulated-Project/offroad/.../index/OffroadItems.java` — регистрация
+  `TireItem` с компонентом `TireLike.{SMALL,TIRE,LARGE,MONSTROUS}_TIRE`

@@ -84,6 +84,19 @@ public final class RecipeRemoval
      * still obtainable via {@code create:pressing/brass_ingot} and other mod
      * paths (TFC anvil, TFC workings, Create crushing). Pure removal — no
      * replacement recipe.
+     *
+     * <p>{@code offroad:small_tire}, {@code offroad:tire},
+     * {@code offroad:large_tire}, {@code offroad:monstrous_tire} are stripped
+     * because their only paths are now the rubber-craft recipes under
+     * {@code tfc_aeronautics:crafting/small_tire},
+     * {@code tfc_aeronautics:crafting/tire},
+     * {@code tfc_aeronautics:crafting/large_tire} and
+     * {@code tfc_aeronautics:crafting/monstrous_tire}. The vanilla kelp/belt
+     * recipes from the offroad sub-jar of {@code create-aeronautics-bundled}
+     * use dried kelp / belt connector — ingredients that have no TFC role.
+     * The shadow-overwrite at {@code data/offroad/recipe/<name>.json} does not
+     * apply because the bundled sub-jar's data pack wins the namespace
+     * priority collision; BAN is required to silence the upstream recipe.
      */
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
@@ -104,7 +117,11 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("simulated", "iron_handle"),
         ResourceLocation.fromNamespaceAndPath("simulated", "spring"),
         ResourceLocation.fromNamespaceAndPath("create", "industrial_iron_block_from_ingots_iron_stonecutting"),
-        ResourceLocation.fromNamespaceAndPath("create", "mixing/brass_ingot")
+        ResourceLocation.fromNamespaceAndPath("create", "mixing/brass_ingot"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "small_tire"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "tire"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "large_tire"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "monstrous_tire")
     );
 
     private RecipeRemoval() {}

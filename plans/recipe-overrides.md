@@ -800,6 +800,48 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id `create:pressing/brass_ingot` сохраняется: если в Create существует advancement на pressing `brass_sheet`, он автоматически засчитывается без правок (прецедент `tight_sheet_*` overrides)
   - **проверено**: JSON валиден × 6 (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
+- [x] `data/tfc_aeronautics/recipe/crafting/small_tire.json` (4 файла — серия rubber-шин offroad)
+  - оригинал offroad (внутри `create-aeronautics-bundled-1.21.1-1.3.2.jar` → `META-INF/jarjar/dev.ryanhcode.offroad.offroad-neoforge-1.21.1-1.3.2.jar` → `data/offroad/recipe/small_tire.json`): shapeless `minecraft:dried_kelp` + `create:shaft` → 1 `offroad:small_tire` (recipe-id `offroad:small_tire`). В TFC-сборке `minecraft:dried_kelp` труднодоступен (морские биомы нестандартны для TFC)
+  - новый shapeless: `tfc_aeronautics:rubber` + `create:shaft` → 1 `offroad:small_tire` (recipe-id `tfc_aeronautics:crafting/small_tire`)
+  - мотивация: `tfc_aeronautics:rubber` (см. `data/tfc_aeronautics/recipe/mixing/rubber.json` — latex_clump + charcoal + 10 мБ vinegar через `create:mixing`) — наша резина, естественный TFC-аналог dried_kelp; `create:shaft` доступен через `data/tfc_aeronautics/recipe/heating/composite_shaft.json` (heat composite при 300°C)
+  - **ветка 2** скилла `recipe-override` (recipe-id в namespace `tfc_aeronautics`, **+** запись в `BANNED_RECIPES` для `offroad:small_tire`). Причина: первая попытка как **ветка 1** (файл `data/offroad/recipe/small_tire.json` затеняет upstream) не сработала — bundled sub-jar offroad имеет приоритет в datapack-merge над нашим модом, несмотря на более позднюю загрузку. Recipe count остался 9236 (как без наших файлов) — наши файлы были silently проигнорированы. Подтверждено: `unzip -l META-INF/jarjar/dev.ryanhcode.offroad.offroad-neoforge-1.21.1-1.3.2.jar` показывает наличие `data/offroad/recipe/{small_tire,tire,large_tire,monstrous_tire,borehead_bearing,rockcutting_wheel,wheel_mount}.json` с kelp/belt-ингредиентами
+  - `show_notification: false` (конвенция)
+  - шейдинг-тегов не требуется: оба ingredient'а — прямые item-id (`tfc_aeronautics:rubber` из `src/main/java/ru/tfc_aeronautics/rubber/RubberRegistration.java:20`, `create:shaft` Create item)
+  - recipe-id изменён: было `offroad:small_tire` (при ветке 1) → стало `tfc_aeronautics:crafting/small_tire`. Advancements offroad (`data/offroad/advancement/recipes/misc/small_tire.json`) триггерятся на `inventory_changed` (предмет в инвентаре), не на recipe-id — не ломаются
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/tfc_aeronautics/recipe/crafting/tire.json`
+  - оригинал offroad shaped 3×3 `[" K ","KSK"," K "]`: 5× `minecraft:dried_kelp` (K) + 1× `create:shaft` (S) → 1 `offroad:tire` (recipe-id `offroad:tire`)
+  - новый shaped 3×3 `[" R ","RSR"," R "]`: 5× `tfc_aeronautics:rubber` (R) + 1× `create:shaft` (S) → 1 `offroad:tire` (recipe-id `tfc_aeronautics:crafting/tire`)
+  - мотивация: тот же craft-путь, что small_tire, но в виде 3×3 креста на верстаке (стандарт для `minecraft:crafting_shaped`)
+  - **ветка 2** скилла `recipe-override` (recipe-id в namespace `tfc_aeronautics`, + `BANNED_RECIPES` для `offroad:tire`). Причина та же — sub-recipe override (ветка 1) не сработал из-за приоритета bundled sub-jar
+  - `show_notification: false` (конвенция)
+  - шейдинг-тегов не требуется
+  - recipe-id изменён: `offroad:tire` → `tfc_aeronautics:crafting/tire`
+  - **внимание к паттерну**: пустые слоты — пробелы `" "`, не `.` (1.21.1 `ShapedRecipePattern` валит JSON с `JsonSyntaxException` на не-пробельном символе вне `key`; прецеденты `goggles.json` / `mechanical_piston.json` / `crushing_wheel.json`)
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/tfc_aeronautics/recipe/crafting/large_tire.json`
+  - оригинал offroad shaped 3×3 `[" B ","BSB"," B "]`: 5× `create:belt_connector` (B) + 1× `create:shaft` (S) → 1 `offroad:large_tire` (recipe-id `offroad:large_tire`)
+  - новый shaped 3×3 `["RRR","RSR","RRR"]`: 8× `tfc_aeronautics:rubber` (R) + 1× `create:shaft` (S) → 1 `offroad:large_tire` (recipe-id `tfc_aeronautics:crafting/large_tire`)
+  - мотивация: upstream использует `create:belt_connector` (Create-only ремень) — в TFC-сборке редок и недоступен на базовом этапе; `tfc_aeronautics:rubber` (8 шт.) — наш аналог, естественный TFC-путь. Pattern с креста на заполненный — семантически «больше резины = крупнее шина»
+  - **ветка 2** скилла `recipe-override` (recipe-id в namespace `tfc_aeronautics`, + `BANNED_RECIPES` для `offroad:large_tire`). Причина та же — sub-recipe override (ветка 1) не сработал
+  - `show_notification: false` (конвенция)
+  - шейдинг-тегов не требуется
+  - recipe-id изменён: `offroad:large_tire` → `tfc_aeronautics:crafting/large_tire`
+  - **внимание к паттерну**: пустых слотов нет — все 9 ячеек заполнены ключами
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/tfc_aeronautics/recipe/crafting/monstrous_tire.json`
+  - оригинал offroad shaped 3×3 `[" K ","KSK"," K "]`: 5× `minecraft:dried_kelp_block` (K) + 1× `create:shaft` (S) → 1 `offroad:monstrous_tire` (recipe-id `offroad:monstrous_tire`)
+  - новый shaped 3×3 `["RRR","RTR","RRR"]`: 8× `tfc_aeronautics:rubber` (R) + 1× `offroad:large_tire` (T) → 1 `offroad:monstrous_tire` (recipe-id `tfc_aeronautics:crafting/monstrous_tire`)
+  - мотивация: monstrous_tire — финальная стадия тир-системы шин; строится вокруг large_tire (предыдущая стадия), обёрнутая 8 кусками резины. Upstream `dried_kelp_block` — без естественного источника в TFC; `offroad:large_tire` — то, что мы только что определили выше
+  - **ветка 2** скилла `recipe-override` (recipe-id в namespace `tfc_aeronautics`, + `BANNED_RECIPES` для `offroad:monstrous_tire`). Причина та же
+  - `show_notification: false` (конвенция)
+  - шейдинг-тегов не требуется
+  - recipe-id изменён: `offroad:monstrous_tire` → `tfc_aeronautics:crafting/monstrous_tire`
+  - **внимание к ключам**: ключ `T` (large_tire) не пересекается с `R` (rubber) или `S` (shaft) — заглавные однобуквенные ключи, регистрозависимые
+  - **внимание к паттерну**: пустых слотов нет — все 9 ячеек заполнены ключами
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+  - подробности в `DOCS.md` §37
+
 ## TODO (новые добавлять сюда)
 
 - [ ] Перевести потребителей `create:copper_sheet` / тега `c:plates/copper` на `tfc_aeronautics:metal/tight_sheet/copper` — предмет стал недобываем после бана `create:pressing/copper_ingot`:
