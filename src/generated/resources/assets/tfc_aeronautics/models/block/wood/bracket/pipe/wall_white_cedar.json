@@ -1,7 +1,0 @@
-{
-  "parent": "create:block/bracket/pipe/wall",
-  "textures": {
-    "bracket": "tfc_aeronautics:block/wood/bracket/bracket_white_cedar",
-    "plate": "tfc_aeronautics:block/wood/bracket/bracket_plate_white_cedar"
-  }
-}
