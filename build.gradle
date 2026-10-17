@@ -61,7 +61,7 @@ dependencies {
     // NeoForge and Minecraft are provided automatically by the moddev plugin
 
     // TFC at compile time only — supplied at runtime via mods.toml dependency on the user's modpack.
-    compileOnly files('libs/tfc-1.21.1-4.2.5.jar')
+    compileOnly files('libs/tfc-1.21.1-4.2.12.jar')
 
     // Create at compile time only — supplied at runtime via mods.toml dependency.
     // The stamping press is built on top of Create's kinetic block / press engine.
