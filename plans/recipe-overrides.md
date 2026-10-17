@@ -607,6 +607,17 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - осознанный trade-off: исходный `tfc_aeronautics:metal/tight_sheet/wrought_iron` (tight_sheet из кованого железа, отдельная позиция в нашей регистрации) в тег **не входит** по спеке пользователя. После merge `propeller.json` теряет возможность быть собранным именно из tight_sheet/wrought_iron, но получает 3 других варианта (`create:iron_sheet`, `tfc:metal/sheet/wrought_iron`, `tight_sheet/steel`)
   - подробный дизайн — в `DOCS.md` §35
 
+- [x] `data/create/recipe/crafting/kinetics/hose_pulley.json`
+  - оригинал Create shaped 3×1 `["B","C","I"]` с `create:copper_casing` (B) + `minecraft:dried_kelp_block` (C) + tag `c:plates/copper` (I) → 1 `create:hose_pulley`. В TFC-сборке мёртв: `minecraft:dried_kelp_block` экзотика (кейп не базовый ресурс TFC), tag `c:plates/copper` после бана `create:pressing/copper_ingot` (см. `## Новые рецепты`) фактически пуст
+  - TFC-style shaped 3×3 `["RCR","RRR","RSR"]`: 7× `tfc_aeronautics:rubber` (R, по периметру — углы + 2 бока верхнего ряда + 2 бока среднего ряда) + 1× `create:copper_casing` (C, верх-середина) + 1× `tfc_aeronautics:metal/tight_sheet/copper` (S, низ-середина) → 1 `create:hose_pulley`
+  - мотивация: rubber — натуральный каучук, семантически точный материал для шлангов (hose_pulley = шкив для подачи жидкости по шлангам); 7× резины по периметру символизируют гибкую оболочку шлангов в змейке. Медь через `tight_sheet/copper` (tier 1, TFC anvil `data/tfc_aeronautics/recipe/anvil/tight_sheet_copper.json` или pressing `.../pressing/tight_sheet_copper.json`) и `copper_casing` (Create-оболочка для пневматики) — закрывают пробел в TFC-металлургическом пути для блока подачи жидкости. Закрывает первую часть TODO «Перевести потребителей `create:copper_sheet`» ниже (`create:crafting/kinetics/hose_pulley`); остаётся `aeronautics:mounted_potato_cannon`
+  - структурно — **TFC-style reshape** (3×1 → 3×3), **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`); прецедент — `rope_pulley.json` (тоже 3×1 → 3×3 «RCR/RRR/RSR», но с andesite_casing + wrought_iron sheet + tfc:rope), `whisk.json` / `propeller.json` / `goggles.json` (аналогичные pattern-reshape'ы)
+  - `show_notification: false` (конвенция проекта для sub-recipe overrides, memory `feedback_show_notification_false.md`); structural reshape, без банa апстрим-recipe-id (datapack-merge затенит оригинал через тот же путь)
+  - шейдинг-тегов не требуется: 3 ingredient'а — прямые item-id (`tfc_aeronautics:rubber` из `src/main/java/ru/tfc_aeronautics/rubber/RubberRegistration.java:20`, `create:copper_casing` — Create, `tfc_aeronautics:metal/tight_sheet/copper` из `src/main/java/ru/tfc_aeronautics/metal/TightSheet.java:31` `COPPER("copper", 1080, ...)`)
+  - recipe-id остаётся `create:crafting/kinetics/hose_pulley`; datapack-merge через datapack-shadow по тому же пути `data/create/recipe/crafting/kinetics/hose_pulley.json` затенит апстрим-recipe автоматически (конвенция `feedback_recipe_override_convention.md`)
+  - **внимание к ключам**: pattern использует три буквы `R`/`C`/`S` разного регистра — все заглавные, не пересекаются с соседними overrides (`rope_pulley.json` тоже R/C/S но другой namespace'ы — здесь это безопасно, recipe'ы лежат в разных папках и действуют на разные результаты)
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+
 ## Новые рецепты
 
 - [x] `data/tfc_aeronautics/recipe/crafting/rope_to_rope_coupling.json` — shapeless 1× `tfc:rope` → 1× `simulated:rope_coupling`. Бесплатная прямая конвертация: игрок с верёвкой получает coupling без затрат. Заменяет заблокированный shaped `simulated:rope_coupling` (см. `## Готово`)
@@ -792,7 +803,6 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
 ## TODO (новые добавлять сюда)
 
 - [ ] Перевести потребителей `create:copper_sheet` / тега `c:plates/copper` на `tfc_aeronautics:metal/tight_sheet/copper` — предмет стал недобываем после бана `create:pressing/copper_ingot`:
-  - `create:crafting/kinetics/hose_pulley` (заодно `minecraft:dried_kelp_block`, из-за которого рецепт мёртв и без этого)
   - `aeronautics:mounted_potato_cannon` (mechanical crafting)
 
 - [ ]

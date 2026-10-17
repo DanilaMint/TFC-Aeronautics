@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": { "item": "tfc_aeronautics:rubber" },
+    "C": { "item": "create:copper_casing" },
+    "S": { "item": "tfc_aeronautics:metal/tight_sheet/copper" }
+  },
+  "pattern": [ "RCR", "RRR", "RSR" ],
+  "result": { "count": 1, "id": "create:hose_pulley" }
+}
