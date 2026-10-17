@@ -47,3 +47,4 @@ run/
 # NeoGradle
 .neo/
 export/
+generated/
