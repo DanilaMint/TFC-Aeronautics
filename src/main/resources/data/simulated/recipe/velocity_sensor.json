@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "l": { "tag": "tfc:lumber" },
+    "p": { "item": "create:propeller" }
+  },
+  "pattern": [
+    "l l",
+    "lpl",
+    "l l"
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:velocity_sensor"
+  },
+  "show_notification": false
+}
