@@ -735,6 +735,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - `show_notification: false` (конвенция проекта для sub-recipe override'ов — memory `feedback_show_notification_false.md`)
   - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/wrought_iron` — прямой item-id из `src/main/java/ru/tfc_aeronautics/metal/TightSheet.java:32`
   - recipe-id остаётся `simulated:directional_linked_receiver`, advancement `data/simulated/advancement/recipes/misc/directional_linked_receiver.json` (recipe-trigger) ссылается на тот же id — засчитывается без правок
+- [x] `data/simulated/recipe/altitude_sensor.json`
+  - оригинал Simulated shaped 1×3 `["P","S","A"]`: 1× `minecraft:paper` (P) + 1× `create:iron_sheet` (S, Create-only железный лист через mechanical press) + 1× `create:andesite_casing` (A) → 1 `simulated:altitude_sensor` (recipe-id `simulated:altitude_sensor`)
+  - новый: тот же pattern, ключ `S = tfc_aeronautics:metal/tight_sheet/wrought_iron` → 1 `simulated:altitude_sensor`
+  - мотивация: `create:iron_sheet` в TFC-сборке недостижим (Create-only лист через mechanical press); `tfc_aeronautics:metal/tight_sheet/wrought_iron` — кованый железный лист (100 мБ), tier 3 через TFC anvil `data/tfc_aeronautics/recipe/anvil/tight_sheet_wrought_iron.json` или pressing. Прецедент — соседний `directional_linked_receiver.json` с тем же свапом `create:iron_sheet → tight_sheet/wrought_iron`
+  - структурно — простой sub-recipe override (как `throttle_lever.json` / `directional_linked_receiver.json`): pattern и аутпут неизменны, поменялся только один ингредиент
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`) — файл по тому же пути затеняет Simulated-овский рецепт автоматически (конвенция: `feedback_recipe_override_convention.md`)
+  - `show_notification: false` (конвенция проекта для sub-recipe override'ов — memory `feedback_show_notification_false.md`)
+  - шейдинг-тегов не требуется: все 3 ингредиента — прямые item-id
+  - recipe-id остаётся `simulated:altitude_sensor`, advancement `data/simulated/advancement/recipes/misc/altitude_sensor.json` (recipe-trigger + recipe reward) ссылается на тот же id — засчитывается без правок
 - [x] `data/simulated/recipe/redstone_magnet.json`
   - `create:copper_sheet` → `tfc_aeronautics:metal/tight_sheet/copper`
 - [x] `data/tfc/tags/fluid/usable_in_jug.json` (tag-override, не recipe)
