@@ -19,16 +19,23 @@ A verdict per row:
   BRIGHTER wood median - brightest > 6/channel (we somehow overshot the
            median — fine, but flagged)
   MISSING  output PNG not present
+
+Sources are the vendored Create textures in `generate/textures/` and the plank
+PNGs read out of the TFC jar in `libs/` — no `code_references/` involved.
 """
 from pathlib import Path
 
 from PIL import Image
 
-from _common import WOODS, REPO
+from _common import WOODS, REPO, VENDORED_TEXTURES, tfc_plank_rgba
 
-CREATE_TEX = REPO / "code_references" / "Create" / "src" / "main" / "resources" / "assets" / "create" / "textures" / "block"
-TFC_PLANKS = REPO / "code_references" / "TerraFirmaCraft" / "src" / "main" / "resources" / "assets" / "tfc" / "textures" / "block" / "wood" / "planks"
+BRACKET_TEX = VENDORED_TEXTURES
 OUT_DIR = REPO / "src" / "generated" / "resources" / "assets" / "tfc_aeronautics" / "textures" / "block" / "wood" / "bracket"
+
+SOURCES = {
+    "bracket": BRACKET_TEX / "bracket_wooden.png",
+    "bracket_plate": BRACKET_TEX / "bracket_plate_wooden.png",
+}
 
 OK_THRESHOLD = 6           # max channel delta still counts as "matches wood colour"
 DIM_FACTOR = 0.95          # brightest pixel below this fraction of wood median → DIM
@@ -67,9 +74,8 @@ def brightest(path: Path) -> tuple[int, int, int]:
     return max(pixels, key=lambda p: p[0] + p[1] + p[2])[:3]
 
 
-def wood_median_rgb(plank_path: Path) -> tuple[int, int, int]:
-    img = Image.open(plank_path).convert("RGBA")
-    pixels = [p for p in img.getdata() if p[3] > 0]
+def wood_median_rgb(plank: Image.Image) -> tuple[int, int, int]:
+    pixels = [p for p in plank.getdata() if p[3] > 0]
     rs = sorted(p[0] for p in pixels)
     gs = sorted(p[1] for p in pixels)
     bs = sorted(p[2] for p in pixels)
@@ -79,16 +85,13 @@ def wood_median_rgb(plank_path: Path) -> tuple[int, int, int]:
 
 def verify_one(prefix: str, src_path: Path, wood: str) -> tuple[str, list[tuple[float, float, float]]]:
     out_path = OUT_DIR / f"{prefix}_{wood}.png"
-    plank = TFC_PLANKS / f"{wood}.png"
     if not out_path.exists():
         return ("MISSING", [(0.0, 0.0, 0.0)])
-    if not plank.exists():
-        return ("MISSING plank", [(0.0, 0.0, 0.0)])
 
     src_avg = avg_rgb(src_path)
     out_avg = avg_rgb(out_path)
     out_max = brightest(out_path)
-    wood_rgb = wood_median_rgb(plank)
+    wood_rgb = wood_median_rgb(tfc_plank_rgba(wood))
 
     diff_max = [out_max[i] - wood_rgb[i] for i in range(3)]
     if max(abs(d) for d in diff_max) <= OK_THRESHOLD:
@@ -110,20 +113,19 @@ def fmt(rgb) -> str:
 
 
 def main() -> None:
-    sources = {
-        "bracket": CREATE_TEX / "bracket_wooden.png",
-        "bracket_plate": CREATE_TEX / "bracket_plate_wooden.png",
-    }
-    missing = [str(p) for p in sources.values() if not p.exists()]
+    missing = [str(p) for p in SOURCES.values() if not p.exists()]
     if missing:
-        raise SystemExit(f"Missing Create reference textures: {missing}")
+        raise SystemExit(
+            f"Missing vendored Create reference textures: {missing} "
+            f"(expected under {BRACKET_TEX})"
+        )
 
     counts: dict[str, int] = {"OK": 0, "DIM": 0, "BRIGHTER": 0, "DARKER": 0, "DRIFT": 0, "MISSING": 0}
-    for prefix, src_path in sources.items():
+    for prefix, src_path in SOURCES.items():
         for wood in WOODS:
             verdict, rows = verify_one(prefix, src_path, wood)
             counts[verdict] = counts.get(verdict, 0) + 1
-            if verdict == "MISSING" or verdict == "MISSING plank":
+            if verdict == "MISSING":
                 print(f"{wood}/{prefix:14s}  {verdict}")
                 continue
             src_avg, out_avg, out_max, wood_rgb, diff_max = rows[0]

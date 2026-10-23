@@ -19,11 +19,11 @@ with the entries in `src/main/java/ru/tfc_aeronautics/client/FluidClientExtensio
 (roin is at line 35; ethanol and stillage follow).
 
 The vanilla bucket textures are read from
-  code_references/Minecraft/1.21.1/assets/minecraft/textures/item/{bucket,water_bucket}.png
-(`code_references/` is gitignored — see CLAUDE.md). If those files are
-missing, the script falls back to extracting them on the fly from a
-Minecraft 1.21.1 client jar. Override the jar path via $MC_JAR; otherwise
-the script probes the Flatpak Prism launcher location used on this dev box.
+  tmp/vanilla_textures/minecraft/item/{bucket,water_bucket}.png
+(vanilla Mojang art can't be vendored into the repo; `tmp/` is gitignored).
+If those files are missing, the script extracts them on the fly from a
+Minecraft 1.21.1 client jar. Override the jar path via $MC_JAR; otherwise the
+script probes the Flatpak Prism launcher location used on this dev box.
 """
 from __future__ import annotations
 
@@ -35,16 +35,7 @@ from PIL import Image
 
 from _common import REPO
 
-MC_ITEM_TEX = (
-    REPO
-    / "code_references"
-    / "Minecraft"
-    / "1.21.1"
-    / "assets"
-    / "minecraft"
-    / "textures"
-    / "item"
-)
+MC_ITEM_TEX = REPO / "tmp" / "vanilla_textures" / "minecraft" / "item"
 
 TEXTURE_DIR = (
     REPO

@@ -21,6 +21,13 @@ The pipeline is fixed-brightness + wood-tint:
    (gray/255) · wood_colour. The brightest end of the bracket reads as the
    full TFC wood tone rather than a dimmed fraction of it.
 
+Inputs (neither needs the gitignored `code_references/` checkouts):
+  generate/textures/bracket_wooden.png         vendored verbatim from
+  generate/textures/bracket_plate_wooden.png    Create 6.0.x
+                                               (assets/create/textures/block/)
+  assets/tfc/textures/block/wood/planks/*.png  read out of the TFC jar in
+                                               `libs/` (see _common.tfc_plank_rgba)
+
 Why a script: runData's first invocation in this project takes minutes for
 asset/Minecraft download + JVM warmup, and re-iterating on the texture set
 shouldn't require that.
@@ -29,17 +36,21 @@ from pathlib import Path
 
 from PIL import Image
 
-from _common import WOODS, REPO
+from _common import WOODS, REPO, VENDORED_TEXTURES, tfc_plank_rgba
 
-CREATE_TEX = REPO / "code_references" / "Create" / "src" / "main" / "resources" / "assets" / "create" / "textures" / "block"
-TFC_PLANKS = REPO / "code_references" / "TerraFirmaCraft" / "src" / "main" / "resources" / "assets" / "tfc" / "textures" / "block" / "wood" / "planks"
+# Vendored Create reference textures, sitting next to this script.
+BRACKET_TEX = VENDORED_TEXTURES
 OUT_DIR = REPO / "src" / "generated" / "resources" / "assets" / "tfc_aeronautics" / "textures" / "block" / "wood" / "bracket"
 
+SOURCES = {
+    "bracket": BRACKET_TEX / "bracket_wooden.png",
+    "bracket_plate": BRACKET_TEX / "bracket_plate_wooden.png",
+}
 
-def wood_median_rgb(plank_path: Path) -> tuple[int, int, int]:
+
+def wood_median_rgb(plank: Image.Image) -> tuple[int, int, int]:
     """Median R, G, B across opaque pixels of the plank PNG."""
-    img = Image.open(plank_path).convert("RGBA")
-    pixels = [p for p in img.getdata() if p[3] > 0]
+    pixels = [p for p in plank.getdata() if p[3] > 0]
     rs = sorted(p[0] for p in pixels)
     gs = sorted(p[1] for p in pixels)
     bs = sorted(p[2] for p in pixels)
@@ -99,22 +110,18 @@ def tint(texture_path: Path, wood_rgb: tuple[int, int, int]) -> Image.Image:
 
 def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    sources = {
-        "bracket": CREATE_TEX / "bracket_wooden.png",
-        "bracket_plate": CREATE_TEX / "bracket_plate_wooden.png",
-    }
-    missing = [str(p) for p in sources.values() if not p.exists()]
+    missing = [str(p) for p in SOURCES.values() if not p.exists()]
     if missing:
-        raise SystemExit(f"Missing Create reference textures: {missing}")
+        raise SystemExit(
+            f"Missing vendored Create reference textures: {missing} "
+            f"(expected under {BRACKET_TEX}, next to this script)"
+        )
 
     written = 0
     for wood in WOODS:
-        plank = TFC_PLANKS / f"{wood}.png"
-        if not plank.exists():
-            raise SystemExit(f"Missing TFC plank texture: {plank}")
-        wood_rgb = wood_median_rgb(plank)
+        wood_rgb = wood_median_rgb(tfc_plank_rgba(wood))
         print(f"{wood:14s} median RGB = {wood_rgb}")
-        for prefix, src in sources.items():
+        for prefix, src in SOURCES.items():
             tinted = tint(src, wood_rgb)
             tinted.save(OUT_DIR / f"{prefix}_{wood}.png")
             written += 1
