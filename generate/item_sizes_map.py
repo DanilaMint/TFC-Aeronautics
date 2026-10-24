@@ -36,6 +36,9 @@ GROUPS: list[SizeGroup] = [
         "wrench", "potato_cannon", "extendo_grip", "wand_of_symmetry",
         "cardboard_sword",
     ]),
+    SizeGroup("very_heavy", "very_large", "simulated", [
+        "plunger_launcher"
+    ]),
     # Armor
     SizeGroup("very_heavy", "large", "create", [
         "copper_diving_helmet", "copper_diving_boots", "copper_backtank"
@@ -74,7 +77,7 @@ GROUPS: list[SizeGroup] = [
         "smart_chute", "linear_chassis", "secondary_linear_chassis",
         "radial_chassis", "portable_storage_interface", "portable_fluid_interface",
         "andesite_casing", "brass_casing", "copper_casing", "sequenced_gearshift",
-        "flywheel", "railway_casing", "item_vault", "fluid_valve",
+        "flywheel", "railway_casing", "item_vault", "fluid_valve", "copper_valve_handle"
 
     ]),
     SizeGroup("light", "large", "create", [
@@ -84,8 +87,25 @@ GROUPS: list[SizeGroup] = [
         f"{color}_table_cloth" for color in DYE_COLORS
     ]), # colored table clothes
     SizeGroup("light", "large", "create", [
-        f"{ "copper" if color == "orange" else color }_valve_handle" for color in DYE_COLORS
+        f"{color}_valve_handle" for color in DYE_COLORS
     ]), # colored valve handles
+    SizeGroup("light", "large", "simulated", [
+        "rope_winch", "rope_connector", "iron_handle", "copper_handle",
+        "directional_gearshift", "torsion_spring", "auger_shaft", "auger_cog",
+        "velocity_sensor", "altitude_sensor", "gimbal_sensor", "navigation_table",
+        "optical_sensor", "docking_connector", "analog_transmission",
+        "steering_wheel", "white_symmetric_sail",
+        "contraption_diagram",
+    ]),
+    SizeGroup("light", "large", "simulated", [
+        f"{color}_handle" for color in DYE_COLORS
+    ]), # colored handle
+    SizeGroup("light", "large", "simulated", [
+        f"{color}_nameplate" for color in DYE_COLORS
+    ]), # colored nameplates
+    SizeGroup("light", "large", "aeronautics", [
+        f"{color}_envelope" for color in DYE_COLORS
+    ]), # colored envelopes
 
     # Redstone things
     SizeGroup("light", "small", "create", [
@@ -117,11 +137,28 @@ GROUPS: list[SizeGroup] = [
         "content_observer", "stockpile_switch", "packager", "repackager",
         "package_frogport", "redstone_requester", "fluid_tank", "item_drain",
     ]),
+    SizeGroup("medium", "large", "simulated", [
+        "physics_assembler", "swivel_bearing", "redstone_magnet"
+    ]),
+    SizeGroup("medium", "large", "simulated", [
+        f"{color}_portable_engine" for color in DYE_COLORS
+    ]), # colored portable engines
+    SizeGroup("medium", "large", "aeronautics", [
+        "adjustable_burner", "steam_vent", "propeller_bearing",
+        "gyroscopic_propeller_bearing", "smart_propeller", "andesite_propeller",
+        "wooden_propeller", "mounted_potato_cannon"
+    ]),
+    SizeGroup("medium", "large", "offroad", [
+        "borehead_bearing", "wheel_mount"
+    ]),
 
     # Heavy machinery
     SizeGroup("heavy", "very_large", "create", [
         "crushing_wheel", "mechanical_press", "mechanical_mixer", "steam_engine",
         "steam_whistle", "basin", "schematicannon"
+    ]),
+    SizeGroup("heavy", "very_large", "offroad", [
+        "rockcutting_wheel", "small_tire", "tire", "large_tire", "monstrous_tire"
     ]),
 
     # Light items-ingredients
@@ -132,6 +169,9 @@ GROUPS: list[SizeGroup] = [
         "empty_schematic", "schematic_and_quill", "crafting_blueprint",
         "superglue", "minecart_coupling"
     ]),
+    SizeGroup("light", "small", "simulated", [
+        "honey_glue"
+    ]),
 
     # Custom anvils
     SizeGroup("very_heavy", "huge","tfc_aeronautics", [f"metal/anvil/{metal}" for metal in [
@@ -140,6 +180,10 @@ GROUPS: list[SizeGroup] = [
         "weak_red_steel", "high_carbon_steel", "high_carbon_black_steel",
         "high_carbon_blue_steel", "high_carbon_red_steel", "unknown"
     ]]),
+
+    SizeGroup("light", "normal", "simulated", [
+        "spring", "rope_coupling", "gyroscopic_mechanism", "engine_assembly",
+    ]),
 ]
 
 if __name__ == '__main__':
