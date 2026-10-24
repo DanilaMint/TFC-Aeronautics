@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Literal, List
 from dataclasses import dataclass
 
-from _common import TFC_SIZE_VALUES, TFC_WEIGHT_VALUES, DYE_COLORS
+from _common import TFC_SIZE_VALUES, TFC_WEIGHT_VALUES, DYE_COLORS, WOODS
 
 Weight = Literal["very_light", "light", "medium", "heavy", "very_heavy"]
 Size = Literal["tiny", "very_small", "small", "normal", "large", "very_large", "huge"]
@@ -106,6 +106,9 @@ GROUPS: list[SizeGroup] = [
     SizeGroup("light", "large", "aeronautics", [
         f"{color}_envelope" for color in DYE_COLORS
     ]), # colored envelopes
+    SizeGroup("light", "normal", "tfc_aeronautics", [
+        f"wood/bracket/{wood}" for wood in WOODS
+    ]), # wooden brackets
 
     # Redstone things
     SizeGroup("light", "small", "create", [
@@ -160,6 +163,9 @@ GROUPS: list[SizeGroup] = [
     SizeGroup("heavy", "very_large", "offroad", [
         "rockcutting_wheel", "small_tire", "tire", "large_tire", "monstrous_tire"
     ]),
+    SizeGroup("heavy", "very_large", "tfc_aeronautics", [f"metal/welding_depot/{metal}" for metal in [
+        "steel", "wrought_iron", "black_steel", "blue_steel", "red_steel"
+    ]]),
 
     # Light items-ingredients
     SizeGroup("light", "small", "create", [
@@ -172,17 +178,31 @@ GROUPS: list[SizeGroup] = [
     SizeGroup("light", "small", "simulated", [
         "honey_glue"
     ]),
+    SizeGroup("light", "small", "tfc_aeronautics", [
+        "composite",
+    ]),
 
     # Custom anvils
-    SizeGroup("very_heavy", "huge","tfc_aeronautics", [f"metal/anvil/{metal}" for metal in [
+    SizeGroup("very_heavy", "huge", "tfc_aeronautics", [f"metal/anvil/{metal}" for metal in [
         "bismuth", "brass", "gold", "nickel", "rose_gold", "silver", "tin", "zinc",
         "sterling_silver", "cast_iron", "pig_iron", "weak_steel", "weak_blue_steel",
         "weak_red_steel", "high_carbon_steel", "high_carbon_black_steel",
         "high_carbon_blue_steel", "high_carbon_red_steel", "unknown"
     ]]),
+    # Powders
+    SizeGroup("very_light", "tiny", "tfc_aeronautics", [f"powder/{metal}" for metal in [
+        "copper", "tin", "zinc", "bismuth", "cast_iron", "gold", "silver", "nickel"
+    ]]),
+    SizeGroup("very_light", "small", "tfc_aeronautics", [
+        "dry_composite", "resin_clump", "latex_clump", "rubber", "impregnated_burlap_cloth"
+    ]),
+    # Tight sheets
+    SizeGroup("medium", "large", "tfc_aeronautics", [f"metal/tight_sheet/{metal}" for metal in [
+        "copper", "wrought_iron", "steel", "brass"
+    ]]),
 
     SizeGroup("light", "normal", "simulated", [
-        "spring", "rope_coupling", "gyroscopic_mechanism", "engine_assembly",
+        "spring", "rope_coupling", "gyroscopic_mechanism", "engine_assembly", "redstone_plate"
     ]),
 ]
 
