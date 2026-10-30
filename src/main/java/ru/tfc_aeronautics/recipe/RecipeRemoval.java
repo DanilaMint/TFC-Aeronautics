@@ -97,6 +97,17 @@ public final class RecipeRemoval
      * The shadow-overwrite at {@code data/offroad/recipe/<name>.json} does not
      * apply because the bundled sub-jar's data pack wins the namespace
      * priority collision; BAN is required to silence the upstream recipe.
+     *
+     * <p>The sixteen {@code create:crafting/logistics/<color>_table_cloth}
+     * recipes are stripped because they all craft a table cloth out of
+     * vanilla wool plus {@code create:andesite_alloy} — a Create-only alloy
+     * that needs the mechanical mixer. The only production path for a table
+     * cloth is now {@code tfc_aeronautics:crafting/white_table_cloth}
+     * (TFC cloth + industrial composite); every other colour is obtained by
+     * dyeing that white cloth, because the Create dyeing recipes
+     * ({@code <color>_table_cloth_from_other_table_cloth}, 16 files) stay
+     * untouched and {@code create:dyed_table_cloths} contains
+     * {@code create:white_table_cloth}.
      */
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
@@ -121,7 +132,23 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("offroad", "small_tire"),
         ResourceLocation.fromNamespaceAndPath("offroad", "tire"),
         ResourceLocation.fromNamespaceAndPath("offroad", "large_tire"),
-        ResourceLocation.fromNamespaceAndPath("offroad", "monstrous_tire")
+        ResourceLocation.fromNamespaceAndPath("offroad", "monstrous_tire"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/white_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/orange_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/magenta_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/light_blue_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/yellow_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/lime_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/pink_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/gray_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/light_gray_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/cyan_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/purple_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/blue_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/brown_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/green_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/red_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/black_table_cloth")
     );
 
     private RecipeRemoval() {}

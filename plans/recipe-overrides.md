@@ -869,6 +869,15 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
   - подробности в `DOCS.md` §37
 
+- [x] `data/tfc_aeronautics/recipe/crafting/white_table_cloth.json` (+ 16 записей в `BANNED_RECIPES`)
+  - оригиналы Create: 16 файлов `data/create/recipe/crafting/logistics/<color>_table_cloth.json` (recipe-id `create:crafting/logistics/<color>_table_cloth`) — shapeless `<color>_wool` + `create:andesite_alloy` → 2 `create:<color>_table_cloth`. В TFC-сборке мертвы: `andesite_alloy` — Create-only сплав (требует mechanical mixer), ванильная шерсть — вне TFC-контекста
+  - новый: shaped 1×3 `["cCc"]` — 2 × `#tfc:cloths` + 1 × `tfc_aeronautics:composite` → 1 `create:white_table_cloth` (recipe-id `tfc_aeronautics:crafting/white_table_cloth`)
+  - **ветка 2** скилла `recipe-override` (новый recipe-id в namespace `tfc_aeronautics` + 16 записей в `BANNED_RECIPES`). Перекрасочные рецепты Create (`<color>_table_cloth_from_other_table_cloth.json`, 16 файлов) **оставлены** — тег `create:dyed_table_cloths` содержит `create:white_table_cloth`, поэтому остальные 15 цветов получаются перекраской белой скатерти
+  - шейдинг-тегов не требуется: `#tfc:cloths` — наш shadow `data/tfc/tags/item/cloths.json` (burlap/wool/silk cloth; самого тега в датапаке TFC нет), `tfc_aeronautics:composite` — прямой item-id из `composite/CompositeRegistration.java`
+  - забанены ровно 16 recipe-id: `create:crafting/logistics/{white,orange,magenta,light_blue,yellow,lime,pink,gray,light_gray,cyan,purple,blue,brown,green,red,black}_table_cloth`. Файлы `*_table_cloth_clear.json` (16 no-op'ов «снятие краски») и stonecutting-рецепты для andesite/brass/copper не тронуты
+  - **побочный эффект**: Create'овские advancement'ы `create:advancement/recipes/building_blocks/crafting/logistics/<color>_table_cloth.json` (критерий `minecraft:recipe_unlocked`) больше не срабатывают — рецептов с такими id не осталось. Косметика: `create:advancement/table_cloth_shop.json` (встроенный магазин Create) не затронут
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+
 ## TODO (новые добавлять сюда)
 
 - [ ] Перевести потребителей `create:copper_sheet` / тега `c:plates/copper` на `tfc_aeronautics:metal/tight_sheet/copper` — предмет стал недобываем после бана `create:pressing/copper_ingot`:
