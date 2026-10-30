@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 40/? ✓ (overrides + 31 envelope)
+**Прогресс:** 41/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -616,6 +616,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - шейдинг-тегов не требуется: 3 ingredient'а — прямые item-id (`tfc_aeronautics:rubber` из `src/main/java/ru/tfc_aeronautics/rubber/RubberRegistration.java:20`, `create:copper_casing` — Create, `tfc_aeronautics:metal/tight_sheet/copper` из `src/main/java/ru/tfc_aeronautics/metal/TightSheet.java:31` `COPPER("copper", 1080, ...)`)
   - recipe-id остаётся `create:crafting/kinetics/hose_pulley`; datapack-merge через datapack-shadow по тому же пути `data/create/recipe/crafting/kinetics/hose_pulley.json` затенит апстрим-recipe автоматически (конвенция `feedback_recipe_override_convention.md`)
   - **внимание к ключам**: pattern использует три буквы `R`/`C`/`S` разного регистра — все заглавные, не пересекаются с соседними overrides (`rope_pulley.json` тоже R/C/S но другой namespace'ы — здесь это безопасно, recipe'ы лежат в разных папках и действуют на разные результаты)
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+
+- [x] `data/create/recipe/crafting/logistics/package_frogport.json`
+  - оригинал Create shaped 3×1 `["B","A","C"]`: 1× `create:item_vault` (A) + tag `c:slimeballs` (B) + 1× `create:andesite_alloy` (C) → 1 `create:package_frogport` (recipe-id `create:crafting/logistics/package_frogport`). В TFC-сборке мёртв: `andesite_alloy` — Create-only сплав, циклически требует mechanical mixer
+  - новый: тот же pattern `["B","A","C"]`, ключи `A = create:item_vault` + `B = c:slimeballs` (→ `tfc:glue` через наш shadow-тег `data/c/tags/item/slimeballs.json`) + `C = tfc_aeronautics:composite` → 1 `create:package_frogport`. Pattern, count, recipe-id, `category` не тронуты — pure ingredient swap, без reshape
+  - мотивация: `tfc_aeronautics:composite` (Industrial Composite) — аналог andesite_alloy в TFC-мире (тот же свап, что у postbox'ов / `hand_crank` / `piston_extension_pole` / `linear_chassis` / `radial_chassis` / `crushing_wheel` / `cart_assembler`); `create:item_vault` в TFC-сборке уже переопределён (`.../kinetics/item_vault.json`: `#tfc_aeronautics:iron_sheet` + `#c:chests/wooden`), slime-часть закрыта нашим shadow-тегом
+  - `show_notification: false` (конвенция проекта)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл затеняет Create-овский рецепт по тому же пути `data/create/recipe/crafting/logistics/package_frogport.json`
+  - шейдинг-тегов не требуется: `tfc_aeronautics:composite` — прямой item-id (`composite/CompositeRegistration.java`, `COMPOSITE`)
+  - recipe-id остаётся `create:crafting/logistics/package_frogport`; advancement Create (`data/create/advancement/recipes/misc/crafting/logistics/package_frogport.json`) ссылается на тот же id — засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## Новые рецепты
