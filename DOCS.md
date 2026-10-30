@@ -832,6 +832,52 @@ Create подключён как `compileOnly` и миксинов в проек
 `tfc:wood/stripped_wood/<порода>` намеренно не включены: рецепт действует
 только на обрубленные брёвна.
 
+### Массовый крафт корпусов (shapeless)
+
+Помимо поштучных `create:item_application`, мод даёт обычный верстачный
+крафт из **тонких листов**: 1 лист + N брёвен → N корпусов, N = 1..8.
+
+| Лист | Расходник | Результат |
+|------|-----------|-----------|
+| `tfc_aeronautics:metal/tight_sheet/brass` | N × `#tfc_aeronautics:stripped_logs` | N × `create:brass_casing` |
+| `tfc_aeronautics:metal/tight_sheet/copper` | N × `#tfc_aeronautics:stripped_logs` | N × `create:copper_casing` |
+| `tfc_aeronautics:metal/tight_sheet/wrought_iron` | N × `#tfc_aeronautics:stripped_logs` | N × `create:andesite_casing` |
+| `tfc_aeronautics:metal/tight_sheet/steel` | N × `create:brass_casing` | N × `create:railway_casing` |
+
+Рецепты — shapeless, генерируются скриптом
+`generate/generate_casing_recipes.py` в datagen-каталог
+`src/generated/resources/data/tfc_aeronautics/recipe/crafting/casing/<вариант>_<N>.json`
+(`brass_casing_1.json` … `brass_casing_8.json` и т.д. по каждому варианту).
+Каталог `src/generated/resources/` в git не входит и перегенерируется
+автоматически (gradle-задача `generateResources` → `python3
+generate/generate.py`); вручную — `python3 generate/generate.py --only casing`.
+
+**Почему восемь рецептов, а не один с диапазоном.** В Minecraft 1.21.1 нет
+count-диапазонов в рецептах: у `Ingredient` нет поля `count` вовсе, а
+`result.count` в `ShapelessRecipe` — обычное целое число. «1-8 → 1-8» одним
+JSON не выразить. Восемь отдельных shapeless-рецептов дают точный эффект:
+`ShapelessRecipe.matches()` требует, чтобы число занятых слотов сетки
+**точно** совпало с числом ингредиентов, поэтому рецепт с N брёвнами
+срабатывает только при N+1 заполненных слотах. Потолок N = 8 — это 1 лист
++ 8 брёвен, то есть полная сетка 3×3 (больше 9 ингредиентов
+`ShapelessRecipe` не принимает).
+
+**Нюанс UX.** Расходник нужно раскладывать по **разным** слотам: стопка из
+8 брёвен в одном слоте считается одним занятым слотом, и такая сетка
+сматчится с рецептом на N = 1 — получится один корпус, а остальные 7 брёвен
+останутся в сетке.
+
+Старые пути `create:item_application` (1 бревно + 1 слиток/composite → 1
+корпус) остаются и работают параллельно — в том числе для `railway_casing`
+(`create:brass_casing` + `tfc_aeronautics:metal/tight_sheet/steel`).
+
+**Про уведомления.** В рецептах проставлено `show_notification: false`, но
+в 1.21.1 это поле есть только у `minecraft:crafting_shaped`; кодек
+`ShapelessRecipe` его не читает, поэтому подсказка «рецепт открыт» будет
+показываться и для shapeless-вариантов (один раз на каждый рецепт). Ключ
+оставлен для единообразия с остальными рецептами мода, на загрузку он не
+влияет.
+
 ---
 
 ## 9. Фреймворк атмосферных структур

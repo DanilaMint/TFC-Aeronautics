@@ -4,6 +4,7 @@ Orchestrator for all Python datagen scripts.
 
 Usage:
   python3 generate/generate.py                    # generate everything
+  python3 generate/generate.py --only casing     # bulk casing crafting recipes
   python3 generate/generate.py --only brackets   # assets + recipes + textures
   python3 generate/generate.py --only milling    # create:milling recipes
   python3 generate/generate.py --only quern      # quern milling (grain → flour)
@@ -18,6 +19,7 @@ import sys
 import time
 
 from generate_bucket_textures import main as gen_buckets
+from generate_casing_recipes import main as gen_casing
 from generate_item_size import main as gen_item_size
 from generate_milling_recipes import main as gen_milling
 from generate_mixing_recipes import main as gen_mixing
@@ -32,6 +34,7 @@ from generate_wooden_bracket_textures import main as gen_textures
 # gets the assets-only run. --only=all runs the leaf groups (re-running the
 # aggregate would double-execute the bracket scripts).
 LEAVES: list[tuple[str, callable]] = [
+    ("casing",            gen_casing),
     ("brackets-assets",   gen_assets),
     ("brackets-recipes",  gen_recipes),
     ("brackets-textures", gen_textures),
@@ -46,6 +49,9 @@ LEAVES: list[tuple[str, callable]] = [
 # Groups reference leaves by label (resolved through LEAVES in main()), so
 # inserting a new leaf never silently shifts a positional reference.
 GROUPS: dict[str, list[str]] = {
+    "casing": [
+        "casing",
+    ],
     "brackets": [
         "brackets-assets",
         "brackets-recipes",
