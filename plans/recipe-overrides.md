@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 41/? ✓ (overrides + 31 envelope)
+**Прогресс:** 42/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -626,6 +626,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл затеняет Create-овский рецепт по тому же пути `data/create/recipe/crafting/logistics/package_frogport.json`
   - шейдинг-тегов не требуется: `tfc_aeronautics:composite` — прямой item-id (`composite/CompositeRegistration.java`, `COMPOSITE`)
   - recipe-id остаётся `create:crafting/logistics/package_frogport`; advancement Create (`data/create/advancement/recipes/misc/crafting/logistics/package_frogport.json`) ссылается на тот же id — засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+
+- [x] `data/create/recipe/crafting/kinetics/placard.json`
+  - оригинал Create shapeless `minecraft:item_frame` + tag `c:plates/brass` → 1 `create:placard` (recipe-id `create:crafting/kinetics/placard`). В TFC-сборке мёртв: тег `c:plates/brass` содержит только `create:brass_sheet` (`Create/src/generated/resources/data/c/tags/item/plates/brass.json`), а `create:brass_sheet` потерял единственный путь получения после override'а `data/create/recipe/pressing/brass_ingot.json` (латунь прессуется в tight sheet) — табличку было невозможно скрафтить
+  - новый: тот же `minecraft:crafting_shapeless`, заменён только второй ингредиент — `tfc_aeronautics:metal/tight_sheet/brass` → 1 `create:placard`. Serializer, `category`, count и recipe-id не тронуты — pure ingredient swap, без reshape
+  - мотивация: замыкает цепочку «латунный слиток → TFC-наковальня/пресс → тонкий латунный лист → табличка». Прецедент в проекте — `data/create/recipe/crafting/kinetics/smart_fluid_pipe.json` уже использует `tfc_aeronautics:metal/tight_sheet/brass` вместо `c:plates/brass`
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл затеняет Create-овский рецепт по тому же пути
+  - `show_notification: false` (конвенция проекта для всех override-рецептов)
+  - шейдинг-тегов не требуется: `minecraft:item_frame` (TFC item frame'ы не трогает) и `tfc_aeronautics:metal/tight_sheet/brass` — прямые item-id (enum `BRASS` в `src/main/java/ru/tfc_aeronautics/metal/TightSheet.java`)
+  - recipe-id остаётся `create:crafting/kinetics/placard`; advancement Create `data/create/advancement/recipes/misc/crafting/kinetics/placard.json` (критерий `has_item` на `#c:ingots/brass`) засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
 ## Новые рецепты
