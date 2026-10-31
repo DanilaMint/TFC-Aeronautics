@@ -638,6 +638,16 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id остаётся `create:crafting/kinetics/placard`; advancement Create `data/create/advancement/recipes/misc/crafting/kinetics/placard.json` (критерий `has_item` на `#c:ingots/brass`) засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
+- [x] `data/create/recipe/crafting/logistics/desk_bell.json`
+  - оригинал Create shapeless 1× `create:andesite_casing` + 1× tag `c:plates/gold` → 1 `create:desk_bell` (recipe-id `create:crafting/logistics/desk_bell`). В TFC-сборке мёртв: тег `c:plates/gold` содержит только `create:golden_sheet` (Create-only пресс), а TFC-золото (`tfc:metal/sheet/gold`) в этот тег не входит
+  - новый: `minecraft:crafting_shaped`, pattern `[" G ","CCC"]` — 1× `tfc:metal/sheet/gold` (G) + 3× `create:andesite_casing` (C) → 3 `create:desk_bell`. Ключи заглавные и не пересекаются; пустые слоты в pattern — пробелы, не `.`
+  - мотивация: `create:andesite_casing` уже переведён на TFC-путь (`data/create/recipe/item_application/andesite_casing.json`: `#tfc_aeronautics:stripped_logs` + `tfc_aeronautics:composite`), а золото берётся из TFC-ковки вместо Create-пресса. Выход ×1 → ×3
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`) — файл затеняет Create-овский рецепт по тому же пути `data/create/recipe/crafting/logistics/desk_bell.json`
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тегов не требуется: `tfc:metal/sheet/gold` и `create:andesite_casing` — прямые item-id
+  - recipe-id остаётся `create:crafting/logistics/desk_bell`; advancement Create (`data/create/advancement/recipes/misc/crafting/logistics/desk_bell.json`) ссылается на тот же id — засчитывается без правок
+  - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
+
 ## Новые рецепты
 
 - [x] `data/tfc_aeronautics/recipe/crafting/rope_to_rope_coupling.json` — shapeless 1× `tfc:rope` → 1× `simulated:rope_coupling`. Бесплатная прямая конвертация: игрок с верёвкой получает coupling без затрат. Заменяет заблокированный shaped `simulated:rope_coupling` (см. `## Готово`)
