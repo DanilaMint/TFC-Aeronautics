@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 42/? ✓ (overrides + 31 envelope)
+**Прогресс:** 50/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -648,7 +648,89 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - recipe-id остаётся `create:crafting/logistics/desk_bell`; advancement Create (`data/create/advancement/recipes/misc/crafting/logistics/desk_bell.json`) ссылается на тот же id — засчитывается без правок
   - **проверено**: JSON валиден (`python3 -c "import json; json.load(...)"` OK), `./gradlew compileJava` BUILD SUCCESSFUL
 
-## Новые рецепты
+**Серия «первые 10 пунктов list.md» (2026-11-08)** — шесть верстачных override'ов (ветка 1: recipe-id сохранён, `BANNED_RECIPES` не трогаем) и два наковальных (ветка 2: новый recipe-id в `tfc_aeronautics` + запись оригинала в `BANNED_RECIPES`). Сводная таблица — в `DOCS.md` §19. Два оставшихся пункта серии (`empty schematic`, `schematic and quill`) переопределения **не получили**: оригинальные Create-рецепты в TFC-сборке полностью рабочие (бумага — `tfc/recipe/scraping/paper.json`, краски — TFC-quern, перо — павлин), поэтому наши версии отменены и удалены.
+
+- [x] `data/create/recipe/crafting/curiosities/brown_toolbox.json`
+  - оригинал Create shaped `[" C ","SWS"," L "]` (recipe-id `create:crafting/curiosities/brown_toolbox`): 1× `create:cogwheel` (C) + 1× tag `c:plates/gold` (S) + 1× tag `c:chests/wooden` (W) + 1× tag `c:leathers` (L) → 1 `create:brown_toolbox`. В TFC-сборке мёртв по одному ключу: `c:plates/gold` содержит только `create:golden_sheet` (Create-only золотой лист, требует mechanical press), TFC-золото в тег не входит
+  - новый: тот же shaped-паттерн, заменён **только** ключ `S` → `tfc_aeronautics:metal/tight_sheet/brass` (тонкий латунный лист, 100 мБ; тег `tfc_aeronautics:sheets/brass`). Остальные три ключа без изменений: `create:cogwheel` (в TFC-сборке переопределён нами же), `#c:chests/wooden` (TFC заполняет тег 40 сундуками — 20 пород + 20 с сундуками-ловушками), `#c:leathers` (TFC-дубильня даёт `minecraft:leather` через `tfc/recipe/barrel/large_leather.json`)
+  - мотивация: тулбокс — «переносной ящик», обшивка — латунный лист; тонкий лист (tight sheet) — наш проектный аналог Create-пластины, производится прессом (`data/create/recipe/pressing/brass_ingot.json`) или наковальней (`data/tfc_aeronautics/recipe/anvil/tight_sheet_brass.json`). Паттерн и семантика (шестерёнка сверху, лист-обшивка, сундук, кожа) сохраняются
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тегов не требуется: `tfc_aeronautics:metal/tight_sheet/brass` — прямой item-id (прецедент `smart_chute` / `smart_fluid_pipe` / `pulse_repeater` с тем же свапом), остальные — common-теги
+  - recipe-id остаётся `create:crafting/curiosities/brown_toolbox`; advancement Create (`data/create/advancement/recipes/misc/crafting/curiosities/brown_toolbox.json`) ссылается на тот же id — засчитывается без правок
+  - остальные 15 цветов тулбокса получаются спец-рецептом покраски `create:toolbox_dyeing` — он не трогается (краски TFC даёт, тег `c:dyes` живой)
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+
+- [x] `data/tfc_aeronautics/recipe/anvil/crafter_slot_cover.json`
+  - оригинал Create shaped `["AAA"]` (recipe-id `create:crafting/kinetics/crafter_slot_cover`): 3× tag `c:nuggets/brass` → 1 `create:crafter_slot_cover`. В TFC-сборке мёртв: нугетов в TFC нет вообще, в теге только `create:brass_nugget` (Create-only, получается дроблением латуни)
+  - новый: `tfc:anvil`, ingredient `tfc:metal/rod/brass` (латунный стержень, tier 2), rules `["draw_not_last", "punch_last"]` — сначала **вытянуть** стержень в тонкую заготовку, затем **пробить** из неё крышечки-заглушки → 3 `create:crafter_slot_cover`. `apply_bonus: false` (предсказуемый выход)
+  - мотивация: крышечка слота крафтера — мелкая латунная деталь; в TFC-мире нугетов нет, а стержень — первая стадия ковки латуни (tier 2). Выход ×1 → ×3 компенсирует стоимость стержня
+  - **ветка 2** скилла `recipe-override` — оригинал `create:crafting/kinetics/crafter_slot_cover` запрещён через `BANNED_RECIPES` в `src/main/java/ru/tfc_aeronautics/recipe/RecipeRemoval.java`
+  - шейдинг-тегов не требуется: `tfc:metal/rod/brass` — прямой item-id. Теплоёмкость заготовки уже есть в датапаке TFC (`tfc/tfc/item_heat/brass/rod.json`)
+  - recipe-id **новый** (`tfc_aeronautics:anvil/crafter_slot_cover`); advancement Create по этому пути **не** засчитывается — прецедент `copper_valve_handle` / `brass_hand` / `mechanical_plough`
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+
+- [x] `data/tfc_aeronautics/recipe/anvil/minecart_coupling.json`
+  - оригинал Create shaped `["  E"," O ","E  "]` (recipe-id `create:crafting/curiosities/minecart_coupling`): 2× `create:andesite_alloy` (E) + 1× tag `c:plates/iron` (O) → 1 `create:minecart_coupling`. В TFC-сборке мёртв **целиком**: `create:andesite_alloy` — Create-only сплав (циклически требует mechanical mixer), `c:plates/iron` содержит только `create:iron_sheet`, а `c:ingots/iron` в TFC пуст → листу не из чего прессовать
+  - новый: `tfc:anvil`, ingredient `tfc:metal/rod/wrought_iron` (кованый стержень, tier 3), rules `["draw_not_last", "bend_last"]` — **вытянуть** пруток, затем **загнуть** конец → крюк-муфта, цепляющийся за тележку → 2 `create:minecart_coupling`. `apply_bonus: false`
+  - мотивация: муфта — загнутый металлический крюк, ровно то, что делается на наковальне; кованый стержень (tier 3) — естественный TFC-материал. Выход ×1 → ×2. Прецедент по форме — `anvil/copper_valve_handle.json` (DRAW + UPSET + BEND) и `anvil/iron_handle_*.json`
+  - **ветка 2** скилла `recipe-override` — оригинал `create:crafting/curiosities/minecart_coupling` запрещён через `BANNED_RECIPES`
+  - шейдинг-тегов не требуется: `tfc:metal/rod/wrought_iron` — прямой item-id. Теплоёмкость — `tfc/tfc/item_heat/wrought_iron/rod.json`
+  - recipe-id **новый** (`tfc_aeronautics:anvil/minecart_coupling`); advancement Create по этому пути не засчитывается — он и так был мёртв в TFC-сборке (его `has_item` требует `create:andesite_alloy`)
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+
+- [x] `data/create/recipe/crafting/appliances/copper_diving_helmet.json`
+  - оригинал Create shaped `["PPP","PGP"]` (recipe-id `create:crafting/appliances/copper_diving_helmet`): 5× tag `c:ingots/copper` (P) + 1× tag `c:glass_blocks` (G) → 1 `create:copper_diving_helmet`. Ингредиенты в TFC живые (`c:ingots/copper` = `tfc:metal/ingot/copper`, `minecraft:glass` — из TFC-стекловарения), но стеклянный **блок** в иллюминаторе — грубая подмена
+  - новый: **shapeless** — 1× `tfc:metal/helmet/copper` + 1× `tfc:lens` → 1 `create:copper_diving_helmet`. Станок меняется: `minecraft:crafting_shaped` → `minecraft:crafting_shapeless`, паттерн убран
+  - мотивация: TFC-броня — единственный «медный шлем» в мире (`tfc:metal/helmet/copper`, `ArmorItem`; делается `tfc:welding` из `tfc:metal/unfinished_helmet/copper` + медного листа), линза — семантически точный иллюминатор (прецедент `goggles.json`, где `tfc:lens` уже используется как «глаз» очков). Shapeless снимает вопрос раскладки: шлем и линза кладутся в любые слоты верстака
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тегов не требуется: оба ингредиента — прямые item-id
+  - recipe-id сохраняется; advancement Create засчитывается без правок
+  - smithing-рецепты апгрейда до незерита (`netherite_diving_helmet`, `netherite_diving_helmet_from_netherite`) не тронуты — они опираются на `create:copper_diving_helmet` как основу
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+
+- [x] `data/create/recipe/crafting/appliances/copper_diving_boots.json`
+  - оригинал Create shaped `["P P","P P","G G"]` (recipe-id `create:crafting/appliances/copper_diving_boots`): 4× tag `c:ingots/copper` (P) + 2× `create:andesite_alloy` (G) → 1 `create:copper_diving_boots`. В TFC-сборке мёртв по подошве: `create:andesite_alloy` — Create-only сплав
+  - новый: **shapeless** — 1× `tfc:metal/boots/copper` + 2× `tfc_aeronautics:composite` (двухслойная подошва) → 1 `create:copper_diving_boots`. Станок меняется: `minecraft:crafting_shaped` → `minecraft:crafting_shapeless`, паттерн убран
+  - мотивация: композит — универсальный TFC-аналог андезитового сплава (тот же свап, что у `hand_crank` / `piston_extension_pole` / `linear_chassis` / `radial_chassis` / `cart_assembler`); медь берётся из готовых TFC-ботинок (`tfc:metal/boots/copper`, `ArmorItem`; `tfc:welding` из `tfc:metal/unfinished_boots/copper` + медного листа), 2 композита — двухслойная подошва (по числу подошвенных деталей как в оригинале Create)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тегов не требуется: `tfc:metal/boots/copper` и `tfc_aeronautics:composite` (barrel-рецепт `data/tfc_aeronautics/recipe/barrel/dry_composite.json`) — прямые item-id
+  - NB: в моде есть `data/tfc_aeronautics/recipe/crushing/copper_boots.json` (`tfc:metal/boots/copper` → 80 × `tfc_aeronautics:powder/copper`) — переработка ботинок обратно в медный порошок
+  - recipe-id сохраняется; advancement Create засчитывается без правок
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+
+- [x] `data/create/recipe/crafting/kinetics/filter.json` (List Filter, item id `create:filter`)
+  - оригинал Create shaped `["ASA"]` (recipe-id `create:crafting/kinetics/filter`): 2× tag `c:nuggets/iron` (A) + 1× tag `minecraft:wool` (S) → 1 `create:filter`. В TFC-сборке мёртв целиком: `minecraft:iron_nugget` в TFC отсутствует (железо идёт по per-metal цепочке `tfc:metal/*`), ванильная шерсть недостижима (в TFC своя — `tfc:wool` / `tfc:wool_cloth`)
+  - новый: тот же паттерн `["ASA"]`, ключ `A` → `tfc:metal/rod/wrought_iron`, ключ `S` → tag `tfc:cloths` → 2 `create:filter`
+  - мотивация: нугетов в TFC нет — стержень из кованого железа (tier 3) ближайший «мелкий металл»; `#tfc:cloths` — наш shadow-тег (burlap/wool/silk cloth), натуральная замена ванильной шерсти в TFC-мире. Металловая иерархия Create (iron → brass → zinc) сохраняется по TFC-тирам
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false` (конвенция проекта)
+  - шейдинг-тег `tfc:cloths` уже зашаден: `src/main/resources/data/tfc/tags/item/cloths.json`; `tfc:metal/rod/wrought_iron` — прямой item-id
+  - recipe-id сохраняется; advancement Create засчитывается без правок
+  - `filter_clear.json` (сброс данных фильтра, shapeless «1× → 1×») **не тронут** — к материалам отношения не имеет
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+
+- [x] `data/create/recipe/crafting/kinetics/attribute_filter.json`
+  - оригинал Create shaped `["ASA"]` (recipe-id `create:crafting/kinetics/attribute_filter`): 2× tag `c:nuggets/brass` (A) + 1× tag `minecraft:wool` (S) → 1 `create:attribute_filter`. В TFC-сборке мёртв целиком (`create:brass_nugget` — Create-only, ванильная шерсть недостижима)
+  - новый: тот же паттерн, ключ `A` → `tfc:metal/rod/brass`, ключ `S` → tag `tfc:cloths` → 2 `create:attribute_filter`
+  - мотивация: латунь (tier 2) — тот же металл, что и в оригинале, но в TFC-форме; латунный стержень — первая стадия ковки латуни. Выход ×1 → ×2
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false`; шейдинг-тег `tfc:cloths` уже зашаден
+  - recipe-id сохраняется; advancement Create засчитывается без правок
+  - `attribute_filter_clear.json` **не тронут**
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+
+- [x] `data/create/recipe/crafting/kinetics/package_filter.json`
+  - оригинал Create shaped `["ASA"]` (recipe-id `create:crafting/kinetics/package_filter`): 2× tag `c:nuggets/zinc` (A) + 1× tag `minecraft:wool` (S) → 1 `create:package_filter`. В TFC-сборке мёртв целиком (`create:zinc_nugget` — Create-only, ванильная шерсть недостижима)
+  - новый: тот же паттерн, ключ `A` → `tfc:metal/rod/zinc`, ключ `S` → tag `tfc:cloths` → 2 `create:package_filter`
+  - мотивация: цинк (tier 1) — самый ранний из трёх металлов фильтров, в TFC он идёт через ковку стержня. Выход ×1 → ×2
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`)
+  - `show_notification: false`; шейдинг-тег `tfc:cloths` уже зашаден
+  - recipe-id сохраняется; advancement Create засчитывается без правок
+  - `package_filter_clear.json` **не тронут**
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
 
 - [x] `data/tfc_aeronautics/recipe/crafting/rope_to_rope_coupling.json` — shapeless 1× `tfc:rope` → 1× `simulated:rope_coupling`. Бесплатная прямая конвертация: игрок с верёвкой получает coupling без затрат. Заменяет заблокированный shaped `simulated:rope_coupling` (см. `## Готово`)
 - [x] `data/tfc_aeronautics/recipe/crafting/rope_coupling_to_rope.json` — shapeless 1× `simulated:rope_coupling` → 1× `tfc:rope`. Обратная конвертация: позволяет размонтировать механизм (вернуть rope обратно, если coupling больше не нужен)

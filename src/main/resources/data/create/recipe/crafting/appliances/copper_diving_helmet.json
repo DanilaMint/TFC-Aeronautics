@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "show_notification": false,
+  "ingredients": [
+    {
+      "item": "tfc:metal/helmet/copper"
+    },
+    {
+      "item": "tfc:lens"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:copper_diving_helmet"
+  }
+}

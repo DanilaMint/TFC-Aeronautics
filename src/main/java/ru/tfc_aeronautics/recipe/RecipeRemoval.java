@@ -98,6 +98,20 @@ public final class RecipeRemoval
      * apply because the bundled sub-jar's data pack wins the namespace
      * priority collision; BAN is required to silence the upstream recipe.
      *
+     * <p>{@code create:crafting/kinetics/crafter_slot_cover} and
+     * {@code create:crafting/curiosities/minecart_coupling} are stripped
+     * because their only paths are now TFC-anvil forging:
+     * {@code tfc_aeronautics:anvil/crafter_slot_cover} (tier 2, brass rod,
+     * three covers) and {@code tfc_aeronautics:anvil/minecart_coupling}
+     * (tier 3, wrought iron rod, two couplings). Both vanilla shaped recipes
+     * are dead in TFC builds — the slot cover wants
+     * {@code c:nuggets/brass} (Create-only nugget) and the coupling wants
+     * {@code create:andesite_alloy} plus {@code c:plates/iron} (both
+     * unobtainable). Consequence: the matching Create advancements
+     * ({@code create:advancement/recipes/misc/crafting/kinetics/crafter_slot_cover}
+     * and {@code .../curiosities/minecart_coupling}) no longer unlock, because
+     * they trigger on the old recipe ids.
+     *
      * <p>The sixteen {@code create:crafting/logistics/<color>_table_cloth}
      * recipes are stripped because they all craft a table cloth out of
      * vanilla wool plus {@code create:andesite_alloy} — a Create-only alloy
@@ -122,6 +136,8 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/copper_valve_handle"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/mechanical_plough"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/basin"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/crafter_slot_cover"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/curiosities/minecart_coupling"),
         ResourceLocation.fromNamespaceAndPath("create", "pressing/copper_ingot"),
         ResourceLocation.fromNamespaceAndPath("simulated", "rope_coupling"),
         ResourceLocation.fromNamespaceAndPath("simulated", "copper_handle"),
