@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "I": {
+      "tag": "tfc_aeronautics:iron_sheet"
+    },
+    "S": {
+      "item": "create:industrial_iron_block"
+    }
+  },
+  "pattern": [
+    "I",
+    "S"
+  ],
+  "result": {
+    "count": 4,
+    "id": "simulated:rope_connector"
+  }
+}

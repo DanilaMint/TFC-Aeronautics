@@ -1,0 +1,32 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": true,
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "C": {
+      "item": "create:cogwheel"
+    },
+    "K": {
+      "item": "tfc_aeronautics:rubber"
+    },
+    "P": {
+      "item": "create:fluid_pipe"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "tfc_aeronautics:metal/tight_sheet/copper"
+    }
+  },
+  "pattern": [
+    "SR  ",
+    "KCPP",
+    "SR  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "aeronautics:mounted_potato_cannon"
+  }
+}

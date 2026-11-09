@@ -122,6 +122,27 @@ public final class RecipeRemoval
      * ({@code <color>_table_cloth_from_other_table_cloth}, 16 files) stay
      * untouched and {@code create:dyed_table_cloths} contains
      * {@code create:white_table_cloth}.
+     *
+     * <p>{@code aeronautics:propeller_bearing},
+     * {@code aeronautics:gyroscopic_propeller_bearing},
+     * {@code aeronautics:mechanical_crafting/mounted_potato_cannon} and
+     * {@code offroad:wheel_mount} are stripped because their only paths are
+     * now the TFC-ified recipes under
+     * {@code tfc_aeronautics:crafting/propeller_bearing},
+     * {@code tfc_aeronautics:crafting/gyroscopic_propeller_bearing},
+     * {@code tfc_aeronautics:crafting/mounted_potato_cannon} and
+     * {@code tfc_aeronautics:crafting/wheel_mount}. All four upstream recipes
+     * are dead in TFC builds — they want {@code c:plates/iron},
+     * {@code c:plates/copper} or {@code create:iron_sheet}, none of which is
+     * obtainable without the Create mechanical press, plus
+     * {@code minecraft:dried_kelp_block} for the potato cannon. As with the
+     * offroad tyres above, the shadow-overwrite at
+     * {@code data/<ns>/recipe/<name>.json} does not apply because the
+     * {@code aeronautics} / {@code offroad} sub-jars of
+     * {@code create-aeronautics-bundled} win the namespace priority collision
+     * against our data pack; BAN is required to silence the upstream recipe.
+     * Consequence: the matching Create Aeronautics / Offroad advancements no
+     * longer unlock, because they trigger on the old recipe ids.
      */
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
@@ -164,7 +185,11 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/brown_table_cloth"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/green_table_cloth"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/red_table_cloth"),
-        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/black_table_cloth")
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/black_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("aeronautics", "propeller_bearing"),
+        ResourceLocation.fromNamespaceAndPath("aeronautics", "gyroscopic_propeller_bearing"),
+        ResourceLocation.fromNamespaceAndPath("aeronautics", "mechanical_crafting/mounted_potato_cannon"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "wheel_mount")
     );
 
     private RecipeRemoval() {}

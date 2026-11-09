@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "show_notification": false,
+  "ingredients": [
+    {
+      "item": "create:chute"
+    },
+    {
+      "item": "create:shaft"
+    },
+    {
+      "item": "tfc_aeronautics:metal/tight_sheet/wrought_iron"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "id": "simulated:auger_shaft"
+  }
+}

@@ -980,9 +980,80 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - **побочный эффект**: Create'овские advancement'ы `create:advancement/recipes/building_blocks/crafting/logistics/<color>_table_cloth.json` (критерий `minecraft:recipe_unlocked`) больше не срабатывают — рецептов с такими id не осталось. Косметика: `create:advancement/table_cloth_shop.json` (встроенный магазин Create) не затронут
   - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
 
+**Батч «10 предметов из `list.md`» (2026-11-09)** — шесть shadow-override'ов в namespace источника (ветка 1: recipe-id сохранён, `BANNED_RECIPES` не трогаем) и четыре наковально-новых (ветка 2: новый recipe-id в `tfc_aeronautics` + запись оригинала в `BANNED_RECIPES`). Сводка — в `DOCS.md` §19.
+
+- [x] `data/create/recipe/crafting/appliances/copper_backtank.json`
+  - оригинал Create shaped `["AGA","PBP"," P "]` (recipe-id `create:crafting/appliances/copper_backtank`): 2× `create:andesite_alloy` (A) + 1× `create:shaft` (G) + тег `c:storage_blocks/copper` (B) + тег `c:ingots/copper` (P, ×3) → 1 `create:copper_backtank`. В TFC-сборке мёртв только `create:andesite_alloy` (Create-only сплав, циклически требует mechanical mixer)
+  - новый: **тот же паттерн**, `A` → `tfc_aeronautics:composite` (композитный каркас/крепление), `B` → **`create:fluid_tank`** (переносной бак = уменьшенный стационарный бак; в TFC-сборке доступен, т.к. у нас переопределён `data/create/recipe/crafting/kinetics/fluid_tank.json` → `tfc_aeronautics:metal/tight_sheet/copper` + `tfc:barrels`), `G` = `create:shaft` без изменений, `P` = `c:ingots/copper` без изменений (в TFC это `tfc:metal/ingot/copper`)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`); `show_notification: false` (конвенция проекта)
+  - smithing-апгрейд `create:netherite_backtank` не тронут — он опирается на `create:copper_backtank` как основу
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/create/recipe/crafting/schematics/schematicannon.json`
+  - оригинал Create shaped `[" I ","LIL","SDS"]` (recipe-id `create:crafting/schematics/schematicannon`): 2× `minecraft:iron_block` (I) + тег `minecraft:logs` (L, ×2) + 1× `minecraft:dispenser` (D) + 2× `minecraft:smooth_stone` (S) → 1 `create:schematicannon`. В TFC-сборке мёртвы все четыре вида ингредиентов: ванильного железа и камня нет, диспенсер требует булыжника
+  - новый: **тот же паттерн**, `I` → `create:industrial_iron_block` (×2; у нас свой anvil-путь `tfc_aeronautics:anvil/industrial_iron_block_{cast_iron,steel}`, апстримный stonecutting забанен), `L` → `#tfc:lumber` (TFC-доски, 20 пород), `S` → `#c:stones/smooth` (21 порода TFC), `D` → `tfc_aeronautics:composite` (корпус/затвор — аналога диспенсера в TFC нет)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `create`, без `BANNED_RECIPES`); `show_notification: false`
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/simulated/recipe/rope_connector.json`
+  - оригинал Simulated shaped 1×2 `["I","S"]` (recipe-id `simulated:rope_connector`): тег `c:plates/iron` (I) + `create:industrial_iron_block` (S) → 1. В TFC-сборке мёртв `c:plates/iron` (в теге только `create:iron_sheet`, Create-only лист)
+  - новый: **тот же паттерн** `["I","S"]`, `I` → `#tfc_aeronautics:iron_sheet` (наш umbrella-тег: `create:iron_sheet` + `tfc:metal/sheet/wrought_iron` + `tfc_aeronautics:metal/tight_sheet/steel` — игрок выбирает любой из трёх), `S` = `create:industrial_iron_block` без изменений. **Выход ×1 → ×4**: лист и блок — крупные заготовки, четыре небольших соединителя из одной заготовки ложится в логику «одна заготовка → N деталей» (как `tfc_aeronautics:anvil/*`: 1 слиток → 2–8 деталей)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`); `show_notification: false`
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/simulated/recipe/auger_shaft.json`
+  - оригинал Simulated shapeless (recipe-id `simulated:auger_shaft`): `create:chute` + `create:shaft` + тег `c:plates/iron` → 2. В TFC-сборке мёртв `c:plates/iron`
+  - новый: **чистый свап одного ингредиента** — `create:chute` + `create:shaft` + `tfc_aeronautics:metal/tight_sheet/wrought_iron` → 2. Формат (shapeless), count и recipe-id без изменений
+  - **ветка 1** скилла `recipe-override`; `show_notification: false`
+  - `simulated:auger_cog` отдельного override'а не требует: апстримные своп-рецепты `auger_cog_from_auger_shaft.json` / `auger_shaft_from_auger_cogwheel.json` — shapeless между `auger_shaft` и `auger_cog`, поэтому как только `auger_shaft` стал крафтиться, `auger_cog` доступен автоматически
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/simulated/recipe/red_portable_engine.json`
+  - оригинал Simulated shaped 1×3 `["G","E","B"]` (recipe-id `simulated:red_portable_engine`): тег `c:plates/iron` (G) + `simulated:engine_assembly` (E) + `minecraft:blast_furnace` (B) → 1. В TFC-сборке мёртвы оба крайних ключа: `c:plates/iron` и ванильная доменная печь
+  - новый: TFC-style shaped 3×3 `[" B ","MEM"," S "]`: `B` = `tfc:brass_mechanisms` (клапанный механизм / головка блока — замена `minecraft:blast_furnace`; **угля в рецепте нет**, топливо подаётся в движок в рантайме, см. DOCS §17 и `PortableEngineFuelHandler`), `E` = `simulated:engine_assembly` (апстрим; у нас переопределён `simulated:sequenced_assembly/engine_assembly.json`), `M` = `tfc_aeronautics:metal/tight_sheet/copper` (×2 — медные трубки/колбы, замена `c:plates/iron`), `S` = `tfc_aeronautics:composite` (опора/рама)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`); `show_notification: false`
+  - остальные 15 цветов — через `simulated:portable_engine_dyeing` (любой движок + краска, `PortableEngineDyeingRecipe`), не трогаем
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/simulated/recipe/mechanical_crafting/docking_connector.json`
+  - оригинал Simulated `create:mechanical_crafting` 4×4 `["ICI"," C ","PAP","BEB"]` (`accept_mirrored: true`): 2× тег `c:plates/iron` (I) + 2× `create:chute` (C) + 2× `minecraft:piston` (P) + `create:brass_casing` (A) + 2× тег `c:plates/brass` (B) + `create:electron_tube` (E) → 2. В TFC-сборке мёртвы оба тега `c:plates/*` (в них только Create-only листы)
+  - новый: **тот же паттерн и та же машина**, `I` → `tfc_aeronautics:metal/tight_sheet/wrought_iron` (×2), `B` → `tfc_aeronautics:metal/tight_sheet/brass` (×2), `P` = `minecraft:piston` **остаётся как есть** — TFC переопределяет ванильный рецепт пистона на TFC-материалы (`data/minecraft/recipe/piston.json`: `tfc:lumber` + `c:cobblestones/normal` + `tfc:brass_mechanisms` + `c:dusts/redstone`), т.е. поршень в TFC-сборке крафтится и является натуральным «выдвижным приводом» стыковки. `C`, `A`, `E` без изменений
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`); `show_notification: false`
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/tfc_aeronautics/recipe/crafting/mounted_potato_cannon.json` (вытеснил `aeronautics:mechanical_crafting/mounted_potato_cannon` через `BANNED_RECIPES`)
+  - оригинал Create Aeronautics `create:mechanical_crafting` 3×4 `["SR  ","KCPP","SR  "]` (`accept_mirrored: true`): 2× тег `c:plates/copper` (S) + 2× тег `c:dusts/redstone` (R) + `minecraft:dried_kelp_block` (K) + `create:cogwheel` (C) + 2× `create:fluid_pipe` (P) → 1. В TFC-сборке мёртвы три ключа: `c:plates/copper` (после бана `create:pressing/copper_ingot` в теге остался только недостижимый `create:copper_sheet`), `minecraft:dried_kelp_block`, плюс umbrella-тег `c:dusts/redstone` шире, чем нужно
+  - новый: **тот же паттерн**, `S` → `tfc_aeronautics:metal/tight_sheet/copper` (×2 — медная обшивка), `K` → `tfc_aeronautics:rubber` (резиновая камера, замена `dried_kelp_block`; `tfc_aeronautics:recipe/mixing/rubber.json` — латекс + уголь + уксус; прецедент — `hose_pulley.json` и вся серия шин offroad), `R` → `minecraft:redstone` (прямой item-id вместо umbrella-тега; конвенция проекта, прецедент `adjustable_burner.json` / `gantry_shaft.json`), `C` = `create:cogwheel` и `P` = `create:fluid_pipe` (×2) без изменений
+  - **закрывает TODO** «Перевести потребителей `create:copper_sheet` / тега `c:plates/copper` на `tfc_aeronautics:metal/tight_sheet/copper`» (см. `## TODO` ниже)
+  - **ветка 2** скилла `recipe-override` (новый recipe-id `tfc_aeronautics:crafting/mounted_potato_cannon` + запись оригинала в `BANNED_RECIPES`). Ветка 1 (shadow по `data/aeronautics/recipe/...`) не годится: `aeronautics` лежит jarjar-подмодом внутри `create-aeronautics-bundled`, его датапак выигрывает коллизию namespace'ов (тот же эффект, что зафиксирован для шин offroad)
+  - **побочный эффект**: advancement Create Aeronautics по апстрим-recipe-id больше не засчитывается — прецедент `crafter_slot_cover` / `copper_valve_handle`
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/tfc_aeronautics/recipe/crafting/propeller_bearing.json` (вытеснил `aeronautics:propeller_bearing` через `BANNED_RECIPES`)
+  - оригинал Create Aeronautics shaped 3×3 `[" A "," S "," B "]` (recipe-id `aeronautics:propeller_bearing`): тег `minecraft:wooden_slabs` (A) + тег `c:plates/iron` (S) + `create:brass_casing` (B) → 1. В TFC-сборке мёртв `c:plates/iron`
+  - новый: **форма апстрима сохранена**, меняется **только** ключ `S` → `#tfc_aeronautics:iron_sheet` (umbrella-тег на 3 железных листа: `create:iron_sheet`, `tfc:metal/sheet/wrought_iron`, `tfc_aeronautics:metal/tight_sheet/steel`). `A` и `B` без изменений — в TFC живые (TFC переопределяет `minecraft:wooden_slabs` под 20 пород; `create:brass_casing` крафтится через наш item_application-путь `data/create/recipe/item_application/tfc_aeronautics_brass_casing.json`)
+  - **ветка 2** скилла `recipe-override` (новый recipe-id `tfc_aeronautics:crafting/propeller_bearing` + BAN оригинала) — по причине приоритета jarjar-датапака, как у `mounted_potato_cannon`
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/tfc_aeronautics/recipe/crafting/gyroscopic_propeller_bearing.json` (вытеснил `aeronautics:gyroscopic_propeller_bearing` через `BANNED_RECIPES`)
+  - оригинал Create Aeronautics shaped 3×3 `[" A "," G "," B "]` (recipe-id `aeronautics:gyroscopic_propeller_bearing`): тег `minecraft:wooden_slabs` (A) + `simulated:gyroscopic_mechanism` (G) + `create:brass_casing` (B) → 1. В TFC-сборке мёртв `c:plates/iron` (тот же тег, что и в апстримном `propeller_bearing.json`)
+  - новый: **форма апстрима сохранена**, `S` → `#tfc_aeronautics:iron_sheet` (тот же umbrella-тег, что в `propeller_bearing.json`), `A`, `G`, `B` без изменений (`simulated:gyroscopic_mechanism` у нас переопределён через `simulated:sequenced_assembly/gyroscopic_mechanism.json`)
+  - **ветка 2** скилла `recipe-override` (новый recipe-id `tfc_aeronautics:crafting/gyroscopic_propeller_bearing` + BAN оригинала)
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/tfc_aeronautics/recipe/crafting/wheel_mount.json` (вытеснил `offroad:wheel_mount` через `BANNED_RECIPES`)
+  - оригинал Create Offroad shaped 1×3 `["C","S","P"]` (recipe-id `offroad:wheel_mount`): `create:andesite_casing` (C) + `simulated:spring` (S) + `create:iron_sheet` (P) → 1. В TFC-сборке мёртв `create:iron_sheet` (Create-only лист, требует mechanical press)
+  - новый: **форма апстрима сохранена**, меняется **только** ключ `P` → `#tfc_aeronautics:iron_sheet` (тот же umbrella-тег, что в `propeller_bearing.json`). `C` = `create:andesite_casing` (в TFC живой — наш item_application-путь `data/create/recipe/item_application/andesite_casing.json`) и `S` = `simulated:spring` (апстримный рецепт забанен, у нас `tfc_aeronautics:anvil/spring.json` — стальной стержень, tier 4, → 2 пружины) без изменений
+  - **ветка 2** скилла `recipe-override` (новый recipe-id `tfc_aeronautics:crafting/wheel_mount` + BAN оригинала) — по причине приоритета jarjar-датапака, как у шин offroad
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+
+**Пять пунктов `list.md`, которые менять не потребовалось:**
+- `simulated:auger_cog` — см. запись выше: доступен автоматически через своп-рецепты
+- `simulated:contraption_diagram` — shapeless `minecraft:paper` + `simulated:physics_assembler`; бумага в TFC жива (scraping), `physics_assembler` переопределён у нас. ⚠️ он использует `minecraft:lever`, а TFC не переопределяет его рецепт — доступность рычага стоит проверить в игре
+- `offroad:borehead_bearing` — `create:gearbox` + `create:industrial_iron_block` + `#minecraft:wooden_slabs`, все три достижимы в TFC-сборке
+- `simulated:plunger_launcher` — переопределён частично (`slime_ball` → `c:slimeballs`), но в нём остались мёртвые `create:andesite_alloy` и `minecraft:copper_ingot` → см. `## TODO`
+- `offroad:rockcutting_wheel` — апстрим `["C","G","S"]` содержит мёртвый `create:iron_sheet` → см. `## TODO`
+
 ## TODO (новые добавлять сюда)
 
-- [ ] Перевести потребителей `create:copper_sheet` / тега `c:plates/copper` на `tfc_aeronautics:metal/tight_sheet/copper` — предмет стал недобываем после бана `create:pressing/copper_ingot`:
-  - `aeronautics:mounted_potato_cannon` (mechanical crafting)
+- [x] Перевести потребителей `create:copper_sheet` / тега `c:plates/copper` на `tfc_aeronautics:metal/tight_sheet/copper` — предмет стал недобываем после бана `create:pressing/copper_ingot`:
+  - `aeronautics:mounted_potato_cannon` (mechanical crafting) — **сделано** в батче 2026-11-09, см. `data/tfc_aeronautics/recipe/crafting/mounted_potato_cannon.json` выше
 
-- [ ]
+- [ ] `simulated:plunger_launcher` (`data/simulated/recipe/mechanical_crafting/plunger_launcher.json`) — в текущем shadow-override'е остались мёртвые `create:andesite_alloy` (ключ `A`) и `minecraft:copper_ingot` (ключ `C`). Замена: `A` → `tfc_aeronautics:composite`, `C` → `tfc:metal/ingot/copper`
+
+- [ ] `offroad:rockcutting_wheel` (`data/offroad/recipe/rockcutting_wheel.json` в батле `create-aeronautics-bundled`) — upstream shaped `["C","G","S"]`: `create:crushing_wheel` + `create:industrial_iron_block` + `create:iron_sheet` (мёртв). Нужен **ветка 2**: новый recipe-id в `tfc_aeronautics:crafting/rockcutting_wheel` + BAN `offroad:rockcutting_wheel`
+
+- [ ] Проверить в игре `#minecraft:logs` — TFC не переопределяет этот тег и не добавляет в него `tfc:wood/log/*`. Три наших override'а (`data/create/recipe/crafting/kinetics/{cart_assembler,linear_chassis,radial_chassis}.json`) используют `#minecraft:logs` и, вероятно, мертвы. Замена: `#tfc:lumber` (как в `water_wheel.json` / `clutch.json` / `velocity_sensor.json`)
+
+- [ ] Проверить в игре 33 shadow-override'а в `data/aeronautics/recipe/` (конверты, `adjustable_burner`, `steam_vent`) — они сделаны по **ветке 1**, а `aeronautics` лежит jarjar-подмодом внутри `create-aeronautics-bundled` и его датапак может выигрывать коллизию namespace'ов (как у шин offroad). Если не применяются — перевести на ветку 2

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "D": {
+      "item": "tfc_aeronautics:composite"
+    },
+    "I": {
+      "item": "create:industrial_iron_block"
+    },
+    "L": {
+      "tag": "tfc:lumber"
+    },
+    "S": {
+      "tag": "c:stones/smooth"
+    }
+  },
+  "pattern": [
+    " I ",
+    "LIL",
+    "SDS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:schematicannon"
+  }
+}
