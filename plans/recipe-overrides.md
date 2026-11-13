@@ -1,6 +1,6 @@
 # Recipe Overrides
 
-**Прогресс:** 50/? ✓ (overrides + 31 envelope)
+**Прогресс:** 52/? ✓ (overrides + 31 envelope)
 
 ## Контекст
 
@@ -1037,22 +1037,29 @@ namespace источника (`data/create/recipe/...`, `data/simulated/recipe/.
   - новый: **форма апстрима сохранена**, меняется **только** ключ `P` → `#tfc_aeronautics:iron_sheet` (тот же umbrella-тег, что в `propeller_bearing.json`). `C` = `create:andesite_casing` (в TFC живой — наш item_application-путь `data/create/recipe/item_application/andesite_casing.json`) и `S` = `simulated:spring` (апстримный рецепт забанен, у нас `tfc_aeronautics:anvil/spring.json` — стальной стержень, tier 4, → 2 пружины) без изменений
   - **ветка 2** скилла `recipe-override` (новый recipe-id `tfc_aeronautics:crafting/wheel_mount` + BAN оригинала) — по причине приоритета jarjar-датапака, как у шин offroad
   - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/simulated/recipe/mechanical_crafting/plunger_launcher.json`
+  - оригинал Simulated `create:mechanical_crafting` 3×4 `["   P","AMFR","CC P"]` (`accept_mirrored: true`, recipe-id `simulated:mechanical_crafting/plunger_launcher`): `create:andesite_alloy` (A) + `minecraft:copper_ingot` (C, ×2) + `create:fluid_pipe` (F) + `create:precision_mechanism` (M) + `minecraft:slime_ball` (P, ×2) + `simulated:rope_coupling` (R) → 1. В TFC-сборке мёртвы `create:andesite_alloy` (Create-only сплав, циклически требует mechanical mixer) и `minecraft:copper_ingot` (в TFC медь — только `tfc:metal/ingot/copper`)
+  - наш shadow-override (создан ранее для замены хардкода `minecraft:slime_ball` → тег `c:slimeballs`) теперь переписан полностью: `A` → `tfc_aeronautics:composite` (композитный корпус — тот же свап, что в `physics_assembler.json` / `package_frogport.json` / `red_portable_engine.json`), `C` → `tfc:metal/ingot/copper` (×2 — медные трубки/гильзы). `F`, `M`, `P`, `R` без изменений (см. мотивацию в DOCS §19)
+  - **ветка 1** скилла `recipe-override` (recipe-id в namespace `simulated`, без `BANNED_RECIPES`); recipe-id сохраняется, advancement Simulated засчитывается без правок
+  - **закрывает TODO** про мёртвые `create:andesite_alloy` / `minecraft:copper_ingot` в этом рецепте
+  - ⚠️ **открытый риск**: `simulated` лежит jarjar-подмодом внутри `create-aeronautics-bundled` — если shadow-override в namespace `simulated` не применится (та же коллизия namespace'ов, что у `aeronautics`/`offroad`), fallback — ветка 2 (новый recipe-id `tfc_aeronautics:crafting/plunger_launcher` + BAN `simulated:mechanical_crafting/plunger_launcher`). Проверка — в игре
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
+- [x] `data/tfc_aeronautics/recipe/crafting/rockcutting_wheel.json` (вытеснил `offroad:rockcutting_wheel` через `BANNED_RECIPES`)
+  - оригинал Create Offroad shaped 1×3 `["C","G","S"]` (recipe-id `offroad:rockcutting_wheel`): `create:crushing_wheel` (C) + `create:industrial_iron_block` (G) + `create:iron_sheet` (S) → 1. В TFC-сборке мёртв `create:iron_sheet` (Create-only лист, требует mechanical press)
+  - новый: **форма апстрима сохранена**, меняется **только** ключ `S` → `#tfc_aeronautics:iron_sheet` (тот же umbrella-тег, что в `wheel_mount.json` / `propeller_bearing.json`). `C` = `create:crushing_wheel` (наш override `data/create/recipe/mechanical_crafting/crushing_wheel.json`) и `G` = `create:industrial_iron_block` (наш anvil-путь `tfc_aeronautics:anvil/industrial_iron_block_{cast_iron,steel}.json`) без изменений. `show_notification: false`
+  - **ветка 2** скилла `recipe-override` (новый recipe-id `tfc_aeronautics:crafting/rockcutting_wheel` + BAN оригинала) — по причине приоритета jarjar-датапака, как у `offroad:wheel_mount` и шин offroad
+  - **побочный эффект**: advancement Offroad `data/offroad/advancement/recipes/misc/rockcutting_wheel.json` больше не засчитывается — прецедент `wheel_mount`
+  - **проверено**: JSON валиден, `./gradlew compileJava` BUILD SUCCESSFUL
 
-**Пять пунктов `list.md`, которые менять не потребовалось:**
+**Три пункта `list.md`, которые менять не потребовалось:**
 - `simulated:auger_cog` — см. запись выше: доступен автоматически через своп-рецепты
 - `simulated:contraption_diagram` — shapeless `minecraft:paper` + `simulated:physics_assembler`; бумага в TFC жива (scraping), `physics_assembler` переопределён у нас. ⚠️ он использует `minecraft:lever`, а TFC не переопределяет его рецепт — доступность рычага стоит проверить в игре
 - `offroad:borehead_bearing` — `create:gearbox` + `create:industrial_iron_block` + `#minecraft:wooden_slabs`, все три достижимы в TFC-сборке
-- `simulated:plunger_launcher` — переопределён частично (`slime_ball` → `c:slimeballs`), но в нём остались мёртвые `create:andesite_alloy` и `minecraft:copper_ingot` → см. `## TODO`
-- `offroad:rockcutting_wheel` — апстрим `["C","G","S"]` содержит мёртвый `create:iron_sheet` → см. `## TODO`
 
 ## TODO (новые добавлять сюда)
 
 - [x] Перевести потребителей `create:copper_sheet` / тега `c:plates/copper` на `tfc_aeronautics:metal/tight_sheet/copper` — предмет стал недобываем после бана `create:pressing/copper_ingot`:
   - `aeronautics:mounted_potato_cannon` (mechanical crafting) — **сделано** в батче 2026-11-09, см. `data/tfc_aeronautics/recipe/crafting/mounted_potato_cannon.json` выше
-
-- [ ] `simulated:plunger_launcher` (`data/simulated/recipe/mechanical_crafting/plunger_launcher.json`) — в текущем shadow-override'е остались мёртвые `create:andesite_alloy` (ключ `A`) и `minecraft:copper_ingot` (ключ `C`). Замена: `A` → `tfc_aeronautics:composite`, `C` → `tfc:metal/ingot/copper`
-
-- [ ] `offroad:rockcutting_wheel` (`data/offroad/recipe/rockcutting_wheel.json` в батле `create-aeronautics-bundled`) — upstream shaped `["C","G","S"]`: `create:crushing_wheel` + `create:industrial_iron_block` + `create:iron_sheet` (мёртв). Нужен **ветка 2**: новый recipe-id в `tfc_aeronautics:crafting/rockcutting_wheel` + BAN `offroad:rockcutting_wheel`
 
 - [ ] Проверить в игре `#minecraft:logs` — TFC не переопределяет этот тег и не добавляет в него `tfc:wood/log/*`. Три наших override'а (`data/create/recipe/crafting/kinetics/{cart_assembler,linear_chassis,radial_chassis}.json`) используют `#minecraft:logs` и, вероятно, мертвы. Замена: `#tfc:lumber` (как в `water_wheel.json` / `clutch.json` / `velocity_sensor.json`)
 

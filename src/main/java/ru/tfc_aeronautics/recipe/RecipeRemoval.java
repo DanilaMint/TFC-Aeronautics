@@ -143,6 +143,19 @@ public final class RecipeRemoval
      * against our data pack; BAN is required to silence the upstream recipe.
      * Consequence: the matching Create Aeronautics / Offroad advancements no
      * longer unlock, because they trigger on the old recipe ids.
+     *
+     * <p>{@code offroad:rockcutting_wheel} is stripped because its only path is
+     * now the TFC-ified recipe under
+     * {@code tfc_aeronautics:crafting/rockcutting_wheel}. The upstream recipe
+     * ({@code create:crushing_wheel} + {@code create:industrial_iron_block} +
+     * {@code create:iron_sheet}) is dead in TFC builds — the Create-only iron
+     * sheet is unobtainable without the mechanical press. As with the offroad
+     * tyres and {@code offroad:wheel_mount}, the shadow-overwrite at
+     * {@code data/offroad/recipe/<name>.json} does not apply because the
+     * {@code offroad} sub-jar of {@code create-aeronautics-bundled} wins the
+     * namespace priority collision against our data pack; BAN is required to
+     * silence the upstream recipe. Consequence: the matching Offroad
+     * advancement no longer unlocks, because it triggers on the old recipe id.
      */
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
@@ -189,7 +202,8 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("aeronautics", "propeller_bearing"),
         ResourceLocation.fromNamespaceAndPath("aeronautics", "gyroscopic_propeller_bearing"),
         ResourceLocation.fromNamespaceAndPath("aeronautics", "mechanical_crafting/mounted_potato_cannon"),
-        ResourceLocation.fromNamespaceAndPath("offroad", "wheel_mount")
+        ResourceLocation.fromNamespaceAndPath("offroad", "wheel_mount"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "rockcutting_wheel")
     );
 
     private RecipeRemoval() {}

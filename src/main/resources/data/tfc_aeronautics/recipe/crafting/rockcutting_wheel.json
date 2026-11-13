@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "C": {
+      "item": "create:crushing_wheel"
+    },
+    "G": {
+      "item": "create:industrial_iron_block"
+    },
+    "S": {
+      "tag": "tfc_aeronautics:iron_sheet"
+    }
+  },
+  "pattern": [
+    "C",
+    "G",
+    "S"
+  ],
+  "result": {
+    "count": 1,
+    "id": "offroad:rockcutting_wheel"
+  }
+}
