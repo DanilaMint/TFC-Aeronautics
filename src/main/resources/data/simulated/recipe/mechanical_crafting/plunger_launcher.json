@@ -4,10 +4,10 @@
   "category": "misc",
   "key": {
     "A": {
-      "item": "create:andesite_alloy"
+      "item": "tfc_aeronautics:composite"
     },
     "C": {
-      "item": "minecraft:copper_ingot"
+      "item": "tfc:metal/ingot/copper"
     },
     "F": {
       "item": "create:fluid_pipe"

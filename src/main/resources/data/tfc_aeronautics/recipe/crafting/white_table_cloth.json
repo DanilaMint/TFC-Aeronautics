@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "C": { "item": "tfc_aeronautics:composite" },
+    "c": { "tag": "tfc:cloths" }
+  },
+  "pattern": [
+    "cCc"
+  ],
+  "result": { "count": 1, "id": "create:white_table_cloth" },
+  "show_notification": false
+}

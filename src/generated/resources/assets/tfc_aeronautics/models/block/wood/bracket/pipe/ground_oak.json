@@ -1,7 +1,0 @@
-{
-  "parent": "create:block/bracket/pipe/ground",
-  "textures": {
-    "bracket": "tfc_aeronautics:block/wood/bracket/bracket_oak",
-    "plate": "tfc_aeronautics:block/wood/bracket/bracket_plate_oak"
-  }
-}

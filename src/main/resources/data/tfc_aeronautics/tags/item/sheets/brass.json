@@ -1,0 +1,7 @@
+{
+  "values": [
+    "create:brass_sheet",
+    "tfc:metal/sheet/brass",
+    "tfc_aeronautics:metal/tight_sheet/brass"
+  ]
+}

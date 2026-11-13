@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "C": {
+      "item": "create:stock_link"
+    },
+    "A": [
+      {
+        "item": "tfc:metal/double_ingot/wrought_iron"
+      },
+      {
+        "item": "tfc:metal/ingot/steel"
+      }
+    ],
+    "B": {
+      "tag": "c:dusts/redstone"
+    }
+  },
+  "pattern": [
+    "C",
+    "A",
+    "B"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:redstone_requester"
+  }
+}

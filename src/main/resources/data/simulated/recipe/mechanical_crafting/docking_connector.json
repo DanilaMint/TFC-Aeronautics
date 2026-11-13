@@ -1,0 +1,36 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": true,
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "A": {
+      "item": "create:brass_casing"
+    },
+    "B": {
+      "item": "tfc_aeronautics:metal/tight_sheet/brass"
+    },
+    "C": {
+      "item": "create:chute"
+    },
+    "E": {
+      "item": "create:electron_tube"
+    },
+    "I": {
+      "item": "tfc_aeronautics:metal/tight_sheet/wrought_iron"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    }
+  },
+  "pattern": [
+    "ICI",
+    " C ",
+    "PAP",
+    "BEB"
+  ],
+  "result": {
+    "count": 2,
+    "id": "simulated:docking_connector"
+  }
+}

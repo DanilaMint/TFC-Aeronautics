@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "B": {
+      "item": "create:brass_casing"
+    },
+    "S": {
+      "tag": "c:rods/wooden"
+    }
+  },
+  "pattern": [
+    "S",
+    "B"
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:throttle_lever"
+  }
+}

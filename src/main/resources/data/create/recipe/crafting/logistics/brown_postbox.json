@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "A": {
+      "item": "tfc_aeronautics:composite"
+    },
+    "B": {
+      "tag": "c:chests/wooden"
+    },
+    "D": {
+      "tag": "c:dyes/brown"
+    }
+  },
+  "pattern": [
+    "D",
+    "B",
+    "A"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:brown_postbox"
+  }
+}

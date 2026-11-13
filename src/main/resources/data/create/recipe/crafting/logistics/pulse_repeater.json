@@ -3,7 +3,7 @@
   "category": "redstone",
   "key": {
     "R": { "item": "minecraft:redstone" },
-    "B": { "item": "tfc:metal/sheet/brass" },
+    "B": { "item": "tfc_aeronautics:metal/tight_sheet/brass" },
     "T": { "item": "minecraft:redstone_torch" },
     "P": { "item": "tfc_aeronautics:redstone_plate" }
   },

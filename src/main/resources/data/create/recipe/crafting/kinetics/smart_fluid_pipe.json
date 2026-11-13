@@ -3,7 +3,7 @@
   "category": "misc",
   "show_notification": false,
   "key": {
-    "B": { "item": "tfc:metal/sheet/brass" },
+    "B": { "item": "tfc_aeronautics:metal/tight_sheet/brass" },
     "P": { "item": "create:fluid_pipe" },
     "E": { "item": "create:electron_tube" }
   },

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": { "item": "tfc_aeronautics:rubber" },
+    "S": { "item": "create:shaft" }
+  },
+  "pattern": [ " R ", "RSR", " R " ],
+  "result": { "count": 1, "id": "offroad:tire" },
+  "show_notification": false
+}

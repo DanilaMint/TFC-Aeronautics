@@ -1,6 +1,6 @@
 # Нагревательные элементы (Heat Dealers)
 
-**Прогресс:** 19/28 ⏳
+**Прогресс:** 21/28 ⏳
 
 Нагревательный элемент — блок, который отдаёт наружу свою текущую температуру в °C по шкале TFC (0…1600, `Heat.maxVisibleTemperature()`). Это общая шина между устройствами TFC и механиками Create: на неё опираются паровой двигатель, паровой вентиль, нагрев в рецептах `create:mixing` и дистиллятор.
 
@@ -13,10 +13,11 @@
                                         │  getTemperature(level, pos, state) -> °C
                      ┌──────────────────┼──────────────────────┐
                      ▼                  ▼                      ▼
-          BoilerHeater.REGISTRY   BasinBlockEntity        (дистиллятор,
-          (паровой котёл,          #getHeatLevel           condenser-coil —
-           steam engine)           через mixin →           будущие планы)
-                                   create:mixing
+          BoilerHeater.REGISTRY   BasinBlockEntity        CondenserCoilBlockEntity
+          (паровой котёл,          #getHeatLevel           #readHeatSourceTemperature
+           steam engine)           через mixin →           (через HeatDealer.findTemperature
+                                   create:mixing            → compare с temperature_range
+                                                           рецепта)
 ```
 
 Реестр — не свой велосипед: используется публичный `com.simibubi.create.api.registry.SimpleRegistry` (тот же, на котором построен `BoilerHeater.REGISTRY` в Create), он потокобезопасен и поддерживает провайдеры по тегам.
@@ -52,8 +53,7 @@ Client-only файлов нет. Уровень нагрева виден по �
 - [x] `create:mixing` — басин над нагревательным элементом (через `BasinBlockEntityMixin`)
 - [x] Паровой котёл Create / steam engine — через провайдер в `BoilerHeater.REGISTRY`, миксин не нужен: реестр публичный API Create. Любой зарегистрированный `HeatDealer` подключается автоматически
 - [ ] Паровой вентиль
-- [ ] Дистиллятор — рецепты `tfc_aeronautics:distillation`; см. `plans/condenser-coil.md`
-- [ ] `tfc_aeronautics:condenser_coil` — конденсация пара из нагреваемого бака; см. `plans/condenser-coil.md`
+- [x] `tfc_aeronautics:condenser_coil` — конденсация: `CondenserCoilBlockEntity#readHeatSourceTemperature` напрямую читает `HeatDealer.findTemperature(...)` в °C и сравнивает с `temperature_range` рецепта (`HeatDealers.toBoilerHeat` для этой логики **не** используется — это шкала SU для бойлера, не для порогов рецепта). См. `plans/condenser-coil.md`
 
 ## Документация
 - [x] `DOCS.md` — раздел «Нагревательные элементы (Heat Dealers)»

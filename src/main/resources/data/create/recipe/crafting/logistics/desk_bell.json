@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "G": { "item": "tfc:metal/sheet/gold" },
+    "C": { "item": "create:andesite_casing" }
+  },
+  "pattern": [
+    " G ",
+    "CCC"
+  ],
+  "result": {
+    "count": 3,
+    "id": "create:desk_bell"
+  }
+}

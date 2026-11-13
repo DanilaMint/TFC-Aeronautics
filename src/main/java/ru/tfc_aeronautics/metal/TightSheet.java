@@ -29,6 +29,7 @@ import net.dries007.tfc.util.Metal;
 public enum TightSheet
 {
     COPPER("copper", 1080, () -> TFCFluids.METALS.get(Metal.COPPER).getSource()),
+    BRASS("brass", 930, () -> TFCFluids.METALS.get(Metal.BRASS).getSource()),
     WROUGHT_IRON("wrought_iron", 1535, () -> TFCFluids.METALS.get(Metal.WROUGHT_IRON).getSource()),
     STEEL("steel", 1540, () -> TFCFluids.METALS.get(Metal.STEEL).getSource());
 

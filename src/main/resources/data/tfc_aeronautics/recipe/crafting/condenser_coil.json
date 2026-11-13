@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "show_notification": true,
+  "key": {
+    "P": { "item": "create:fluid_pipe" }
+  },
+  "pattern": [
+    " P ",
+    "PPP",
+    " P "
+  ],
+  "result": {
+    "count": 1,
+    "id": "tfc_aeronautics:condenser_coil"
+  }
+}

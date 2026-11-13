@@ -39,6 +39,8 @@ import net.dries007.tfc.util.data.Fuel;
 
 import org.jetbrains.annotations.Nullable;
 
+import ru.tfc_aeronautics.Config;
+
 /**
  * The heater's brain: holds the inventory (item + fuel), the internal molten-metal
  * fluid tank, the current device temperature, and the {@link HeaterValueBehaviour}
@@ -193,14 +195,28 @@ public class HeaterBlockEntity extends SmartBlockEntity implements IBellowsConsu
         temperature = HeatCapability.adjustDeviceTemp(temperature, baseTarget, airTicks, isRaining);
         temperature = Mth.clamp(temperature, 0f, MAX_TEMP + 200f); // hard physical cap (visible scale + small headroom)
 
+        // Resolve heating-speed multiplier. 0.0 means "instant heating" — we bypass TFC's
+        // per-tick addTemp physics and set the item's temperature directly to the knob value
+        // (`maxTemperature`). On the same tick, the normal tryApplyHeatingRecipe below checks
+        // whether a recipe fires at that temperature and transforms the item. If the knob is
+        // set below the recipe's required temperature, the item stays hot but never transforms.
+        // Otherwise the multiplier scales TFC's addTemp `modifier` (default 3) so that the
+        // per-tick heating rate (`modifier / heatCapacity`) is multiplied by the config value.
+        float multiplier = Config.HEATER_SPEED_MULTIPLIER.get().floatValue();
+        float effectiveTemp = multiplier <= 0f ? maxTemperature : temperature * multiplier;
+
         // 5. Hand our device temperature up to whatever consumes heat above us
-        HeatCapability.provideHeatTo(level, worldPosition.above(), Direction.DOWN, temperature);
+        HeatCapability.provideHeatTo(level, worldPosition.above(), Direction.DOWN, effectiveTemp);
 
         // 6. Heat the item in slot 0
         ItemStack stack = inventory.getStackInSlot(SLOT_ITEM);
         @Nullable IHeat heat = HeatCapability.get(stack);
         if (heat != null && temperature > 0f) {
-            HeatCapability.addTemp(heat, temperature);
+            if (multiplier <= 0f) {
+                heat.setTemperature(maxTemperature);
+            } else {
+                HeatCapability.addTemp(heat, effectiveTemp, 3f * multiplier);
+            }
         }
 
         // 7. Apply any HeatingRecipe transformation

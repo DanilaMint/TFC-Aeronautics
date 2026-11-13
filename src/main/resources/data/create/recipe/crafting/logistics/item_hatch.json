@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "show_notification": false,
+  "ingredients": [
+    [
+      { "tag": "tfc_aeronautics:iron_sheet" }
+    ],
+    [
+      { "item": "tfc:metal/trapdoor/bismuth_bronze" },
+      { "item": "tfc:metal/trapdoor/black_bronze" },
+      { "item": "tfc:metal/trapdoor/black_steel" },
+      { "item": "tfc:metal/trapdoor/blue_steel" },
+      { "item": "tfc:metal/trapdoor/bronze" },
+      { "item": "tfc:metal/trapdoor/copper" },
+      { "item": "tfc:metal/trapdoor/red_steel" },
+      { "item": "tfc:metal/trapdoor/steel" },
+      { "item": "tfc:metal/trapdoor/wrought_iron" }
+    ]
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:item_hatch"
+  }
+}

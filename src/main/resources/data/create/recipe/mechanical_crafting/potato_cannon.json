@@ -1,0 +1,20 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": true,
+  "category": "misc",
+  "key": {
+    "C": { "tag": "c:ingots/copper" },
+    "L": { "tag": "c:ingots/brass" },
+    "R": { "item": "create:precision_mechanism" },
+    "S": { "item": "create:fluid_pipe" }
+  },
+  "pattern": [
+    "LRSSS",
+    "CC   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:potato_cannon"
+  },
+  "show_notification": false
+}

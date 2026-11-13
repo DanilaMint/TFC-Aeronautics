@@ -52,6 +52,110 @@ public final class RecipeRemoval
      * is stripped because its only path is now TFC-anvil recipes under
      * {@code tfc_aeronautics:anvil/industrial_iron_block_cast_iron} and
      * {@code tfc_aeronautics:anvil/industrial_iron_block_steel}.
+     *
+     * <p>{@code create:crafting/kinetics/basin} is stripped because its only
+     * path is now the ceramic preform route:
+     * {@code tfc_aeronautics:ceramic/unfired_basin} (shaped craft) →
+     * {@code tfc:heating} → {@code create:basin}.
+     *
+     * <p>{@code simulated:iron_handle} is stripped because its only path is now
+     * TFC-anvil forging of a metal rod:
+     * {@code tfc_aeronautics:anvil/iron_handle_wrought_iron} (tier 3, one
+     * handle) and {@code tfc_aeronautics:anvil/iron_handle_steel} (tier 4, two
+     * handles). The {@code simulated:handle_undye} shapeless recipe stays — it
+     * strips dye off a coloured handle rather than producing iron.
+     *
+     * <p>{@code simulated:spring} is stripped because its only path is now
+     * TFC-anvil forging of a steel rod:
+     * {@code tfc_aeronautics:anvil/spring} (tier 4, three bends, two
+     * springs). The vanilla shaped recipe is dead in TFC builds
+     * ({@code create:iron_sheet} requires mechanical press), and the rod
+     * triple-bend yields the same two-spring output as the original.
+     *
+     * <p>{@code create:pressing/copper_ingot} is stripped so that pressing a
+     * copper ingot yields only {@code tfc_aeronautics:metal/tight_sheet/copper}
+     * via {@code create:pressing/tight_sheet_copper}. Both recipes matched the
+     * same {@code c:ingots/copper} input, so which sheet came out depended on
+     * recipe iteration order. This is a pure removal — {@code create:copper_sheet}
+     * has no other production path and becomes unobtainable by design.
+     *
+     * <p>{@code create:mixing/brass_ingot} is stripped so that the mechanical
+     * mixer cannot bootstrap brass from copper and zinc in TFC builds; brass is
+     * still obtainable via {@code create:pressing/brass_ingot} and other mod
+     * paths (TFC anvil, TFC workings, Create crushing). Pure removal — no
+     * replacement recipe.
+     *
+     * <p>{@code offroad:small_tire}, {@code offroad:tire},
+     * {@code offroad:large_tire}, {@code offroad:monstrous_tire} are stripped
+     * because their only paths are now the rubber-craft recipes under
+     * {@code tfc_aeronautics:crafting/small_tire},
+     * {@code tfc_aeronautics:crafting/tire},
+     * {@code tfc_aeronautics:crafting/large_tire} and
+     * {@code tfc_aeronautics:crafting/monstrous_tire}. The vanilla kelp/belt
+     * recipes from the offroad sub-jar of {@code create-aeronautics-bundled}
+     * use dried kelp / belt connector — ingredients that have no TFC role.
+     * The shadow-overwrite at {@code data/offroad/recipe/<name>.json} does not
+     * apply because the bundled sub-jar's data pack wins the namespace
+     * priority collision; BAN is required to silence the upstream recipe.
+     *
+     * <p>{@code create:crafting/kinetics/crafter_slot_cover} and
+     * {@code create:crafting/curiosities/minecart_coupling} are stripped
+     * because their only paths are now TFC-anvil forging:
+     * {@code tfc_aeronautics:anvil/crafter_slot_cover} (tier 2, brass rod,
+     * three covers) and {@code tfc_aeronautics:anvil/minecart_coupling}
+     * (tier 3, wrought iron rod, two couplings). Both vanilla shaped recipes
+     * are dead in TFC builds — the slot cover wants
+     * {@code c:nuggets/brass} (Create-only nugget) and the coupling wants
+     * {@code create:andesite_alloy} plus {@code c:plates/iron} (both
+     * unobtainable). Consequence: the matching Create advancements
+     * ({@code create:advancement/recipes/misc/crafting/kinetics/crafter_slot_cover}
+     * and {@code .../curiosities/minecart_coupling}) no longer unlock, because
+     * they trigger on the old recipe ids.
+     *
+     * <p>The sixteen {@code create:crafting/logistics/<color>_table_cloth}
+     * recipes are stripped because they all craft a table cloth out of
+     * vanilla wool plus {@code create:andesite_alloy} — a Create-only alloy
+     * that needs the mechanical mixer. The only production path for a table
+     * cloth is now {@code tfc_aeronautics:crafting/white_table_cloth}
+     * (TFC cloth + industrial composite); every other colour is obtained by
+     * dyeing that white cloth, because the Create dyeing recipes
+     * ({@code <color>_table_cloth_from_other_table_cloth}, 16 files) stay
+     * untouched and {@code create:dyed_table_cloths} contains
+     * {@code create:white_table_cloth}.
+     *
+     * <p>{@code aeronautics:propeller_bearing},
+     * {@code aeronautics:gyroscopic_propeller_bearing},
+     * {@code aeronautics:mechanical_crafting/mounted_potato_cannon} and
+     * {@code offroad:wheel_mount} are stripped because their only paths are
+     * now the TFC-ified recipes under
+     * {@code tfc_aeronautics:crafting/propeller_bearing},
+     * {@code tfc_aeronautics:crafting/gyroscopic_propeller_bearing},
+     * {@code tfc_aeronautics:crafting/mounted_potato_cannon} and
+     * {@code tfc_aeronautics:crafting/wheel_mount}. All four upstream recipes
+     * are dead in TFC builds — they want {@code c:plates/iron},
+     * {@code c:plates/copper} or {@code create:iron_sheet}, none of which is
+     * obtainable without the Create mechanical press, plus
+     * {@code minecraft:dried_kelp_block} for the potato cannon. As with the
+     * offroad tyres above, the shadow-overwrite at
+     * {@code data/<ns>/recipe/<name>.json} does not apply because the
+     * {@code aeronautics} / {@code offroad} sub-jars of
+     * {@code create-aeronautics-bundled} win the namespace priority collision
+     * against our data pack; BAN is required to silence the upstream recipe.
+     * Consequence: the matching Create Aeronautics / Offroad advancements no
+     * longer unlock, because they trigger on the old recipe ids.
+     *
+     * <p>{@code offroad:rockcutting_wheel} is stripped because its only path is
+     * now the TFC-ified recipe under
+     * {@code tfc_aeronautics:crafting/rockcutting_wheel}. The upstream recipe
+     * ({@code create:crushing_wheel} + {@code create:industrial_iron_block} +
+     * {@code create:iron_sheet}) is dead in TFC builds — the Create-only iron
+     * sheet is unobtainable without the mechanical press. As with the offroad
+     * tyres and {@code offroad:wheel_mount}, the shadow-overwrite at
+     * {@code data/offroad/recipe/<name>.json} does not apply because the
+     * {@code offroad} sub-jar of {@code create-aeronautics-bundled} wins the
+     * namespace priority collision against our data pack; BAN is required to
+     * silence the upstream recipe. Consequence: the matching Offroad
+     * advancement no longer unlocks, because it triggers on the old recipe id.
      */
     public static final Set<ResourceLocation> BANNED_RECIPES = ImmutableSet.of(
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/fluid_pipe"),
@@ -65,8 +169,41 @@ public final class RecipeRemoval
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/depot"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/copper_valve_handle"),
         ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/mechanical_plough"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/basin"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/kinetics/crafter_slot_cover"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/curiosities/minecart_coupling"),
+        ResourceLocation.fromNamespaceAndPath("create", "pressing/copper_ingot"),
         ResourceLocation.fromNamespaceAndPath("simulated", "rope_coupling"),
-        ResourceLocation.fromNamespaceAndPath("create", "industrial_iron_block_from_ingots_iron_stonecutting")
+        ResourceLocation.fromNamespaceAndPath("simulated", "copper_handle"),
+        ResourceLocation.fromNamespaceAndPath("simulated", "iron_handle"),
+        ResourceLocation.fromNamespaceAndPath("simulated", "spring"),
+        ResourceLocation.fromNamespaceAndPath("create", "industrial_iron_block_from_ingots_iron_stonecutting"),
+        ResourceLocation.fromNamespaceAndPath("create", "mixing/brass_ingot"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "small_tire"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "tire"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "large_tire"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "monstrous_tire"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/white_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/orange_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/magenta_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/light_blue_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/yellow_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/lime_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/pink_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/gray_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/light_gray_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/cyan_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/purple_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/blue_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/brown_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/green_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/red_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("create", "crafting/logistics/black_table_cloth"),
+        ResourceLocation.fromNamespaceAndPath("aeronautics", "propeller_bearing"),
+        ResourceLocation.fromNamespaceAndPath("aeronautics", "gyroscopic_propeller_bearing"),
+        ResourceLocation.fromNamespaceAndPath("aeronautics", "mechanical_crafting/mounted_potato_cannon"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "wheel_mount"),
+        ResourceLocation.fromNamespaceAndPath("offroad", "rockcutting_wheel")
     );
 
     private RecipeRemoval() {}

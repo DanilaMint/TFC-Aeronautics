@@ -1,0 +1,11 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    { "item": "tfc_aeronautics:latex_clump" },
+    { "item": "tfc:powder/charcoal" },
+    { "type": "neoforge:single", "amount": 10, "fluid": "tfc:vinegar" }
+  ],
+  "results": [
+    { "count": 1, "id": "tfc_aeronautics:rubber" }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:item_frame"
+    },
+    {
+      "item": "tfc_aeronautics:metal/tight_sheet/brass"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:placard"
+  },
+  "show_notification": false
+}

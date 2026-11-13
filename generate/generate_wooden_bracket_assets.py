@@ -18,7 +18,12 @@ Output:
   src/generated/resources/assets/tfc_aeronautics/models/item/wood/bracket/<wood>.json   (20)
 
 Source template:
-  code_references/Create/src/generated/resources/assets/create/blockstates/wooden_bracket.json
+  generate/templates/wooden_bracket.json
+
+That's a verbatim copy of Create's datagen output
+(`assets/create/blockstates/wooden_bracket.json` from the 6.0.x jar), vendored
+next to this script so datagen doesn't depend on the gitignored
+`code_references/Create` checkout.
 
 The template is rewritten per-wood with two string substitutions:
   create:block/bracket/...     ->  tfc_aeronautics:block/wood/bracket/...
@@ -27,12 +32,12 @@ The template is rewritten per-wood with two string substitutions:
 import json
 from pathlib import Path
 
-from _common import WOODS, REPO, GEN, write_json
+from _common import WOODS, REPO, GEN, VENDORED_TEMPLATES, write_json
 
 TYPES = ["cog", "pipe", "shaft"]
 POSITIONS = ["ground", "wall"]
 
-TEMPLATE = REPO / "code_references" / "Create" / "src" / "generated" / "resources" / "assets" / "create" / "blockstates" / "wooden_bracket.json"
+TEMPLATE = VENDORED_TEMPLATES / "wooden_bracket.json"
 
 
 def render_blockstate(template_text: str, wood: str) -> str:
@@ -75,7 +80,9 @@ def write_blockstate(wood: str, rendered: str) -> Path:
 
 def main() -> int:
     if not TEMPLATE.exists():
-        raise SystemExit(f"Missing template: {TEMPLATE}")
+        raise SystemExit(
+            f"Missing template: {TEMPLATE} — it ships with the repo, next to this script."
+        )
 
     template_text = TEMPLATE.read_text()
     # JSON sanity: make sure the template itself parses — catch corruption early.

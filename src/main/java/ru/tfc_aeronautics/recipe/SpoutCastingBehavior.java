@@ -13,11 +13,16 @@ import net.dries007.tfc.common.component.mold.IMold;
 import net.dries007.tfc.common.recipes.CastingRecipe;
 
 /**
- * Lets Create's spout execute TFC's casting recipes: when the spout is placed above
- * a mold table holding an empty mold, and the spout's tank contains the molten metal
- * the matching {@code tfc:casting} recipe wants, the spout pours the recipe's fluid
- * amount (100 mB for ingot molds, etc.) into the mold and immediately produces the
- * cast item into the mold table's output slot.
+ * Lets Create's spout pour molten metal from its tank into a TFC ceramic mold sitting
+ * on a mold table underneath it: each tick the spout holds the belt item under the
+ * spout, then drains up to the amount the matching {@code tfc:casting} recipe still
+ * needs (100 mB for an empty ingot mold, etc.) and fills it into the mold's fluid
+ * handler. Empty molds get filled to the recipe amount; partially-filled molds get
+ * topped up with whatever the spout can spare (down to the recipe amount) so the mold
+ * can continue on the belt with metal inside.
+ *
+ * Cast-item extraction is intentionally not handled here — the spout only fills, and
+ * any subsequent casting/cooling/extraction is left to other stations.
  *
  * Registered against TFC's {@code mold_table} block entity via
  * {@link BlockSpoutingBehaviour#BY_BLOCK_ENTITY}.
@@ -43,31 +48,36 @@ public enum SpoutCastingBehavior implements BlockSpoutingBehaviour {
         if (mold == null)
             return 0;
 
-        if (!mold.getFluidInTank(0).isEmpty())
-            return 0;
-
         CastingRecipe recipe = CastingRecipe.get(mold);
         if (recipe == null)
             return 0;
 
         int amount = recipe.getFluidIngredient().amount();
-        if (availableFluid.getAmount() < amount)
-            return 0;
-
         if (!recipe.getFluidIngredient().test(availableFluid))
             return 0;
 
-        if (simulate)
-            return amount;
+        FluidStack existing = mold.getFluidInTank(0);
+        int currentAmount = existing.getAmount();
+        int remaining = amount - currentAmount;
 
-        ItemStack result = recipe.assemble(mold);
-        if (result.isEmpty())
+        if (remaining <= 0)
             return 0;
 
-        moldTable.setOutputStack(result);
-        mold.drainIgnoringTemperature(amount, IFluidHandler.FluidAction.EXECUTE);
+        if (currentAmount > 0 && !existing.getFluid().equals(availableFluid.getFluid()))
+            return 0;
+
+        int drainable = Math.min(remaining, availableFluid.getAmount());
+        if (drainable <= 0)
+            return 0;
+
+        if (simulate)
+            return drainable;
+
+        FluidStack toFill = new FluidStack(availableFluid.getFluid(), drainable);
+        int filled = mold.fill(toFill, IFluidHandler.FluidAction.EXECUTE);
+
         moldTable.markForSync();
 
-        return amount;
+        return filled;
     }
 }

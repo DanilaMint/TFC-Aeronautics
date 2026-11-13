@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "B": {
+      "item": "tfc:brass_mechanisms"
+    },
+    "E": {
+      "item": "simulated:engine_assembly"
+    },
+    "M": {
+      "item": "tfc_aeronautics:metal/tight_sheet/copper"
+    },
+    "S": {
+      "item": "tfc_aeronautics:composite"
+    }
+  },
+  "pattern": [
+    " B ",
+    "MEM",
+    " S "
+  ],
+  "result": {
+    "count": 1,
+    "id": "simulated:red_portable_engine"
+  }
+}

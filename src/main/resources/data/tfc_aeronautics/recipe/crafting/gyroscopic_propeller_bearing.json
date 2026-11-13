@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "A": {
+      "tag": "minecraft:wooden_slabs"
+    },
+    "S": {
+      "tag": "tfc_aeronautics:iron_sheet"
+    },
+    "G": {
+      "item": "simulated:gyroscopic_mechanism"
+    },
+    "B": {
+      "item": "create:brass_casing"
+    }
+  },
+  "pattern": [
+    " A ",
+    " G ",
+    " B "
+  ],
+  "result": {
+    "count": 1,
+    "id": "aeronautics:gyroscopic_propeller_bearing"
+  }
+}

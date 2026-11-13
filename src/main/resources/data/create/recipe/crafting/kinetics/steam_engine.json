@@ -1,0 +1,45 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": { "item": "tfc:metal/double_sheet/copper" },
+  "results": [
+    { "id": "create:steam_engine" }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "tfc:metal/double_sheet/copper" },
+        { "item": "create:shaft" }
+      ],
+      "results": [ { "id": "tfc:metal/double_sheet/copper" } ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "tfc:metal/double_sheet/copper" },
+        { "item": "tfc:metal/rod/steel" }
+      ],
+      "results": [ { "id": "tfc:metal/double_sheet/copper" } ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [ { "item": "tfc:metal/double_sheet/copper" } ],
+      "results": [ { "id": "tfc:metal/double_sheet/copper" } ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "tfc:metal/double_sheet/copper" },
+        { "item": "tfc:brass_mechanisms" }
+      ],
+      "results": [ { "id": "tfc:metal/double_sheet/copper" } ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [ { "item": "tfc:metal/double_sheet/copper" } ],
+      "results": [ { "id": "tfc:metal/double_sheet/copper" } ]
+    }
+  ],
+  "transitional_item": { "id": "tfc:metal/double_sheet/copper" },
+  "show_notification": false
+}

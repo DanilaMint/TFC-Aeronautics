@@ -20,6 +20,10 @@ public class Config {
             .comment("Chance that stripping (right-clicking with an axe) a resin-bearing log drops a resin clump. 0.15 = 15%.")
             .defineInRange("resinDropChance", 0.15, 0.0, 1.0);
 
+    public static final ModConfigSpec.DoubleValue LATEX_DROP_CHANCE = BUILDER
+            .comment("Chance that stripping (right-clicking with an axe) a hevea/kapok log drops a latex clump. 0.15 = 15%.")
+            .defineInRange("latexDropChance", 0.15, 0.0, 1.0);
+
     public static final ModConfigSpec.BooleanValue SHAFT_DAMAGE_ENABLED = BUILDER
             .comment("Whether touching a bare spinning shaft or cogwheel hurts. Encased ones are always safe.")
             .define("shaftDamageEnabled", true);
@@ -51,6 +55,23 @@ public class Config {
     public static final ModConfigSpec.DoubleValue SHAFT_SOUND_VOLUME = BUILDER
             .comment("Volume of the sound played when a shaft hits an entity. 0.0 = silent.")
             .defineInRange("shaftSoundVolume", 0.5, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue HEATER_SPEED_MULTIPLIER = BUILDER
+            .comment("Multiplier on heating speed for the tfc_aeronautics:heater block. "
+                    + "Scales TFC's HeatCapability.addTemp `modifier` (default 3) so the per-tick heating "
+                    + "rate (`modifier / heatCapacity`) is multiplied by this value, and scales the temperature "
+                    + "handed to HeatCapability.provideHeatTo (block above). 1.0 = as currently; "
+                    + "2.0 = roughly twice as fast heating; 0.0 = item in slot 0 (and block above) is set "
+                    + "instantly to the knob value (maxTemperature) in one tick; if a HeatingRecipe fires at that "
+                    + "temperature, it transforms the item normally. The knob must be set to at least the recipe's "
+                    + "required temperature for the recipe to fire.")
+            .defineInRange("heaterSpeedMultiplier", 1.0, 0.0, 10.0);
+
+    public static final ModConfigSpec.IntValue DISTILLATING_WARMUP_TICKS = BUILDER
+            .comment("Ticks the condenser coil spends in WARMUP before locking the tank and starting the run. "
+                    + "Any change to the tank's fluid contents while warming up restarts the timer. "
+                    + "Default 200 = 10 seconds at 20 tps.")
+            .defineInRange("distillatingWarmupTicks", 200, 0, 72000);
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 

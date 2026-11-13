@@ -1,26 +1,29 @@
 #!/usr/bin/env python3
 """
-Generate the rosin bucket item texture.
+Generate the mod's fluid bucket item textures.
 
 Composites the vanilla Minecraft empty bucket with a fluid overlay tinted
-with the rosin colour. The "fluid region" shape is derived from
+with each fluid's colour. The "fluid region" shape is derived from
 vanilla `water_bucket.png` — pixels where it differs significantly from
 the empty `bucket.png` mark the inside-of-the-bucket area where any
-fluid would be visible. Those pixels get re-tinted with rosin; pixels
-identical to the empty bucket are kept as-is.
+fluid would be visible. Those pixels get re-tinted with the fluid's RGB;
+pixels identical to the empty bucket are kept as-is.
 
-Output:
+Output (one PNG per fluid):
   src/generated/resources/assets/tfc_aeronautics/textures/item/rosin_bucket.png
+  src/generated/resources/assets/tfc_aeronautics/textures/item/ethanol_bucket.png
+  src/generated/resources/assets/tfc_aeronautics/textures/item/stillage_bucket.png
 
-The rosin colour is the same one used for the in-world fluid render —
-see `src/main/java/ru/tfc_aeronautics/client/FluidClientExtensions.java:35`.
+The fluid colours must match the in-world fluid render — keep them in sync
+with the entries in `src/main/java/ru/tfc_aeronautics/client/FluidClientExtensions.java`
+(roin is at line 35; ethanol and stillage follow).
 
 The vanilla bucket textures are read from
-  code_references/Minecraft/1.21.1/assets/minecraft/textures/item/{bucket,water_bucket}.png
-(`code_references/` is gitignored — see CLAUDE.md). If those files are
-missing, the script falls back to extracting them on the fly from a
-Minecraft 1.21.1 client jar. Override the jar path via $MC_JAR; otherwise
-the script probes the Flatpak Prism launcher location used on this dev box.
+  tmp/vanilla_textures/minecraft/item/{bucket,water_bucket}.png
+(vanilla Mojang art can't be vendored into the repo; `tmp/` is gitignored).
+If those files are missing, the script extracts them on the fly from a
+Minecraft 1.21.1 client jar. Override the jar path via $MC_JAR; otherwise the
+script probes the Flatpak Prism launcher location used on this dev box.
 """
 from __future__ import annotations
 
@@ -32,17 +35,9 @@ from PIL import Image
 
 from _common import REPO
 
-MC_ITEM_TEX = (
-    REPO
-    / "code_references"
-    / "Minecraft"
-    / "1.21.1"
-    / "assets"
-    / "minecraft"
-    / "textures"
-    / "item"
-)
-OUT = (
+MC_ITEM_TEX = REPO / "tmp" / "vanilla_textures" / "minecraft" / "item"
+
+TEXTURE_DIR = (
     REPO
     / "src"
     / "generated"
@@ -51,11 +46,15 @@ OUT = (
     / "tfc_aeronautics"
     / "textures"
     / "item"
-    / "rosin_bucket.png"
 )
 
-# Source of truth: FluidClientExtensions.java:35 — `TFCFluids.ALPHA_MASK | 0xC68A3A`.
-ROSIN_RGB: tuple[int, int, int] = (0xC6, 0x8A, 0x3A)
+# Each entry is (bucket item id, fluid RGB).
+# Keep these aligned with `src/main/java/ru/tfc_aeronautics/client/FluidClientExtensions.java`.
+FLUIDS: list[tuple[str, tuple[int, int, int]]] = [
+    ("rosin",    (0xC6, 0x8A, 0x3A)),  # honey-amber, mirrors rosin
+    ("ethanol",  (0xE8, 0xE8, 0xE8)),  # near-transparent, slightly more than vodka
+    ("stillage", (0xB5, 0x9A, 0x73)),  # pale yellow
+]
 
 # Sum-of-channel-difference threshold (0..765). Anything above this means the
 # water_bucket pixel has clearly deviated from the empty bucket pixel —
@@ -73,6 +72,10 @@ _DEFAULT_MC_JAR_CANDIDATES = (
     Path("~/.minecraft/versions/1.21.1/1.21.1.jar"),
     Path("~/Library/Application Support/minecraft/versions/1.21.1/1.21.1.jar"),
 )
+
+
+def out_path(name: str) -> Path:
+    return TEXTURE_DIR / f"{name}_bucket.png"
 
 
 def _resolve_mc_jar() -> Path:
@@ -151,10 +154,15 @@ def main() -> int:
             f"Size mismatch: {empty_path.name}={empty.size} vs {water_path.name}={water.size}"
         )
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    composite_fluid_bucket(empty, water, ROSIN_RGB).save(OUT)
-    print(f"wrote 1 PNG to {OUT.relative_to(REPO)}")
-    return 1
+    TEXTURE_DIR.mkdir(parents=True, exist_ok=True)
+    written = 0
+    for name, rgb in FLUIDS:
+        path = out_path(name)
+        composite_fluid_bucket(empty, water, rgb).save(path)
+        written += 1
+        print(f"wrote {path.relative_to(REPO)}")
+    print(f"wrote {written} PNGs total")
+    return written
 
 
 if __name__ == "__main__":

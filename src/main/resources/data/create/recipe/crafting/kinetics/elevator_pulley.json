@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "B": {
+      "item": "create:brass_casing"
+    },
+    "S": {
+      "item": "tfc:metal/sheet/wrought_iron"
+    },
+    "R": {
+      "item": "tfc:rope"
+    }
+  },
+  "pattern": [
+    "RBR",
+    "RRR",
+    "RSR"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:elevator_pulley"
+  }
+}

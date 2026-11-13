@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "W": {
+      "tag": "tfc:workbenches"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "PWP",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:crafting_blueprint"
+  }
+}

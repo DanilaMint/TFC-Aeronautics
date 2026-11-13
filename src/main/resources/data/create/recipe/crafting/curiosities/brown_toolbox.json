@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "C": { "item": "create:cogwheel" },
+    "L": { "tag": "c:leathers" },
+    "S": { "item": "tfc_aeronautics:metal/tight_sheet/brass" },
+    "W": { "tag": "c:chests/wooden" }
+  },
+  "pattern": [
+    " C ",
+    "SWS",
+    " L "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:brown_toolbox"
+  }
+}

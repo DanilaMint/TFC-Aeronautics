@@ -1,0 +1,16 @@
+{
+  "type": "tfc:anvil",
+  "ingredient": {
+    "item": "tfc:metal/rod/wrought_iron"
+  },
+  "result": {
+    "count": 2,
+    "id": "create:minecart_coupling"
+  },
+  "rules": [
+    "draw_not_last",
+    "bend_last"
+  ],
+  "apply_bonus": false,
+  "tier": 3
+}

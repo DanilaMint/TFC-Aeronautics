@@ -3,7 +3,7 @@
   "category": "misc",
   "show_notification": false,
   "key": {
-    "B": { "item": "tfc:metal/sheet/wrought_iron" },
+    "B": { "tag": "tfc_aeronautics:iron_sheet" },
     "C": { "tag": "c:chests/wooden" }
   },
   "pattern": [ "B", "C", "B" ],

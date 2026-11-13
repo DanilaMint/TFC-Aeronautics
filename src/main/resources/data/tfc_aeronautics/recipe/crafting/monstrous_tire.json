@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": { "item": "tfc_aeronautics:rubber" },
+    "T": { "item": "offroad:large_tire" }
+  },
+  "pattern": [ "RRR", "RTR", "RRR" ],
+  "result": { "count": 1, "id": "offroad:monstrous_tire" },
+  "show_notification": false
+}

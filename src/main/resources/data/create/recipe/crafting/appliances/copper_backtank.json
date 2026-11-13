@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "A": {
+      "item": "tfc_aeronautics:composite"
+    },
+    "B": {
+      "item": "create:fluid_tank"
+    },
+    "G": {
+      "item": "create:shaft"
+    },
+    "P": {
+      "tag": "c:ingots/copper"
+    }
+  },
+  "pattern": [
+    "AGA",
+    "PBP",
+    " P "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:copper_backtank"
+  }
+}

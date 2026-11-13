@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "show_notification": false,
+  "key": {
+    "A": {
+      "item": "create:item_vault"
+    },
+    "B": {
+      "tag": "c:slimeballs"
+    },
+    "C": {
+      "item": "tfc_aeronautics:composite"
+    }
+  },
+  "pattern": [
+    "B",
+    "A",
+    "C"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:package_frogport"
+  }
+}

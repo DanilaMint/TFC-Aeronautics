@@ -7,7 +7,11 @@
     "AssemblyOperatorBlockItemMixin",
     "BasinBlockEntityMixin",
     "BasinMixingFoodDataMixin",
+    "BeltInventoryCrucibleMixin",
+    "CrucibleBlockEntityMixin",
+    "FluidTankBlockEntityMixin",
     "MillstoneBlockEntityMixin",
+    "RecipeApplierHeatMixin",
     "RecipeManagerMixin"
   ],
   "injectors": {
