@@ -45,6 +45,7 @@
 35. [Тег `tfc_aeronautics:iron_sheet` — консолидация листов железа/стали](#35-тег-tfc_aeronauticsiron_sheet)
 36. [TFC Crucible: интеграция с belt / fluid_pipe / funnel / heat](#36-tfc-crucible-интеграция-с-belt--fluid_pipe--funnel--heat)
 37. [Шины offroad из резины (Rubber Tires)](#37-шины-offroad-из-резины-rubber-tires)
+38. [TFC-сундуки как хранилища конструкций Create (Mounted Storage)](#38-tfc-сундуки-как-хранилища-конструкций-create-mounted-storage)
 
 ---
 
@@ -4471,3 +4472,97 @@ recipe count остался 9236 (как без наших файлов), наш
   центральным ключом-валом (структурно аналогично `tire.json` / `large_tire.json`)
 - `code_references/Simulated-Project/offroad/.../index/OffroadItems.java` — регистрация
   `TireItem` с компонентом `TireLike.{SMALL,TIRE,LARGE,MONSTROUS}_TIRE`
+
+---
+
+## 38. TFC-сундуки как хранилища конструкций Create (Mounted Storage)
+
+Create 6.x умеет превращать блоки, поставленные на конструкцию (contraption), в
+**хранилища** — API `com.simibubi.create.api.contraption.storage.item` («Mounted Storage»).
+Ванильный сундук на конструкции: пила/харвестер/воронка складывают в него добычу, ПКМ
+открывает GUI, при разборке конструкции содержимое возвращается в сундук. TFC-сундуки
+(`tfc:wood/chest/*`, `tfc:wood/trapped_chest/*` — 40 блоков) в этом списке отсутствовали:
+на конструкции они были обычными блоками и ничего не собирали.
+
+Реализовано **одним датапак-файлом**, Java-код не потребовался:
+
+`src/main/resources/data/create/tags/block/chest_mounted_storage.json`
+
+```json
+{ "replace": false, "values": [ "tfc:wood/chest/acacia", ... 40 id ... ] }
+```
+
+Список id — из тега TFC `c:chests/wooden`
+(`code_references/TerraFirmaCraft/src/generated/resources/data/c/tags/block/chests/wooden.json`).
+
+### Почему этого достаточно
+
+Точка расширения Create — **тег**, а не Java-регистрация:
+
+- `MountedItemStorageType.REGISTRY` — `SimpleRegistry<Block, MountedItemStorageType<?>>`
+  (`api/contraption/storage/item/MountedItemStorageType.java`) с tag-провайдером
+  `TagProviderImpl` (`holder.is(tag)`). Прямая регистрация важнее провайдеров; далее по
+  приоритету — теги; последним идёт fallback (`MountedItemStorageFallbackProvider`),
+  которому нужен capability ровно класса `ItemStackHandler` (у TFC-сундука это
+  `InventoryWrapper`, поэтому fallback не подошёл бы).
+- `AllMountedStorageTypes.CHEST` = `ChestMountedStorageType`
+  (`api/contraption/storage/item/chest/ChestMountedStorageType.java`) — привязан к тегу
+  `create:chest_mounted_storage` (в Create туда входят `minecraft:chest` и
+  `minecraft:trapped_chest`).
+- `ChestMountedStorageType#getHandler`: `be instanceof Container ? new InvWrapper(container)`.
+  `TFCChestBlock extends ChestBlock`, `TFCChestBlockEntity extends ChestBlockEntity` →
+  `Container` ✓ → 18 слотов (9×2) на каждый сундук; половины двойного сундука —
+  отдельные хранилища, как и у ванильного сундука.
+- `ChestMountedStorage#unmount`: проверка `be instanceof Container && getSlots() ==
+  container.getContainerSize()` (18 == 18 ✓) → `ItemHelper.copyContents` возвращает
+  предметы в сундук в мире.
+- `ChestMountedStorage#getHandlerForMenu` читает `ChestBlock.TYPE` / `ChestBlock.FACING` —
+  у TFC-сундука эти свойства есть (наследование от `ChestBlock`), поэтому два соседних
+  TFC-сундука на конструкции дают объединённое GUI 9×4. Склейку половин в одну
+  конструкцию Create делает сам: `Contraption` (~стр. 355) берёт блоки с
+  `state.hasProperty(ChestBlock.TYPE)`.
+
+Куда сливаются предметы: `MovementBehaviour#collectOrDropItem` (пила, харвестер, роллер)
+и `FunnelMovementBehaviour#succ` (воронка) вставляют их в общий плоский инвентарь
+`contraption.getStorage().getAllItems()`, а `MountedItemStorageWrapper` раскладывает по
+конкретным хранилищам. Это общий путь и для ванильных сундуков, поэтому TFC-сундуки
+подхватят его автоматически. За сборку отвечает и общий конфиг Create
+`kinetics.moveItemsToStorage` (по умолчанию `true`).
+
+Датапак-файл лежит в нашем паке по пути `data/create/tags/block/...`; загрузчик тегов
+объединяет файлы одного id тега из разных паков, а у Create свой файл без
+`"replace": true` — ванильные сундуки остаются рабочими. Это тот же приём, что уже
+применён в проекте (`data/minecraft/tags/block/needs_stone_tool.json`,
+`data/c/tags/item/sheets/brass.json`, `data/create/recipe/**`).
+
+### Ограничения (осознанно оставлены)
+
+- **Лимит размера предмета TFC не учитывается.** `TFCChestBlockEntity#isValid`
+  (`size ≤ TFCConfig.chestMaximumItemSize`, по умолчанию `LARGE`) проверяется в мировом
+  GUI сундука, но не в generic-GUI Create: кирку или наковальню можно положить в
+  движущийся сундук, и при разборке `copyContents` запишет их через `setStackInSlot` без
+  валидации. Так же ведёт себя и ванильный сундук на конструкции. Исправление требует
+  собственного `MountedItemStorageType` (регистрация типа в `create:mounted_item_storage_type`
+  через `RegisterEvent` + `MountedItemStorageType.REGISTRY.register(block, type)` для 40
+  блоков) — отдельная задача.
+- **Песты и отложенный лут TFC** (`PestContainer`, `unpackLootTable`) на конструкции не
+  работают — так же, как у ванильного сундука.
+- **Ящики (`tfc:wood/crate/*`) и бочки (`tfc:wood/barrel/*`)** не подключены: у crate
+  capability отдаёт `InventoryItemHandler` (36 слотов) — подошло бы через
+  `create:simple_mounted_storage`, но `isItemValid` при возврате не соблюдается; у
+  barrel 3 слота + жидкость — не подходит под generic-GUI Create (нужно кратное 9 слотов).
+- **Сундук на конструкции рисуется как обычный блок** (без анимации крышки) — поведение
+  Create, не TFC.
+
+### Файлы
+
+- `src/main/resources/data/create/tags/block/chest_mounted_storage.json` — единственное
+  изменение (40 id)
+- `plans/tfc-chest-mounted-storage.md` — заметка по механике
+
+### Связь
+
+- `code_references/Create/src/main/java/com/simibubi/create/api/contraption/storage/item/` —
+  API Mounted Storage
+- `code_references/TerraFirmaCraft/src/main/java/net/dries007/tfc/common/blocks/wood/TFCChestBlock.java`
+  и `.../blockentities/TFCChestBlockEntity.java` — блок и BE TFC-сундука
