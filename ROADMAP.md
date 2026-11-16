@@ -3,7 +3,7 @@
 Статус механик мода. Каждая подсистема — отдельный файл в [`plans/`](plans/).
 Прогресс = выполнено / всего задач. ✓ — закрыто, ⏳ — в работе, ☐ — не начато.
 
-**Итого:** 306 / 382 (≈ 80 %).
+**Итого:** 329 / 406 (≈ 81 %).
 
 - [Metal Powders](plans/metal-powders.md) — 10/10 ✓
 - [Industrial Composite](plans/industrial-composite.md) — 13/13 ✓
@@ -22,6 +22,7 @@
 - [Stamping Press](plans/stamping-press.md) — 25/27 ⏳
 - [Condenser Coil](plans/condenser-coil.md) — 26/28 ⏳ (блок + модель + логика + тип рецепта `tfc_aeronautics:distillating` + миксин блокировки бака + ресурсы + JEI-категория — готово; ponder и готовые рецепты/жидкости — в следующей итерации)
 - [Spout / Casting](plans/spout-casting.md) — 3/3 ✓
+- [Basin × `tfc:barrel_instant`](plans/basin-barrel-instant.md) — 23/24 ⏳ (чаша Create сама исполняет instant-рецепты TFC; не закрыт рантайм-чек в Prism-лаунчере)
 - [Quern / Millstone Sync](plans/quern-millstone-sync.md) — 9/9 ✓
 - [Shaft Damage](plans/shaft-damage.md) — 6/7 ⏳
 - [Worldgen](plans/worldgen.md) — 46/46 ✓

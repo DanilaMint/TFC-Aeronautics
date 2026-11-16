@@ -46,6 +46,7 @@
 36. [TFC Crucible: интеграция с belt / fluid_pipe / funnel / heat](#36-tfc-crucible-интеграция-с-belt--fluid_pipe--funnel--heat)
 37. [Шины offroad из резины (Rubber Tires)](#37-шины-offroad-из-резины-rubber-tires)
 38. [TFC-сундуки как хранилища конструкций Create (Mounted Storage)](#38-tfc-сундуки-как-хранилища-конструкций-create-mounted-storage)
+39. [Чаша Create выполняет `tfc:barrel_instant` рецепты](#39-чаша-create-выполняет-tfcbarrel_instant-рецепты)
 
 ---
 
@@ -4566,3 +4567,171 @@ Create 6.x умеет превращать блоки, поставленные 
   API Mounted Storage
 - `code_references/TerraFirmaCraft/src/main/java/net/dries007/tfc/common/blocks/wood/TFCChestBlock.java`
   и `.../blockentities/TFCChestBlockEntity.java` — блок и BE TFC-сундука
+
+---
+
+## 39. Чаша Create выполняет `tfc:barrel_instant` рецепты
+
+Чаша Create (`create:basin`) умеет работать как TFC-бочка для рецептов типа
+`tfc:barrel_instant`: положил в чашу предмет + нужную жидкость — на следующем
+серверном тике предмет переработался, жидкость превратилась, результат лежит в
+output-инвентаре чаши.
+
+Механика нужна, потому что простые TFC-переработки (соль → солёная вода, известь →
+известковая вода, земля + вода → грязь, запечатанная глина → глиняные шарики,
+переработка оливок и рапса, чистка сети/банки/миски) иначе доступны только через
+ванильную TFC-бочку. Отдельно это даёт `tfc_aeronautics:composite` — предмет,
+которым в датапаке подменён `create:andesite_alloy` (см. §19).
+
+### Точка подключения
+
+Никаких mixin'ов: используется публичный API Create
+`com.simibubi.create.api.event.BlockEntityBehaviourEvent`.
+
+`BasinBarrelInstantCompat` (подписан на игровую шину NeoForge, GAME-bus по
+умолчанию — как `depot/DepotCraftHandler`):
+
+```java
+@EventBusSubscriber(modid = TFCAeronautics.MOD_ID)
+public final class BasinBarrelInstantCompat
+{
+    @SubscribeEvent
+    public static void onBlockEntityBehaviour(BlockEntityBehaviourEvent event)
+    {
+        event.forType(AllBlockEntityTypes.BASIN.get(), be -> event.attach(new BasinBarrelInstantBehaviour(be)));
+    }
+}
+```
+
+Событие постится ровно один раз на экземпляр блок-энтити — при первой загрузке
+NBT или, для только что поставленного блока, в `initialize()` первого тика
+(`SmartBlockEntity:64-72`, `:110-120`). Поведение, добавленное через
+`event.attach`, дальше живёт как обычное create-поведение: его тикают,
+инициализируют и синхронизируют.
+
+`BehaviourType` обязан быть **единственным** `static final` экземпляром: карта
+поведений Create — `Reference2ObjectArrayMap`, ключи сравниваются по ссылке, а
+`BehaviourType` не переопределяет `equals`.
+
+### Что именно делает чаша
+
+`BasinBarrelInstantBehaviour#tick()` (серверная часть):
+
+1. **Гейт по оператору.** Если на 2 блока выше чаши стоит
+   `BasinOperatingBlockEntity` (механический миксер или пресс) — чаша молчит.
+   Create-машина вытягивает предметы из того же `inputInventory`, так что без
+   этого гейта они бы дрались за один и тот же стак.
+2. **Быстрый выход:** input-инвентарь пуст → выход.
+3. **Снимок состояния** (9 слотов + содержимое бака). Если ничего не изменилось
+   с прошлого тика — выход, рецепты не ищутся зря
+   (`RecipeManager#getAllRecipesFor` делает `List.copyOf` на каждый вызов).
+4. **Поиск совпадения** — перебор слотов × рецептов
+   `level.getRecipeManager().getAllRecipesFor(TFCRecipeTypes.BARREL_INSTANT.get())`:
+   * предмет: `recipe.getInputItem().ingredient().test(stack)` — **сырой**
+     `Ingredient`, без проверки количества (`SizedIngredient#test` включает её,
+     а `count` нам нужен отдельно для расчёта партий);
+   * жидкость: `recipe.getInputFluid().ingredient().test(fluidStack)`;
+   * рабочая жидкость ищется по **обоим** сегментам `inputTank`: у бака
+     `enforceVariety`, поэтому нужная жидкость может лежать не в первом сегменте.
+5. **Расчёт партий:**
+   `batches = min(жидкость / inputFluid.amount(), предметы / inputItem.count())`.
+6. **Подгонка под вместимость выхода.** `outputTank` вмещает максимум 1000 mB
+   одной жидкости, `outputInventory` — 9×64. Поэтому multiplier подбирается
+   перебором вниз: берётся первый вариант, для которого
+   `basin.acceptOutputs(items, fluids, true)` вернул `true`. Если не влезает даже
+   одна партия — ничего не делаем (ждём, пока игрок освободит output-зону).
+7. **Выполнение:**
+   * предметы списываются через
+     `input.setStackInSlot(slot, live.copyWithCount(live.getCount() - count * itemCount))`
+     — именно `setStackInSlot`, **не** `extractItem`: у `BasinInventory`
+     `stackNonStackables = true`, и `SmartInventory#extractItem` зажимает
+     количество до `maxStackSize`, тихо ломая расчёт партий;
+   * жидкость сливается через
+     `basin.inputTank.getCapability().drain(fluid.copyWithAmount(...), EXECUTE)`;
+   * результат выдаётся через `basin.acceptOutputs(items, fluids, false)`;
+   * звук — `Helpers.playSound(level, pos, recipe.getCompleteSound())` (TFC).
+8. **Снимок** обновляется только если рецепт не нашёлся. Если рецепт выполнен —
+   снимок не обновляется: содержимое изменилось, и на следующем тике проверка
+   повторится. Это и даёт цепочки рецептов (`process_olives` → `clean_jute_net`).
+
+### Отличия от TFC-бочки
+
+| | TFC-бочка | Чаша Create |
+|---|---|---|
+| Соотношение предметов и жидкости | `moreItemsThanFluid`: жидкости должно быть не больше, чем предметов (1 соль на 125 mB воды — не сработает, нужно 8 солей на 1000 mB) | не требуется: 1 соли на ведро воды достаточно |
+| Лишняя жидкость | уничтожается (`assembleOutputs` сливает весь бак и кладёт обратно только выход) | остаётся в чаше |
+| Итог | 1 соль + ведро воды → **ничего не происходит**; 8 солей + ведро воды → ведро солёной воды | 1 соль + ведро воды → 125 mB солёной воды + 875 mB воды; следующая соль даст ещё 125 mB |
+| Прогресс | у `barrel_sealed` есть таймер; `barrel_instant` — мгновенно | мгновенно, на следующем серверном тике |
+
+Механику TFC мы **не** переиспользуем: `InstantBarrelRecipe#matches(BarrelInventory)`
+и `BarrelRecipe#assembleOutputs(BarrelInventory)` не вызываются, интерфейс
+`BarrelInventory` не реализуется. Данные рецепта (ингредиент, жидкость,
+`ItemStackProvider` с модификаторами вида `tfc:empty_bowl`, звук) берутся из
+самого TFC-объекта `InstantBarrelRecipe`.
+
+### Какие рецепты работают
+
+Все `tfc:barrel_instant` — 20 ванильных TFC + `tfc_aeronautics:barrel/dry_composite`:
+
+| Рецепт | Вход | Выход |
+|---|---|---|
+| `salt_water` | вода 125 mB + `tfc:powder/salt` | `tfc:salt_water` 125 mB |
+| `limewater` | вода 500 mB + `tfc:powder/lime` **или** `tfc:powder/flux` | `tfc:limewater` 500 mB |
+| `clay_ball` | вода 100 mB + `tfc:hardened_clay` | 4 × `minecraft:clay_ball` |
+| `mud/<soil>` × 8 | вода 250 mB + `tfc:dirt/<soil>` | `tfc:mud/<soil>` |
+| `process_olives` / `process_canola` | `tfc:olive_oil_water` / `tfc:canola_oil_water` 250 mB + `tfc:jute_net` | 50 mB масла + `tfc:dirty_jute_net` |
+| `clean_jute_net` | вода 100 mB + `tfc:dirty_jute_net` | `tfc:jute_net` |
+| `clean_jar` | вода 100 mB + банка с консервами | пустая банка |
+| `clean_bowl` | вода 100 mB + тарелка супа/салата | пустая тарелка |
+| `tfc_aeronautics:barrel/dry_composite` | `tfc:limewater` 25 mB + `tfc_aeronautics:dry_composite` | `tfc_aeronautics:composite` |
+
+Не поддерживается:
+
+* **Охлаждающие рецепты** (`water_cooling`, `salt_water_cooling`,
+  `olive_oil_cooling`, `canola_oil_cooling`) — у них ингредиент `tfc:heat`,
+  они матчат любой горячий предмет. В чаше с каплей воды любой горячий предмет
+  начал бы остывать на 5° за тик, что конфликтует с Create-heat и миксером.
+  Фильтр — по типу ингредиента:
+  `recipe.getInputItem().ingredient().getCustomIngredient() instanceof HeatIngredient`
+  (ровно тот же предикат, что использует сам TFC в `JEIIntegration`).
+* **`tfc:barrel_instant_fluid`** (`brine`, `milk_vinegar`) — жидкость + жидкость.
+  Требует «подлить жидкость из контейнера в бак», такого входа у чаши нет.
+
+### Ограничения
+
+* **Спут Create в чашу не наливает.** `create:basin` не зарегистрирован в
+  `AllBlockSpoutingBehaviours`, поэтому вода идёт ведром (ПКМ), трубой/депо по
+  `Capabilities.FluidHandler.BLOCK` или воронкой.
+* **Предмет ПКМ-вставить в чашу нельзя** — Create 6.0.11 этого не умеет
+  (в `BasinBlock#useItemOn` только ведро/бутылка/губка). Предметы попадают в
+  чашу ванильными путями: падение `ItemEntity` (`BasinBlock#updateEntityAfterFallOn`),
+  воронка/хоппер/лента, рука Create.
+* **Забрать предмет из чаши пустой рукой нельзя** — баг порта Create 6.0.11:
+  `BasinBlock` не переопределяет `useWithoutItem`, поэтому ветка «пустая рука →
+  вернуть предметы» из `useItemOn` мертва. Результат достаётся воронкой/лентой
+  из output-инвентаря, жидкость — ведром.
+* **Чаша вмещает максимум 1000 mB одной жидкости** (`enforceVariety` у
+  `inputTank`/`outputTank`). Вторая жидкость кладётся во второй сегмент.
+* **При `FACING != DOWN`** (гаечным ключом, если рядом лента) результат уходит в
+  `spoutputBuffer` и выталкивается в ленту под чашей, а не в output-инвентарь —
+  стандартное поведение Create.
+* **Миксер/пресс над чашей блокирует переработку** (см. п. 1 алгоритма).
+* **`neoforge:compound` в TFC-рецептах — это OR, а не AND**: `limewater`
+  получается из извести **или** флюса, а не из обоих сразу.
+* Рецепты `tfc:barrel_instant` видны в JEI только у TFC-бочки — под чашу JEI
+  их не показывает. Отдельный JEI-плагин не делался.
+
+### Файлы
+
+- `src/main/java/ru/tfc_aeronautics/basin/BasinBarrelInstantBehaviour.java` — поведение
+- `src/main/java/ru/tfc_aeronautics/basin/BasinBarrelInstantCompat.java` — подписка
+- `plans/basin-barrel-instant.md` — план по механике
+
+### Связь
+
+- `code_references/TerraFirmaCraft/src/main/java/net/dries007/tfc/common/recipes/InstantBarrelRecipe.java`
+  и `BarrelRecipe.java` — исходная семантика бочки
+- `code_references/TerraFirmaCraft/src/main/java/net/dries007/tfc/common/blockentities/BarrelBlockEntity.java`
+  — как бочка исполняет instant-рецепты (`needsInstantRecipeUpdate` → `assembleOutputs`)
+- `code_references/Create/src/main/java/com/simibubi/create/content/processing/basin/BasinBlockEntity.java`
+  — `acceptOutputs`, `inputTank`, `inputInventory`
