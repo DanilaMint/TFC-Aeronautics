@@ -14,6 +14,7 @@ import ru.tfc_aeronautics.burlap.BurlapRegistration;
 import ru.tfc_aeronautics.chain.ChainConveyorRegistration;
 import ru.tfc_aeronautics.condenser_coil.CondenserCoilRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
+import ru.tfc_aeronautics.crop.KokSagyzRegistration;
 import ru.tfc_aeronautics.drill_head.DrillHeadRegistration;
 import ru.tfc_aeronautics.fluid.FluidBlocks;
 import ru.tfc_aeronautics.fluid.FluidItems;
@@ -77,6 +78,7 @@ public class TFCAeronautics {
         WoodenBracketRegistration.register(modEventBus);
         WeldingDepotRegistration.register(modEventBus);
         CeramicRegistration.register(modEventBus);
+        KokSagyzRegistration.register(modEventBus);
         CreativeTabs.register(modEventBus);
         RecipeRegistration.register(modEventBus);
 

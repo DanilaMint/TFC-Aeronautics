@@ -201,6 +201,10 @@ GROUPS: list[SizeGroup] = [
         "copper", "wrought_iron", "steel", "brass"
     ]]),
 
+    # Kok-Saghyz crop
+    SizeGroup("light", "small", "tfc_aeronautics", [
+        "kok_sagyz_roots", "wild_crop/kok_sagyz", "seeds/kok_sagyz"
+    ]),
     SizeGroup("light", "normal", "simulated", [
         "spring", "rope_coupling", "gyroscopic_mechanism", "engine_assembly", "redstone_plate"
     ]),

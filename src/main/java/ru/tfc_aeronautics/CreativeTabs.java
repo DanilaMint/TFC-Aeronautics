@@ -16,6 +16,7 @@ import ru.tfc_aeronautics.chain.ChainConveyorRegistration;
 import ru.tfc_aeronautics.ceramic.CeramicRegistration;
 import ru.tfc_aeronautics.condenser_coil.CondenserCoilRegistration;
 import ru.tfc_aeronautics.composite.CompositeRegistration;
+import ru.tfc_aeronautics.crop.KokSagyzRegistration;
 import ru.tfc_aeronautics.drill_head.DrillHeadRegistration;
 import ru.tfc_aeronautics.fluid.FluidItems;
 import ru.tfc_aeronautics.harvester_blade.HarvesterBladeRegistration;
@@ -68,6 +69,9 @@ public final class CreativeTabs
                 WoodenBracketRegistration.BRACKETS.keySet().forEach(wood -> output.accept(WoodenBracketRegistration.BRACKET_ITEMS.get(wood).get()));
                 WeldingDepotRegistration.DEPOT_ITEMS.values().forEach(i -> output.accept(i.get()));
                 output.accept(CeramicRegistration.UNFIRED_BASIN.get());
+                output.accept(KokSagyzRegistration.SEEDS.get());
+                output.accept(KokSagyzRegistration.ROOTS.get());
+                output.accept(KokSagyzRegistration.WILD_CROP_ITEM.get());
             })
             .build());
 

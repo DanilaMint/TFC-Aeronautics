@@ -9,6 +9,7 @@ Usage:
   python3 generate/generate.py --only milling    # create:milling recipes
   python3 generate/generate.py --only quern      # quern milling (grain → flour)
   python3 generate/generate.py --only item-size  # data/tfc_aeronautics/tfc/item_size/*.json
+  python3 generate/generate.py --only kok-sagyz  # crop assets, data and field guide page
   python3 generate/generate.py --only brackets-assets,brackets-textures  # multiple groups
 
 Each sub-script is independently runnable. The orchestrator just runs selected
@@ -21,6 +22,7 @@ import time
 from generate_bucket_textures import main as gen_buckets
 from generate_casing_recipes import main as gen_casing
 from generate_item_size import main as gen_item_size
+from generate_kok_sagyz import main as gen_kok_sagyz
 from generate_milling_recipes import main as gen_milling
 from generate_mixing_recipes import main as gen_mixing
 from generate_pressing_double_ingot_recipes import main as gen_pressing
@@ -40,6 +42,7 @@ LEAVES: list[tuple[str, callable]] = [
     ("brackets-textures", gen_textures),
     ("buckets",           gen_buckets),
     ("item-size",         gen_item_size),
+    ("kok-sagyz",         gen_kok_sagyz),
     ("milling",           gen_milling),
     ("mixing",            gen_mixing),
     ("pressing",          gen_pressing),
@@ -62,6 +65,7 @@ GROUPS: dict[str, list[str]] = {
     "brackets-textures": ["brackets-textures"],
     "buckets":           ["buckets"],
     "item-size":         ["item-size"],
+    "kok-sagyz":         ["kok-sagyz"],
     "milling":           ["milling"],
     "mixing":            ["mixing"],
     "pressing":          ["pressing"],

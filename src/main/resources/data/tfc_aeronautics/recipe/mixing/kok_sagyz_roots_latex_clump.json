@@ -1,0 +1,10 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    { "item": "tfc_aeronautics:kok_sagyz_roots" },
+    { "type": "neoforge:single", "amount": 10, "fluid": "tfc_aeronautics:ethanol" }
+  ],
+  "results": [
+    { "count": 1, "id": "tfc_aeronautics:latex_clump" }
+  ]
+}
