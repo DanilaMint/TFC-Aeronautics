@@ -43,8 +43,8 @@ Output (under src/generated/resources/):
   data/minecraft/tags/block/compostables.json                     (additive)
   assets/tfc/patchouli_books/field_guide/{en_us,ru_ru}/entries/food/kok_sagyz.json
 
-The textures themselves are placeholders and live in src/main/resources - see
-generate_kok_sagyz_textures.py.
+The textures themselves are placeholders and live in src/main/resources, so they
+are tracked and can be repainted by hand - this script does not touch them.
 """
 from __future__ import annotations
 
