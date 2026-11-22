@@ -1,0 +1,22 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:unstitch",
+      "resource": "tfc_aeronautics:stamping_press/atlas",
+      "divisor_x": 64,
+      "divisor_y": 64,
+      "regions": [
+        { "sprite": "tfc_aeronautics:block/stamping_press_north", "x": 0, "y": 0, "width": 16, "height": 12 },
+        { "sprite": "tfc_aeronautics:block/stamping_press_south", "x": 16, "y": 0, "width": 16, "height": 12 },
+        { "sprite": "tfc_aeronautics:block/stamping_press_top", "x": 32, "y": 0, "width": 16, "height": 14 },
+        { "sprite": "tfc_aeronautics:block/stamping_press_east", "x": 48, "y": 0, "width": 14, "height": 12 },
+        { "sprite": "tfc_aeronautics:block/stamping_press_west", "x": 0, "y": 16, "width": 14, "height": 12 },
+        { "sprite": "tfc_aeronautics:block/stamping_press_shaft", "x": 16, "y": 16, "width": 4, "height": 16 },
+        { "sprite": "tfc_aeronautics:block/stamping_press_head_peen_side", "x": 32, "y": 16, "width": 8, "height": 2 },
+        { "sprite": "tfc_aeronautics:block/stamping_press_head_peen_top", "x": 48, "y": 16, "width": 8, "height": 8 },
+        { "sprite": "tfc_aeronautics:block/stamping_press_head_rod_side", "x": 0, "y": 32, "width": 6, "height": 22 },
+        { "sprite": "tfc_aeronautics:block/stamping_press_head_rod_top", "x": 16, "y": 32, "width": 6, "height": 6 }
+      ]
+    }
+  ]
+}

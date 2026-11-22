@@ -12,8 +12,9 @@
 - [x] blockstate `assets/tfc_aeronautics/blockstates/stamping_press.json`
 
 ## Текстурирование
-- [x] 6 граней: `assets/tfc_aeronautics/textures/block/stamping_press_{top,north,south,east,west}.png` + `stamping_press_shaft.png`
-- [x] 4 head: `assets/tfc_aeronautics/textures/block/stamping_press_head_{peen_side,peen_top,rod_side,rod_top}.png`
+- [x] 10 текстур в одном атласе: `assets/tfc_aeronautics/textures/stamping_press/atlas.png` (64×64, плитки по сетке 16)
+  + `assets/minecraft/atlases/blocks.json` — source `minecraft:unstitch` режет атлас на 10 спрайтов
+  `tfc_aeronautics:block/stamping_press_*` (те же id, что в моделях — модели не менялись)
 
 ## Моделирование
 - [x] block `assets/tfc_aeronautics/models/block/stamping_press.json`
